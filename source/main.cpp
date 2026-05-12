@@ -4,6 +4,8 @@
 #include "engine/game.hpp"
 #include "engine/includes.hpp"
 #include "scenes/mainScene.hpp"
+#include "specialized/clickableRedBox.hpp"
+#include "specialized/colourChangeBox.hpp"
 
 #include <exception>
 
@@ -23,6 +25,8 @@ int main(int argumentCount, const char *arguments[]) {
     try {
         game.registerScene<MainScene>("main");
         Box::registerType();
+        ClickableRedBox::registerType();
+        ColourChangeBox::registerType();
         Text::registerType();
         Texture::registerType();
         game.queueScene("main");

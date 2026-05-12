@@ -5,30 +5,13 @@
 
 #include <stdexcept>
 
-void Text::registerType() {
-    Node::registerType<Text>("Text");
+Text::Text() {
+    setRenderFunction(
+            [this](SDL_Renderer *renderer) { renderSelf(renderer); });
 }
 
-void Text::render(SDL_Renderer *renderer) {
-    if (textureDirty) {
-        rebuildTexture(renderer);
-    }
-
-    if (texture == nullptr) {
-        Node::render(renderer);
-        return;
-    }
-
-    SDL_Rect destination{
-            position.x,
-            position.y,
-            textureSize.x,
-            textureSize.y,
-    };
-
-    SDL_RenderCopy(renderer, texture, nullptr, &destination);
-
-    Node::render(renderer);
+void Text::registerType() {
+    Node::registerType<Text>("Text");
 }
 
 void Text::setProperty(const std::string &name, const std::string &value) {
@@ -62,6 +45,30 @@ void Text::setProperty(const std::string &name, const std::string &value) {
     }
 
     Node::setProperty(name, value);
+}
+
+SDL_Point Text::getPosition() const {
+    return position;
+}
+
+void Text::renderSelf(SDL_Renderer *renderer) {
+    if (textureDirty) {
+        rebuildTexture(renderer);
+    }
+
+    if (texture == nullptr) {
+        return;
+    }
+
+    const SDL_Point position = getGlobalPosition();
+    SDL_Rect destination{
+            position.x,
+            position.y,
+            textureSize.x,
+            textureSize.y,
+    };
+
+    SDL_RenderCopy(renderer, texture, nullptr, &destination);
 }
 
 void Text::rebuildTexture(SDL_Renderer *renderer) {

@@ -160,7 +160,7 @@ void Game::run() {
             continue;
         }
 
-        activeScene->update(deltaTime);
+        activeScene->process(deltaTime);
 
         SDL_SetRenderDrawColor(SDLRenderer.get(), 0, 0, 0, 255);
         SDL_RenderClear(SDLRenderer.get());

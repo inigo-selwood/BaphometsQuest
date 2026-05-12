@@ -6,24 +6,25 @@
 
 class Text : public Node {
   public:
-    Text() = default;
+    Text();
 
     static void registerType();
-
-    void render(SDL_Renderer *renderer) override;
 
     void setProperty(
             const std::string &name, const std::string &value) override;
 
   private:
+    SDL_Point getPosition() const override;
+
+    void renderSelf(SDL_Renderer *renderer);
     void rebuildTexture(SDL_Renderer *renderer);
 
     SDL_Color colour{255, 255, 255, 255};
-    SDL_Point position{0, 0};
-    int fontSize = 8;
-    bool textureDirty = true;
     std::string fontPath;
+    int fontSize = 8;
+    SDL_Point position{0, 0};
     std::string text;
     SDL_Texture *texture = nullptr;
+    bool textureDirty = true;
     SDL_Point textureSize{0, 0};
 };
