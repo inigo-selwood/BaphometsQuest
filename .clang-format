@@ -1,0 +1,15 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 79
+ContinuationIndentWidth: 8
+AlignAfterOpenBracket: DontAlign
+AlignOperands: DontAlign
+BinPackArguments: false
+BreakBeforeBinaryOperators: NonAssignment
+PenaltyBreakBeforeFirstCallParameter: 0
+DerivePointerAlignment: false
+PointerAlignment: Right
+ReferenceAlignment: Right
+AllowShortFunctionsOnASingleLine: Empty

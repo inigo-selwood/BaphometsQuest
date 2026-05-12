@@ -1,0 +1,31 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Configure and build the game
+    sources:
+      - CMakeLists.txt
+      - source/**/*.cpp
+      - source/**/*.hpp
+    generates:
+      - build/untitled_game
+    cmds:
+      - cmake -S . -B build
+      - cmake --build build
+
+  clean:
+    desc: Remove generated build output
+    cmds:
+      - rm -rf build
+
+  format:
+    desc: Format source files
+    cmds:
+      - find source -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i
+
+  run:
+    desc: Build and run the game
+    deps:
+      - build
+    cmds:
+      - ./build/untitled_game
