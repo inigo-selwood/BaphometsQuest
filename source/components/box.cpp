@@ -1,55 +1,66 @@
 #include "box.hpp"
 
-#include "../engine/property.hpp"
+#include "../engine/properties/property.hpp"
 
 Box::Box() {
-    setRenderFunction(
-            [this](SDL_Renderer *renderer) { renderSelf(renderer); });
+    this->setRenderFunction([this](SDL_Renderer *renderer) {
+        this->renderSelf(renderer);
+    });
 }
 
 void Box::registerType() {
-    Node::registerType<Box>("Box");
+    Engine::Node::registerType<Box>("Box");
 }
 
 void Box::setColour(SDL_Color newColour) {
-    colour = newColour;
+    this->colour = newColour;
 }
 
 void Box::setProperty(const std::string &name, const std::string &value) {
-    if (name == "colour") {
-        colour = Property::parseColour(value, name);
+    if(name == "colour") {
+        this->colour = Engine::Property::parseColour(value, name);
         return;
     }
 
-    if (name == "size") {
-        size = Property::parsePoint(value, name);
+    if(name == "size") {
+        this->size = Engine::Property::parsePoint(value, name);
         return;
     }
 
-    if (name == "position") {
-        position = Property::parsePoint(value, name);
+    if(name == "position") {
+        this->position = Engine::Property::parsePoint(value, name);
         return;
     }
 
-    Node::setProperty(name, value);
+    Engine::Node::setProperty(name, value);
 }
 
 SDL_Point Box::getPosition() const {
-    return position;
+    return this->position;
 }
 
 bool Box::isPointInside(SDL_Point point) const {
-    const SDL_Point globalPosition = getGlobalPosition();
+    const SDL_Point globalPosition = this->getGlobalPosition();
 
-    return point.x >= globalPosition.x && point.x < globalPosition.x + size.x
-            && point.y >= globalPosition.y
-            && point.y < globalPosition.y + size.y;
+    return point.x >= globalPosition.x
+        && point.x < globalPosition.x + this->size.x
+        && point.y >= globalPosition.y
+        && point.y < globalPosition.y + this->size.y;
 }
 
 void Box::renderSelf(SDL_Renderer *renderer) {
-    const SDL_Point globalPosition = getGlobalPosition();
-    SDL_Rect rectangle{globalPosition.x, globalPosition.y, size.x, size.y};
+    const SDL_Point globalPosition = this->getGlobalPosition();
+    SDL_Rect rectangle{globalPosition.x,
+        globalPosition.y,
+        this->size.x,
+        this->size.y};
 
-    SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
+    SDL_SetRenderDrawColor(
+        renderer,
+        this->colour.r,
+        this->colour.g,
+        this->colour.b,
+        this->colour.a
+    );
     SDL_RenderFillRect(renderer, &rectangle);
 }

@@ -1,17 +1,20 @@
 #pragma once
 
-#include "../engine/node.hpp"
+#include "../engine/scene/node.hpp"
 
 #include <string>
 
-class Text : public Node {
+/** Rendered text node backed by cached SDL_ttf textures. */
+class Text : public Engine::Node {
   public:
     Text();
 
+    /** Register the Text XML node type. */
     static void registerType();
 
-    void setProperty(
-            const std::string &name, const std::string &value) override;
+    /** Apply text, font, colour, size, and position properties from XML. */
+    void
+    setProperty(const std::string &name, const std::string &value) override;
 
   private:
     SDL_Point getPosition() const override;

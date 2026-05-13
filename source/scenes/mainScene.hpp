@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../engine/scene.hpp"
+#include "../engine/scene/scene.hpp"
 
-class MainScene : public Scene {
+/** Initial scene loaded from resources/scenes/main.xml. */
+class MainScene : public Engine::Scene {
   public:
     MainScene() = default;
     ~MainScene() override = default;

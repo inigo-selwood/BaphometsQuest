@@ -2,6 +2,9 @@
 
 #include "node.hpp"
 
+namespace Engine {
+
+/** Root node type for a playable scene. */
 class Scene : public Node {
   public:
     ~Scene() override = default;
@@ -9,3 +12,5 @@ class Scene : public Node {
   protected:
     Scene() = default;
 };
+
+} // namespace Engine

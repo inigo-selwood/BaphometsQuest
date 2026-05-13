@@ -7,8 +7,10 @@ tasks:
       - CMakeLists.txt
       - source/**/*.cpp
       - source/**/*.hpp
+      - resources/**/*
     generates:
       - build/untitled_game
+      - build/resources
     cmds:
       - cmake -S . -B build
       - cmake --build build
@@ -18,10 +20,28 @@ tasks:
     cmds:
       - rm -rf build
 
+  debug:
+    desc: Build and run the game with debug logging
+    deps:
+      - build
+    cmds:
+      - ./build/untitled_game debug
+
   format:
-    desc: Format source files
+    desc: Format source and resource files
     cmds:
       - find source -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i
+      - |
+        find resources -name '*.xml' -type f | while read -r file; do
+          tidy -config .tidyrc -m "$file"
+        done
+
+  help:
+    desc: Build and show app command help
+    deps:
+      - build
+    cmds:
+      - ./build/untitled_game --help
 
   run:
     desc: Build and run the game
@@ -29,3 +49,17 @@ tasks:
       - build
     cmds:
       - ./build/untitled_game
+
+  tilemap:
+    desc: Build and run the tilemap editor
+    deps:
+      - build
+    cmds:
+      - ./build/untitled_game tilemap
+
+  tileset:
+    desc: Build and run the tileset editor
+    deps:
+      - build
+    cmds:
+      - ./build/untitled_game tileset

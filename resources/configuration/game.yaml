@@ -1,0 +1,24 @@
+window:
+    title: Untitled Game
+    logical-width: 256
+    logical-height: 192
+    scale: 3
+    resizable: false
+
+render:
+    scale-quality: nearest
+    clear-colour: "#000000"
+
+audio:
+    frequency: 44100
+    channels: 2
+    chunk-size: 2048
+
+frame-rate:
+    target: 24
+    minimum: 12
+    step: 1
+    overrun-tolerance-ms: 2
+    underrun-headroom-ms: 4
+    overrun-hysteresis-frames: 12
+    underrun-hysteresis-frames: 90

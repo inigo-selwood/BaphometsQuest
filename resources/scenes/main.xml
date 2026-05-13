@@ -1,22 +1,23 @@
+<?xml version="1.0" encoding="us-ascii"?>
 <Scene>
-    <ColourChangeBox name="blueBox"
-                     colour="#409cff"
-                     size="96,64"
-                     position="80,64">
-        <ClickableRedBox name="redBox"
-                         colour="#ff4040"
-                         size="32,24"
-                         position="8,8">
-            <Text name="helloWorld"
-                  colour="#ffffff"
-                  font="resources/fonts/Early GameBoy.ttf"
-                  position="8,8"
-                  size="8"
-                  text="Hello world" />
-        </ClickableRedBox>
-    </ColourChangeBox>
-    <Texture name="tilesetPreview"
-             path="resources/textures/tileset.png"
-             position="16,16"
-             region="0,0,16,16" />
+  <ColourChangeBox name="blueBox"
+                   colour="#409cff"
+                   size="96,64"
+                   position="80,64">
+    <ClickableRedBox name="redBox"
+                     colour="#ff4040"
+                     size="32,24"
+                     position="8,8">
+      <Text name="helloWorld"
+            colour="#ffffff"
+            font="resources/fonts/Early GameBoy.ttf"
+            position="8,8"
+            size="8"
+            text="Hello world" />
+    </ClickableRedBox>
+  </ColourChangeBox>
+  <Texture name="tilesetPreview"
+           path="resources/textures/tileset.png"
+           position="16,16"
+           region="0,0,16,16" />
 </Scene>
