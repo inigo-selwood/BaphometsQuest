@@ -18,6 +18,7 @@ void Texture::registerType() {
 void Texture::setProperty(const std::string &name, const std::string &value) {
     if(name == "path") {
         this->path = value;
+        this->textureID.reset();
         return;
     }
 
@@ -43,14 +44,17 @@ void Texture::renderSelf(SDL_Renderer *renderer) {
         throw std::runtime_error("Texture node is missing required path.");
     }
 
-    const auto &textureAsset =
-        Engine::Game::getInstance().getAssets().getImageTexture(
-            renderer,
-            this->path
-        );
+    auto &assets = Engine::Game::getInstance().getAssets();
+
+    if(!this->textureID.has_value()) {
+        this->textureID = assets.loadImageTexture(renderer, this->path);
+    }
+
+    auto &texture = assets.get<SDL_Texture>(*this->textureID);
+    const SDL_Point textureSize = assets.getTextureSize(*this->textureID);
 
     const SDL_Rect source = this->region.w == 0 || this->region.h == 0
-        ? SDL_Rect{0, 0, textureAsset.size.x, textureAsset.size.y}
+        ? SDL_Rect{0, 0, textureSize.x, textureSize.y}
         : this->region;
     const SDL_Point position = this->getGlobalPosition();
     SDL_Rect destination{
@@ -60,5 +64,5 @@ void Texture::renderSelf(SDL_Renderer *renderer) {
         source.h,
     };
 
-    SDL_RenderCopy(renderer, textureAsset.texture, &source, &destination);
+    SDL_RenderCopy(renderer, &texture, &source, &destination);
 }

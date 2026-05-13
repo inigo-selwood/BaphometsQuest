@@ -57,24 +57,26 @@ void Text::renderSelf(SDL_Renderer *renderer) {
         this->rebuildTexture(renderer);
     }
 
-    if(this->texture == nullptr) {
+    if(!this->textureID.has_value()) {
         return;
     }
 
+    auto &assets = Engine::Game::getInstance().getAssets();
+    auto &texture = assets.get<SDL_Texture>(*this->textureID);
+    const SDL_Point textureSize = assets.getTextureSize(*this->textureID);
     const SDL_Point position = this->getGlobalPosition();
     SDL_Rect destination{
         position.x,
         position.y,
-        this->textureSize.x,
-        this->textureSize.y,
+        textureSize.x,
+        textureSize.y,
     };
 
-    SDL_RenderCopy(renderer, this->texture, nullptr, &destination);
+    SDL_RenderCopy(renderer, &texture, nullptr, &destination);
 }
 
 void Text::rebuildTexture(SDL_Renderer *renderer) {
-    this->texture = nullptr;
-    this->textureSize = SDL_Point{0, 0};
+    this->textureID.reset();
     this->textureDirty = false;
 
     if(this->text.empty()) {
@@ -93,15 +95,11 @@ void Text::rebuildTexture(SDL_Renderer *renderer) {
         );
     }
 
-    const auto &textureAsset =
-        Engine::Game::getInstance().getAssets().getTextTexture(
-            renderer,
-            this->fontPath,
-            this->fontSize,
-            this->colour,
-            this->text
-        );
-
-    this->texture = textureAsset.texture;
-    this->textureSize = textureAsset.size;
+    this->textureID = Engine::Game::getInstance().getAssets().loadTextTexture(
+        renderer,
+        this->fontPath,
+        this->fontSize,
+        this->colour,
+        this->text
+    );
 }

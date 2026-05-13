@@ -1,7 +1,9 @@
 #pragma once
 
+#include "../engine/assets/assetRegistry.hpp"
 #include "../engine/scene/node.hpp"
 
+#include <optional>
 #include <string>
 
 /** Renders an image texture or a rectangular region from an image texture. */
@@ -24,4 +26,5 @@ class Texture : public Engine::Node {
     std::string path;
     SDL_Point position{0, 0};
     SDL_Rect region{0, 0, 0, 0};
+    std::optional<Engine::AssetRegistry::AssetID> textureID;
 };

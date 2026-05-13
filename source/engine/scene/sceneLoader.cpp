@@ -78,9 +78,11 @@ void loadSceneFromXML(
     AssetRegistry &assets,
     const std::string &path
 ) {
-    const tinyxml2::XMLDocument &document = assets.getXML(path, "scene XML");
+    const AssetRegistry::AssetID sceneXMLID =
+        assets.loadXML(path, "scene XML");
+    const auto &sceneXML = assets.get<tinyxml2::XMLDocument>(sceneXMLID);
 
-    const tinyxml2::XMLElement *root = document.RootElement();
+    const tinyxml2::XMLElement *root = sceneXML.RootElement();
 
     if(root == nullptr || std::string(root->Name()) != SCENE_ROOT) {
         throw std::runtime_error(
@@ -90,6 +92,7 @@ void loadSceneFromXML(
     }
 
     loadNodeChildren(scene, *root);
+    assets.unload(sceneXMLID);
 }
 
 } // namespace Engine

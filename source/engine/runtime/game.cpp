@@ -62,12 +62,13 @@ void Game::start() {
     this->SDLImageStarted = true;
     spdlog::debug("Initialized SDL_image with PNG support.");
 
+    const AssetRegistry::AssetID configID =
+        this->assets.loadYAML(CONFIG_PATH, CONFIG_CONTEXT);
+    const YAML::Node &config = this->assets.get<YAML::Node>(configID);
+
     // Audio subsystem.
-    const YAML::Node audio = Validation::requireMap(
-        this->assets.getYAML(CONFIG_PATH, CONFIG_CONTEXT),
-        "audio",
-        CONFIG_CONTEXT
-    );
+    const YAML::Node audio =
+        Validation::requireMap(config, "audio", CONFIG_CONTEXT);
     const int audioChannels = Validation::requirePositiveValue<int>(
         audio,
         "channels",
@@ -123,11 +124,8 @@ void Game::start() {
     spdlog::debug("Initialized SDL_ttf.");
 
     // Render configuration.
-    const YAML::Node render = Validation::requireMap(
-        this->assets.getYAML(CONFIG_PATH, CONFIG_CONTEXT),
-        "render",
-        CONFIG_CONTEXT
-    );
+    const YAML::Node render =
+        Validation::requireMap(config, "render", CONFIG_CONTEXT);
     const std::string scaleQuality =
         Validation::requireString(render, "scale-quality", CONFIG_CONTEXT);
     this->clearColour = Property::parseColour(
@@ -138,11 +136,8 @@ void Game::start() {
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, scaleQuality.c_str());
 
     // Window creation.
-    const YAML::Node window = Validation::requireMap(
-        this->assets.getYAML(CONFIG_PATH, CONFIG_CONTEXT),
-        "window",
-        CONFIG_CONTEXT
-    );
+    const YAML::Node window =
+        Validation::requireMap(config, "window", CONFIG_CONTEXT);
     const int logicalHeight = Validation::requirePositiveValue<int>(
         window,
         "logical-height",
@@ -216,17 +211,20 @@ void Game::start() {
         logicalWidth * windowScale,
         logicalHeight * windowScale
     );
+
+    this->assets.unload(configID);
 }
 
 void Game::run() {
     spdlog::info("Entering game loop.");
 
+    const AssetRegistry::AssetID configID =
+        this->assets.loadYAML(CONFIG_PATH, CONFIG_CONTEXT);
+    const YAML::Node &config = this->assets.get<YAML::Node>(configID);
+
     // Frame-rate configuration.
-    const YAML::Node frameRate = Validation::requireMap(
-        this->assets.getYAML(CONFIG_PATH, CONFIG_CONTEXT),
-        "frame-rate",
-        CONFIG_CONTEXT
-    );
+    const YAML::Node frameRate =
+        Validation::requireMap(config, "frame-rate", CONFIG_CONTEXT);
     this->loopTimer.minimumFrameRate =
         Validation::requirePositiveValue<std::uint32_t>(
             frameRate,
@@ -280,6 +278,8 @@ void Game::run() {
             "Game config frame-rate.step must not exceed frame-rate.target."
         );
     }
+
+    this->assets.unload(configID);
 
     this->running = true;
     this->loopTimer.currentFrameRate = this->loopTimer.targetFrameRate;
@@ -418,7 +418,7 @@ void Game::quit() {
     this->SDLWindow.reset();
     spdlog::debug("Destroyed SDL renderer and window.");
 
-    this->assets.clear();
+    this->assets.unloadAll();
 
     if(this->SDLAudioOpened) {
         Mix_CloseAudio();
@@ -461,6 +461,9 @@ void Game::loadQueuedScene() {
     if(this->activeScene != nullptr) {
         spdlog::debug("Exiting active scene.");
         this->activeScene->exitTree();
+        this->activeScene.reset();
+        this->assets.unloadAll(AssetRegistry::AssetType::ImageTexture);
+        this->assets.unloadAll(AssetRegistry::AssetType::TextTexture);
     }
 
     spdlog::info("Loading scene '{}'.", *this->queuedSceneName);

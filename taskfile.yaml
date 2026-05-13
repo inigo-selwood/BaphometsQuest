@@ -3,6 +3,7 @@ version: '3'
 tasks:
   build:
     desc: Configure and build the game
+    method: timestamp
     sources:
       - CMakeLists.txt
       - source/**/*.cpp
@@ -10,10 +11,11 @@ tasks:
       - resources/**/*
     generates:
       - build/untitled_game
-      - build/resources
+      - build/.task-build.stamp
     cmds:
       - cmake -S . -B build
       - cmake --build build
+      - cmake -E touch build/.task-build.stamp
 
   clean:
     desc: Remove generated build output

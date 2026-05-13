@@ -84,17 +84,20 @@ class Game {
 
     struct LoopTimer {
         std::uint32_t currentFrameRate = 0;
-        float deltaTime = 0.0F;
         std::uint32_t frameDelay = 0;
+        std::uint32_t minimumFrameRate = 0;
+        std::uint32_t step = 0;
+        std::uint32_t targetFrameRate = 0;
+
+        float deltaTime = 0.0F;
         std::uint32_t frameStartTicks = 0;
         std::uint32_t frameTicks = 0;
-        std::uint32_t minimumFrameRate = 0;
+
         int overrunFrameCount = 0;
         int overrunHysteresisFrames = 0;
         std::uint32_t overrunToleranceMS = 0;
-        std::uint32_t targetFrameRate = 0;
+
         int underrunFrameCount = 0;
-        std::uint32_t step = 0;
         int underrunHysteresisFrames = 0;
         std::uint32_t underrunHeadroomMS = 0;
     };

@@ -1,7 +1,9 @@
 #pragma once
 
+#include "../engine/assets/assetRegistry.hpp"
 #include "../engine/scene/node.hpp"
 
+#include <optional>
 #include <string>
 
 /** Rendered text node backed by cached SDL_ttf textures. */
@@ -27,7 +29,6 @@ class Text : public Engine::Node {
     int fontSize = 8;
     SDL_Point position{0, 0};
     std::string text;
-    SDL_Texture *texture = nullptr;
     bool textureDirty = true;
-    SDL_Point textureSize{0, 0};
+    std::optional<Engine::AssetRegistry::AssetID> textureID;
 };
