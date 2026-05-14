@@ -3,10 +3,92 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
+#include <cctype>
 #include <memory>
 #include <stdexcept>
 
 namespace Engine {
+
+namespace {
+
+std::string assetLogDomain(const std::string &context) {
+    if(context.empty()) {
+        return "Asset";
+    }
+
+    const std::size_t separator = context.find(' ');
+
+    std::string domain = separator == std::string::npos
+        ? context
+        : context.substr(0, separator);
+
+    if(!domain.empty()) {
+        domain[0] = static_cast<char>(std::toupper(domain[0]));
+    }
+
+    return domain;
+}
+
+std::string assetLogType(AssetRegistry::AssetType type) {
+    switch(type) {
+    case AssetRegistry::AssetType::Font:
+        return "Font";
+    case AssetRegistry::AssetType::ImageTexture:
+        return "Image texture";
+    case AssetRegistry::AssetType::TextTexture:
+        return "Text texture";
+    case AssetRegistry::AssetType::Music:
+        return "Music";
+    case AssetRegistry::AssetType::SoundEffect:
+        return "Sound effect";
+    case AssetRegistry::AssetType::XML:
+        return "XML";
+    case AssetRegistry::AssetType::YAML:
+        return "YAML";
+    }
+
+    return "Unknown";
+}
+
+void logAssetLoad(
+    AssetRegistry::AssetID id,
+    AssetRegistry::AssetType type,
+    const std::string &context = ""
+) {
+    if(context.empty()) {
+        spdlog::debug(
+            "Loading {}:{} ({})",
+            assetLogDomain(context),
+            id.UID,
+            assetLogType(type)
+        );
+        return;
+    }
+
+    spdlog::info(
+        "Loading {}:{} ({}, {})",
+        assetLogDomain(context),
+        id.UID,
+        assetLogType(type),
+        context
+    );
+}
+
+void logAssetLoaded(
+    AssetRegistry::AssetID id,
+    AssetRegistry::AssetType type,
+    const std::string &context
+) {
+    spdlog::info(
+        "Loaded {}:{} ({}, {})",
+        assetLogDomain(context),
+        id.UID,
+        assetLogType(type),
+        context
+    );
+}
+
+} // namespace
 
 AssetRegistry::AssetID
 AssetRegistry::loadFont(const std::string &path, int size) {
@@ -20,7 +102,7 @@ AssetRegistry::loadFont(const std::string &path, int size) {
         return id;
     }
 
-    spdlog::debug("Loading font asset '{}'.", id.UID);
+    logAssetLoad(id, AssetType::Font);
 
     std::unique_ptr<TTF_Font, FontDeleter> font(
         TTF_OpenFont(resolvedPath.c_str(), size)
@@ -53,7 +135,7 @@ AssetRegistry::AssetID AssetRegistry::loadImageTexture(
         return id;
     }
 
-    spdlog::debug("Loading image texture asset '{}'.", id.UID);
+    logAssetLoad(id, AssetType::ImageTexture);
 
     std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface(
         IMG_Load(resolvedPath.c_str()),
@@ -96,7 +178,7 @@ AssetRegistry::AssetID AssetRegistry::loadMusic(const std::string &path) {
         return id;
     }
 
-    spdlog::debug("Loading music asset '{}'.", id.UID);
+    logAssetLoad(id, AssetType::Music);
 
     std::unique_ptr<Mix_Music, MusicDeleter> music(
         Mix_LoadMUS(resolvedPath.c_str())
@@ -127,7 +209,7 @@ AssetRegistry::loadSoundEffect(const std::string &path) {
         return id;
     }
 
-    spdlog::debug("Loading sound effect asset '{}'.", id.UID);
+    logAssetLoad(id, AssetType::SoundEffect);
 
     std::unique_ptr<Mix_Chunk, SoundEffectDeleter> soundEffect(
         Mix_LoadWAV(resolvedPath.c_str())
@@ -156,7 +238,7 @@ AssetRegistry::loadXML(const std::string &path, const std::string &context) {
         return id;
     }
 
-    spdlog::info("Loading XML asset '{}' for {}.", id.UID, context);
+    logAssetLoad(id, AssetType::XML, context);
 
     auto document = std::make_unique<tinyxml2::XMLDocument>();
     const tinyxml2::XMLError loadResult =
@@ -170,7 +252,7 @@ AssetRegistry::loadXML(const std::string &path, const std::string &context) {
         );
     }
 
-    spdlog::info("Loaded XML asset '{}' for {}.", id.UID, context);
+    logAssetLoaded(id, AssetType::XML, context);
 
     const auto [documentIterator, inserted] =
         this->XMLDocuments.emplace(resolvedPath, std::move(document));
@@ -202,11 +284,7 @@ AssetRegistry::AssetID AssetRegistry::loadTextTexture(
         return id;
     }
 
-    spdlog::debug(
-        "Creating text texture asset '{}' from text '{}'.",
-        id.UID,
-        text
-    );
+    logAssetLoad(id, AssetType::TextTexture);
 
     TTF_Font *font = nullptr;
 
@@ -258,7 +336,7 @@ AssetRegistry::loadYAML(const std::string &path, const std::string &context) {
         return id;
     }
 
-    spdlog::info("Loading YAML asset '{}' for {}.", id.UID, context);
+    logAssetLoad(id, AssetType::YAML, context);
 
     try {
         auto [documentIterator, inserted] = this->YAMLDocuments.emplace(
@@ -268,7 +346,7 @@ AssetRegistry::loadYAML(const std::string &path, const std::string &context) {
         (void)documentIterator;
         (void)inserted;
 
-        spdlog::info("Loaded YAML asset '{}' for {}.", id.UID, context);
+        logAssetLoaded(id, AssetType::YAML, context);
 
         return id;
     } catch(const YAML::Exception &exception) {

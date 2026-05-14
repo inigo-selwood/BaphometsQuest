@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../components/box.hpp"
+#include "../../engine/components/box.hpp"
 
 /** Demo box that can change colour in response to gameplay signals. */
 class ColourChangeBox : public Box {

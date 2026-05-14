@@ -1,8 +1,8 @@
 window:
-    title: Untitled Game
-    logical-width: 256
-    logical-height: 192
-    scale: 3
+    title: Baphomet's Quest
+    logical-width: 160
+    logical-height: 144
+    scale: 4
     resizable: false
 
 render:

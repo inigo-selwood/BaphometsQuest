@@ -1,8 +1,13 @@
 #include "assetRegistry.hpp"
 
 #include <stdexcept>
+#include <vector>
 
 namespace Engine {
+
+void AssetRegistry::clear() {
+    this->unloadAll();
+}
 
 void AssetRegistry::unload(const AssetID &id) {
     const auto assetIterator = this->assets.find(id.UID);
@@ -66,6 +71,8 @@ void AssetRegistry::unloadAll() {
         );
     }
 
+    this->activeAssetGroup.reset();
+    this->assetGroupNames.clear();
     this->assetIDs.clear();
     this->assets.clear();
     this->fonts.clear();
@@ -74,6 +81,37 @@ void AssetRegistry::unloadAll() {
     this->textures.clear();
     this->XMLDocuments.clear();
     this->YAMLDocuments.clear();
+}
+
+void AssetRegistry::unloadGroup(AssetGroupID group) {
+    if(group.UID == 0) {
+        return;
+    }
+
+    std::vector<AssetID> assetsToUnload;
+
+    for(const auto &[UID, asset] : this->assets) {
+        if(asset.group.UID == group.UID) {
+            assetsToUnload.push_back(AssetID{UID});
+        }
+    }
+
+    spdlog::debug(
+        "Unloading {} asset(s) from group '{}'.",
+        assetsToUnload.size(),
+        group.UID
+    );
+
+    for(const AssetID &id : assetsToUnload) {
+        this->unload(id);
+    }
+
+    this->assetGroupNames.erase(group.UID);
+
+    if(this->activeAssetGroup.has_value()
+        && this->activeAssetGroup->UID == group.UID) {
+        this->activeAssetGroup.reset();
+    }
 }
 
 void AssetRegistry::unloadAll(AssetType type) {

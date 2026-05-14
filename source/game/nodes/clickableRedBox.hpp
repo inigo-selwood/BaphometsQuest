@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../components/box.hpp"
+#include "../../engine/components/box.hpp"
 
 /** Demo box that emits clicked(int button, int x, int y) when clicked. */
 class ClickableRedBox : public Box {

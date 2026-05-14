@@ -5,5 +5,5 @@ void ColourChangeBox::registerType() {
 }
 
 void ColourChangeBox::turnGreen() {
-    this->setColour(SDL_Color{64, 255, 112, 255});
+    this->setProperty("colour", SDL_Color{64, 255, 112, 255});
 }

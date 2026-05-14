@@ -84,6 +84,18 @@ std::string AssetRegistry::typeName(AssetType type) {
     return "unknown";
 }
 
+void AssetRegistry::clearActiveGroup() {
+    this->activeAssetGroup.reset();
+}
+
+AssetRegistry::AssetGroupID
+AssetRegistry::createGroup(const std::string &name) {
+    const AssetGroupID group{this->nextAssetGroupUID++};
+    this->assetGroupNames.emplace(group.UID, name);
+    spdlog::debug("Created asset group '{}' for '{}'.", group.UID, name);
+    return group;
+}
+
 void AssetRegistry::forgetAsset(const AssetID &id) {
     const auto assetIterator = this->assets.find(id.UID);
 
@@ -124,9 +136,26 @@ AssetRegistry::getOrCreateID(AssetType type, const std::string &key) {
 
     const AssetID id{this->nextAssetUID++};
     this->assetIDs.emplace(lookupKey, id.UID);
-    this->assets.emplace(id.UID, AssetRecord{type, key});
+    this->assets.emplace(
+        id.UID,
+        AssetRecord{
+            type,
+            key,
+            this->activeAssetGroup.value_or(AssetGroupID{}),
+        }
+    );
 
     return id;
+}
+
+void AssetRegistry::setActiveGroup(AssetGroupID group) {
+    if(group.UID == 0 || !this->assetGroupNames.contains(group.UID)) {
+        throw std::runtime_error(
+            "Unknown asset group: " + std::to_string(group.UID)
+        );
+    }
+
+    this->activeAssetGroup = group;
 }
 
 bool AssetRegistry::isTextureType(AssetType type) {
