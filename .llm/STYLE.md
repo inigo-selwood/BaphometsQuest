@@ -9,9 +9,10 @@ project. Prefer these conventions over generic C++ defaults when they differ.
 - Types use `PascalCase`
 - Namespaces use `PascalCase`
 - Functions, methods, variables, and members use `camelCase`
-- Acronyms in identifiers are treated as words: use `getIsoTimestamp`, not `getISOTimestamp`
-- Constants also use `camelCase` unless an external API or macro requires otherwise
+- Acronyms in identifiers: use `getISOTimestamp`, not `getIsoTimestamp`
+- Constants use `UPPER_CASE` unless an external API or macro requires otherwise
 - External/library names keep their native casing, such as `SDL_*`, `TTF_*`, `Mix_*`, `CLI`, and `YAML::Node`
+- YAML keys use `kebab-case`
 
 ## Structure
 
@@ -30,6 +31,7 @@ project. Prefer these conventions over generic C++ defaults when they differ.
 - Managers own collections and IDs, not the inner lifecycle of each resource
 - Custom deleters inside classes should be private, named, and inline when the body is only a line or two
 - Keep temporary implementation-only deleters local to the `.cpp` file
+- Avoid explicit copy/move/default boilerplate when member types already express the intended semantics
 
 ## Formatting
 
@@ -39,6 +41,8 @@ project. Prefer these conventions over generic C++ defaults when they differ.
 - Keep comments succinct and useful; avoid narrating obvious code
 - Prefer ASCII unless the surrounding file already has a clear reason for Unicode
 - Do not add decorative separators or large comment banners
+- Prefer direct logical flow over tiny one-use helpers
+- Add helpers only when they remove real complexity or repeated non-trivial logic
 
 ## APIs
 
