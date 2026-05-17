@@ -15,7 +15,7 @@ tasks:
     desc: Configure and build the debug game
     deps:
       - configure-debug
-    method: timestamp
+    method: checksum
     sources:
       - CMakeLists.txt
       - source/**/*.cpp
@@ -44,7 +44,7 @@ tasks:
     desc: Build an optimised release and bundle release resources
     deps:
       - configure-release
-    method: timestamp
+    method: checksum
     sources:
       - CMakeLists.txt
       - source/**/*.cpp
