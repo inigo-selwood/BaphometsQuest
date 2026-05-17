@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base.hpp"
+#include "resource/base.hpp"
 
 #include <cstdint>
 #include <memory>

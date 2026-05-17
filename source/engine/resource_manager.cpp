@@ -1,4 +1,4 @@
-#include "manager.hpp"
+#include "resource_manager.hpp"
 
 #include <spdlog/spdlog.h>
 #include <yaml-cpp/yaml.h>

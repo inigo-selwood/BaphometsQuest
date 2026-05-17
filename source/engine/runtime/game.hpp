@@ -1,9 +1,9 @@
 #pragma once
 
 #include "lifecycle.hpp"
-#include "resources/manager.hpp"
-#include "resources/types/yaml.hpp"
-#include "signal_manager.hpp"
+#include "../resource/types/yaml.hpp"
+#include "../resource_manager.hpp"
+#include "../signal_manager.hpp"
 
 #include <filesystem>
 #include <memory>

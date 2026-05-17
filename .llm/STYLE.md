@@ -17,8 +17,10 @@ project. Prefer these conventions over generic C++ defaults when they differ.
 ## Structure
 
 - Keep engine code under `source/engine`
-- Keep resource code under `source/engine/resources`
-- Keep concrete resource types under `source/engine/resources/types`
+- Keep runtime service roots under `source/engine/runtime`
+- Keep resource code under `source/engine/resource`
+- Keep the resource manager at `source/engine/resource_manager.*`
+- Keep concrete resource types under `source/engine/resource/types`
 - Prefer namespaces that mirror concepts, such as `Engine::Resource` and `Engine::Signal`
 - Do not create broad utility namespaces when a focused namespace is clearer
 - Prefer direct public properties only when they are intentionally part of the simple API

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "resources/types/yaml.hpp"
+#include "../resource/types/yaml.hpp"
 
 #include <stdexcept>
 #include <string>
