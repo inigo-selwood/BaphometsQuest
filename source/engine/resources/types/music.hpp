@@ -18,7 +18,7 @@ class Music : public Engine::Resource::Base {
     };
 
     static std::unique_ptr<Mix_Music, MusicDeleter>
-    loadMusic(const std::string &path);
+    load(const std::string &path);
 
   public:
     explicit Music(const std::string &path);

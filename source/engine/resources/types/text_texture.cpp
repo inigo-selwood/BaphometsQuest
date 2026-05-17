@@ -16,8 +16,7 @@ struct SurfaceDeleter {
 
 } // namespace
 
-std::unique_ptr<SDL_Texture, TextTexture::TextureDeleter>
-TextTexture::renderTextTexture(
+std::unique_ptr<SDL_Texture, TextTexture::TextureDeleter> TextTexture::render(
     SDL_Renderer *renderer,
     const Engine::Resource::Font &font,
     SDL_Color colour,
@@ -47,7 +46,7 @@ TextTexture::renderTextTexture(
 }
 
 SDL_Rect
-TextTexture::queryTextureSize(SDL_Texture *texture, const std::string &text) {
+TextTexture::querySize(SDL_Texture *texture, const std::string &text) {
     SDL_Rect size{0, 0, 0, 0};
 
     if(SDL_QueryTexture(texture, nullptr, nullptr, &size.w, &size.h) != 0) {
@@ -65,9 +64,9 @@ TextTexture::TextTexture(
     SDL_Color colour,
     const std::string &text
 )
-    : handle(renderTextTexture(renderer, font, colour, text)),
+    : handle(render(renderer, font, colour, text)),
       fontDescription(font.describe()), colour(colour),
-      size(queryTextureSize(this->handle.get(), text)), text(text) {}
+      size(querySize(this->handle.get(), text)), text(text) {}
 
 std::string TextTexture::describe() const {
     ::YAML::Node name;

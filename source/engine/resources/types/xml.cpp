@@ -4,9 +4,7 @@
 
 namespace Engine::Resource {
 
-namespace {
-
-std::unique_ptr<tinyxml2::XMLDocument> loadDocument(const std::string &path) {
+std::unique_ptr<tinyxml2::XMLDocument> XML::load(const std::string &path) {
     auto document = std::make_unique<tinyxml2::XMLDocument>();
     const tinyxml2::XMLError error = document->LoadFile(path.c_str());
 
@@ -19,9 +17,7 @@ std::unique_ptr<tinyxml2::XMLDocument> loadDocument(const std::string &path) {
     return document;
 }
 
-} // namespace
-
-XML::XML(const std::string &path) : document(loadDocument(path)), path(path) {}
+XML::XML(const std::string &path) : document(load(path)), path(path) {}
 std::string XML::describe() const {
     ::YAML::Node name;
     name["type"] = "XML";

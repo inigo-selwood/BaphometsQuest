@@ -5,7 +5,7 @@
 namespace Engine::Resource {
 
 std::unique_ptr<Mix_Chunk, SoundEffect::SoundEffectDeleter>
-SoundEffect::loadSoundEffect(const std::string &path) {
+SoundEffect::load(const std::string &path) {
     std::unique_ptr<Mix_Chunk, SoundEffectDeleter> soundEffect(
         Mix_LoadWAV(path.c_str())
     );
@@ -20,7 +20,7 @@ SoundEffect::loadSoundEffect(const std::string &path) {
 }
 
 SoundEffect::SoundEffect(const std::string &path)
-    : handle(loadSoundEffect(path)), path(path) {}
+    : handle(load(path)), path(path) {}
 
 std::string SoundEffect::describe() const {
     ::YAML::Node name;

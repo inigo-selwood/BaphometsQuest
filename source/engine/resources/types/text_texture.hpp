@@ -18,15 +18,14 @@ class TextTexture : public Engine::Resource::Base {
         }
     };
 
-    static std::unique_ptr<SDL_Texture, TextureDeleter> renderTextTexture(
+    static std::unique_ptr<SDL_Texture, TextureDeleter> render(
         SDL_Renderer *renderer,
         const Engine::Resource::Font &font,
         SDL_Color colour,
         const std::string &text
     );
 
-    static SDL_Rect
-    queryTextureSize(SDL_Texture *texture, const std::string &text);
+    static SDL_Rect querySize(SDL_Texture *texture, const std::string &text);
 
   public:
     TextTexture(

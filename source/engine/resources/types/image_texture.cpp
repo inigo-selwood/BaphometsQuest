@@ -7,7 +7,7 @@
 namespace Engine::Resource {
 
 std::unique_ptr<SDL_Texture, ImageTexture::TextureDeleter>
-ImageTexture::loadTexture(SDL_Renderer *renderer, const std::string &path) {
+ImageTexture::load(SDL_Renderer *renderer, const std::string &path) {
     std::unique_ptr<SDL_Texture, TextureDeleter> texture(
         IMG_LoadTexture(renderer, path.c_str())
     );
@@ -22,7 +22,7 @@ ImageTexture::loadTexture(SDL_Renderer *renderer, const std::string &path) {
 }
 
 SDL_Rect
-ImageTexture::queryTextureSize(SDL_Texture *texture, const std::string &path) {
+ImageTexture::querySize(SDL_Texture *texture, const std::string &path) {
     SDL_Rect size{0, 0, 0, 0};
 
     if(SDL_QueryTexture(texture, nullptr, nullptr, &size.w, &size.h) != 0) {
@@ -35,8 +35,8 @@ ImageTexture::queryTextureSize(SDL_Texture *texture, const std::string &path) {
 }
 
 ImageTexture::ImageTexture(SDL_Renderer *renderer, const std::string &path)
-    : handle(loadTexture(renderer, path)), path(path),
-      size(queryTextureSize(this->handle.get(), path)) {}
+    : handle(load(renderer, path)), path(path),
+      size(querySize(this->handle.get(), path)) {}
 
 std::string ImageTexture::describe() const {
     ::YAML::Node name;

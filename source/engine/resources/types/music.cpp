@@ -5,7 +5,7 @@
 namespace Engine::Resource {
 
 std::unique_ptr<Mix_Music, Music::MusicDeleter>
-Music::loadMusic(const std::string &path) {
+Music::load(const std::string &path) {
     std::unique_ptr<Mix_Music, MusicDeleter> music(Mix_LoadMUS(path.c_str()));
 
     if(!music) {
@@ -17,7 +17,7 @@ Music::loadMusic(const std::string &path) {
     return music;
 }
 
-Music::Music(const std::string &path) : handle(loadMusic(path)), path(path) {}
+Music::Music(const std::string &path) : handle(load(path)), path(path) {}
 
 std::string Music::describe() const {
     ::YAML::Node name;

@@ -5,7 +5,7 @@
 namespace Engine::Resource {
 
 std::unique_ptr<TTF_Font, Font::FontDeleter>
-Font::loadFont(const std::string &path, int size) {
+Font::load(const std::string &path, int size) {
     std::unique_ptr<TTF_Font, FontDeleter> font(
         TTF_OpenFont(path.c_str(), size)
     );
@@ -20,7 +20,7 @@ Font::loadFont(const std::string &path, int size) {
 }
 
 Font::Font(const std::string &path, int size)
-    : handle(loadFont(path, size)), path(path), size(size) {}
+    : handle(load(path, size)), path(path), size(size) {}
 
 std::string Font::describe() const {
     ::YAML::Node name;

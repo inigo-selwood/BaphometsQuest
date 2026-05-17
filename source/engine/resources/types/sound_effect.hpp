@@ -18,7 +18,7 @@ class SoundEffect : public Engine::Resource::Base {
     };
 
     static std::unique_ptr<Mix_Chunk, SoundEffectDeleter>
-    loadSoundEffect(const std::string &path);
+    load(const std::string &path);
 
   public:
     explicit SoundEffect(const std::string &path);

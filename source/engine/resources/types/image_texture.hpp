@@ -18,10 +18,9 @@ class ImageTexture : public Engine::Resource::Base {
     };
 
     static std::unique_ptr<SDL_Texture, TextureDeleter>
-    loadTexture(SDL_Renderer *renderer, const std::string &path);
+    load(SDL_Renderer *renderer, const std::string &path);
 
-    static SDL_Rect
-    queryTextureSize(SDL_Texture *texture, const std::string &path);
+    static SDL_Rect querySize(SDL_Texture *texture, const std::string &path);
 
   public:
     ImageTexture(SDL_Renderer *renderer, const std::string &path);

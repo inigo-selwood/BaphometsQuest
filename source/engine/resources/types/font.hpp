@@ -18,7 +18,7 @@ class Font : public Engine::Resource::Base {
     };
 
     static std::unique_ptr<TTF_Font, FontDeleter>
-    loadFont(const std::string &path, int size);
+    load(const std::string &path, int size);
 
   public:
     Font(const std::string &path, int size);
