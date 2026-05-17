@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../format/format.hpp"
-#include "../parse/parse.hpp"
 #include "../signals/signalRegistry.hpp"
 
 #include <SDL.h>
@@ -21,76 +19,6 @@
 #include <spdlog/spdlog.h>
 
 namespace Engine {
-
-template <typename ValueType> struct PropertyParser {
-    static ValueType parse(const std::string &, const std::string &) = delete;
-};
-
-template <> struct PropertyParser<bool> {
-    static bool parse(const std::string &value, const std::string &name) {
-        return Parse::boolean(value, name);
-    }
-};
-
-template <> struct PropertyParser<float> {
-    static float parse(const std::string &value, const std::string &name) {
-        return Parse::floating(value, name);
-    }
-};
-
-template <> struct PropertyParser<int> {
-    static int parse(const std::string &value, const std::string &name) {
-        return Parse::integer(value, name);
-    }
-};
-
-template <> struct PropertyParser<SDL_Color> {
-    static SDL_Color parse(const std::string &value, const std::string &name) {
-        return Parse::colour(value, name);
-    }
-};
-
-template <> struct PropertyParser<SDL_Point> {
-    static SDL_Point parse(const std::string &value, const std::string &name) {
-        return Parse::point(value, name);
-    }
-};
-
-template <> struct PropertyParser<SDL_Rect> {
-    static SDL_Rect parse(const std::string &value, const std::string &name) {
-        return Parse::rect(value, name);
-    }
-};
-
-template <> struct PropertyParser<std::string> {
-    static std::string parse(const std::string &value, const std::string &) {
-        return value;
-    }
-};
-
-template <typename ValueType>
-std::string propertyValueToString(const ValueType &value) {
-    return Format::value(value);
-}
-
-template <> inline std::string propertyValueToString<bool>(const bool &value) {
-    return Format::boolean(value);
-}
-
-template <>
-inline std::string propertyValueToString<SDL_Color>(const SDL_Color &value) {
-    return Format::colour(value);
-}
-
-template <>
-inline std::string propertyValueToString<SDL_Point>(const SDL_Point &value) {
-    return Format::point(value);
-}
-
-template <>
-inline std::string propertyValueToString<SDL_Rect>(const SDL_Rect &value) {
-    return Format::rect(value);
-}
 
 /**
  * Base type for all objects that can live in the scene tree.
@@ -261,20 +189,7 @@ class Node {
 
     /** Return a typed property value. */
     template <typename ValueType>
-    ValueType getProperty(const std::string &name) const {
-        const auto &property = this->getPropertyBinding(name);
-
-        if(property.type != std::type_index(typeid(ValueType))) {
-            throw std::runtime_error(
-                "Property '" + name + "' on node '" + this->getName()
-                + "' has an unexpected type."
-            );
-        }
-
-        const auto &typedProperty =
-            static_cast<const PropertyBinding<ValueType> &>(property);
-        return typedProperty.getter();
-    }
+    ValueType getProperty(const std::string &name) const;
 
     /** Exit and remove all direct children. */
     void clearChildren();
@@ -331,26 +246,7 @@ class Node {
 
     /** Set a typed property value. */
     template <typename ValueType>
-    void setProperty(const std::string &name, const ValueType &value) {
-        auto &property = this->getPropertyBinding(name);
-
-        if(property.type != std::type_index(typeid(ValueType))) {
-            throw std::runtime_error(
-                "Property '" + name + "' on node '" + this->getName()
-                + "' has an unexpected type."
-            );
-        }
-
-        auto &typedProperty =
-            static_cast<PropertyBinding<ValueType> &>(property);
-        typedProperty.setter(value);
-        spdlog::trace(
-            "set property {}.{}: to {}",
-            this->getName(),
-            name,
-            typedProperty.valueToString()
-        );
-    }
+    void setProperty(const std::string &name, const ValueType &value);
 
     /** Traverse input handling for this node and its children. */
     virtual void input(const SDL_Event &event);
@@ -373,6 +269,9 @@ class Node {
     /** Hook called when this node exits the scene tree. */
     virtual void onExitTree();
 
+    /** Apply a callback to each direct child node. */
+    void forEachChild(const std::function<void(Node &)> &callback);
+
     /** Assign this node's optional input callback. */
     void setInputFunction(InputFunction newInputFunction);
 
@@ -384,28 +283,8 @@ class Node {
             parser,
         std::function<ValueType()> getter,
         std::function<void(const ValueType &)> setter,
-        std::function<std::string(const ValueType &)> formatter =
-            propertyValueToString<ValueType>
-    ) {
-        if(this->properties.contains(name)) {
-            throw std::runtime_error(
-                "Property '" + name + "' is already registered on node '"
-                + this->getName() + "'."
-            );
-        }
-
-        this->properties.emplace(
-            name,
-            std::make_unique<PropertyBinding<ValueType>>(
-                name,
-                owner,
-                std::move(parser),
-                std::move(getter),
-                std::move(setter),
-                std::move(formatter)
-            )
-        );
-    }
+        std::function<std::string(const ValueType &)> formatter
+    );
 
     template <typename ValueType>
     void registerProperty(
@@ -413,15 +292,7 @@ class Node {
         const std::string &owner,
         std::function<ValueType()> getter,
         std::function<void(const ValueType &)> setter
-    ) {
-        this->registerProperty<ValueType>(
-            name,
-            owner,
-            PropertyParser<ValueType>::parse,
-            std::move(getter),
-            std::move(setter)
-        );
-    }
+    );
 
     template <typename ValueType>
     void registerProperty(
@@ -430,16 +301,7 @@ class Node {
         std::function<ValueType()> getter,
         std::function<void(const ValueType &)> setter,
         std::function<std::string(const ValueType &)> formatter
-    ) {
-        this->registerProperty<ValueType>(
-            name,
-            owner,
-            PropertyParser<ValueType>::parse,
-            std::move(getter),
-            std::move(setter),
-            std::move(formatter)
-        );
-    }
+    );
 
     /** Assign this node's optional process callback. */
     void setProcessFunction(ProcessFunction newProcessFunction);
@@ -448,61 +310,6 @@ class Node {
     void setRenderFunction(RenderFunction newRenderFunction);
 
   private:
-    struct PropertyBindingBase {
-        PropertyBindingBase(
-            std::string propertyName,
-            std::string propertyOwner,
-            std::type_index propertyType
-        )
-            : name(std::move(propertyName)), owner(std::move(propertyOwner)),
-              type(propertyType) {}
-
-        virtual ~PropertyBindingBase() = default;
-
-        virtual void setFromString(const std::string &value) = 0;
-        virtual std::string valueToString() const = 0;
-
-        std::string name;
-        std::string owner;
-        std::type_index type;
-    };
-
-    template <typename ValueType>
-    struct PropertyBinding final : PropertyBindingBase {
-        PropertyBinding(
-            const std::string &propertyName,
-            const std::string &propertyOwner,
-            std::function<ValueType(const std::string &, const std::string &)>
-                propertyParser,
-            std::function<ValueType()> propertyGetter,
-            std::function<void(const ValueType &)> propertySetter,
-            std::function<std::string(const ValueType &)> propertyFormatter
-        )
-            : PropertyBindingBase(
-                  propertyName,
-                  propertyOwner,
-                  std::type_index(typeid(ValueType))
-              ),
-              formatter(std::move(propertyFormatter)),
-              getter(std::move(propertyGetter)),
-              parser(std::move(propertyParser)),
-              setter(std::move(propertySetter)) {}
-
-        void setFromString(const std::string &value) override {
-            this->setter(this->parser(value, this->name));
-        }
-
-        std::string valueToString() const override {
-            return this->formatter(this->getter());
-        }
-
-        std::function<std::string(const ValueType &)> formatter;
-        std::function<ValueType()> getter;
-        std::function<ValueType(const std::string &, const std::string &)>
-            parser;
-        std::function<void(const ValueType &)> setter;
-    };
-
     struct Child {
         std::string name;
         std::unique_ptr<Node> node;
@@ -557,3 +364,5 @@ void setNodePropertyFromString(
 );
 
 } // namespace Engine
+
+#include "nodeProperties.hpp"

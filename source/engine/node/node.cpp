@@ -232,6 +232,12 @@ void Node::onEnterTree() {}
 
 void Node::onExitTree() {}
 
+void Node::forEachChild(const std::function<void(Node &)> &callback) {
+    for(auto &child : this->children) {
+        callback(*child.node);
+    }
+}
+
 void Node::setInputFunction(InputFunction newInputFunction) {
     this->inputFunction = std::move(newInputFunction);
 }
