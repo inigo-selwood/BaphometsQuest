@@ -1,0 +1,15 @@
+logger:
+  application-name: baphomets_quest
+
+window:
+  title: Baphomet's Quest
+  width: 640
+  height: 480
+
+renderer:
+  scale: 1
+
+audio:
+  frequency: 44100
+  channels: 2
+  chunk-size: 2048

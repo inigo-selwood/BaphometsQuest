@@ -21,10 +21,12 @@ namespace Logger {
  * @param executablePath Path used to launch the executable
  * @param consoleLevel Console log level name: trace, debug, info, warn, error,
  * critical, or off
+ * @param applicationName Name used for the spdlog logger
  */
 void start(
     const std::filesystem::path &executablePath,
-    const std::string &consoleLevel = "off"
+    const std::string &consoleLevel,
+    const std::string &applicationName
 );
 
 } // namespace Logger

@@ -1,9 +1,13 @@
 #pragma once
 
+#include "lifecycle.hpp"
 #include "resources/manager.hpp"
+#include "resources/types/yaml.hpp"
 #include "signal_manager.hpp"
 
+#include <filesystem>
 #include <memory>
+#include <string>
 
 #include <SDL.h>
 
@@ -24,7 +28,17 @@ class Game {
         }
     };
 
+    Engine::Resource::ID settingsId = 0;
+
   public:
+    ~Game();
+
+    /** Load settings and start engine-level services */
+    void start(
+        const std::filesystem::path &executablePath,
+        const std::string &consoleLogLevel
+    );
+
     /** Create a window and renderer for the current run stub */
     void run();
 

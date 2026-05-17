@@ -1,7 +1,5 @@
 #include "arguments.hpp"
 #include "engine/game.hpp"
-#include "engine/lifecycle.hpp"
-#include "logger.hpp"
 
 #include <CLI/CLI.hpp>
 
@@ -19,12 +17,9 @@ int main(int argumentCount, const char *arguments[]) {
         return application.exit(exception);
     }
 
-    Logger::start(parsedArguments.executablePath, parsedArguments.logLevel);
-
     try {
-        Engine::Lifecycle::Session lifecycle;
-
         Engine::Game game;
+        game.start(parsedArguments.executablePath, parsedArguments.logLevel);
         game.run();
     } catch(const std::exception &exception) {
         spdlog::error("{}", exception.what());
