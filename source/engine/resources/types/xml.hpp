@@ -15,8 +15,8 @@ class XML : public Engine::Resource::Base {
 
     std::string describe() const override;
 
-    const std::unique_ptr<tinyxml2::XMLDocument> Document;
-    const std::string Path;
+    const std::unique_ptr<tinyxml2::XMLDocument> document;
+    const std::string path;
 };
 
 } // namespace Engine::Resource

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "signal_manager.hpp"
 #include "resources/manager.hpp"
+#include "signal_manager.hpp"
 
 #include <memory>
 
@@ -29,16 +29,16 @@ class Game {
     void run();
 
     /** Shared resource manager */
-    Engine::Resource::Manager Resources;
+    Engine::Resource::Manager resources;
 
     /** Shared signal manager */
-    Engine::Signal::Manager Signals;
+    Engine::Signal::Manager signals;
 
     /** Active SDL renderer */
-    std::unique_ptr<SDL_Renderer, RendererDeleter> Renderer;
+    std::unique_ptr<SDL_Renderer, RendererDeleter> renderer;
 
     /** Active SDL window */
-    std::unique_ptr<SDL_Window, WindowDeleter> Window;
+    std::unique_ptr<SDL_Window, WindowDeleter> window;
 };
 
 } // namespace Engine

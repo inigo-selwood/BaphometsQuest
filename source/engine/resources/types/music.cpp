@@ -17,12 +17,12 @@ Music::loadMusic(const std::string &path) {
     return music;
 }
 
-Music::Music(const std::string &path) : Handle(loadMusic(path)), Path(path) {}
+Music::Music(const std::string &path) : handle(loadMusic(path)), path(path) {}
 
 std::string Music::describe() const {
     ::YAML::Node name;
     name["type"] = "Music";
-    name["path"] = this->Path;
+    name["path"] = this->path;
 
     return this->formatDescription(name);
 }

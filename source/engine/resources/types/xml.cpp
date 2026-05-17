@@ -21,11 +21,11 @@ std::unique_ptr<tinyxml2::XMLDocument> loadDocument(const std::string &path) {
 
 } // namespace
 
-XML::XML(const std::string &path) : Document(loadDocument(path)), Path(path) {}
+XML::XML(const std::string &path) : document(loadDocument(path)), path(path) {}
 std::string XML::describe() const {
     ::YAML::Node name;
     name["type"] = "XML";
-    name["path"] = this->Path;
+    name["path"] = this->path;
 
     return this->formatDescription(name);
 }

@@ -35,13 +35,13 @@ ImageTexture::queryTextureSize(SDL_Texture *texture, const std::string &path) {
 }
 
 ImageTexture::ImageTexture(SDL_Renderer *renderer, const std::string &path)
-    : Handle(loadTexture(renderer, path)), Path(path),
-      Size(queryTextureSize(this->Handle.get(), path)) {}
+    : handle(loadTexture(renderer, path)), path(path),
+      size(queryTextureSize(this->handle.get(), path)) {}
 
 std::string ImageTexture::describe() const {
     ::YAML::Node name;
     name["type"] = "ImageTexture";
-    name["path"] = this->Path;
+    name["path"] = this->path;
 
     return this->formatDescription(name);
 }

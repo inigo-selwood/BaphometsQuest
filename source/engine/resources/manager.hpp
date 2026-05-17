@@ -34,7 +34,7 @@ class Manager {
             "ResourceType must inherit from Engine::Resource::Base."
         );
 
-        const ID id = this->nextResourceID++;
+        const ID id = this->nextResourceId++;
 
         this->resources.emplace(
             id,
@@ -87,7 +87,7 @@ class Manager {
 
   private:
     std::unordered_map<ID, std::unique_ptr<Base>> resources;
-    ID nextResourceID = 1;
+    ID nextResourceId = 1;
 };
 
 } // namespace Engine::Resource

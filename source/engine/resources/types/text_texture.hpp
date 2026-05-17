@@ -38,11 +38,11 @@ class TextTexture : public Engine::Resource::Base {
 
     std::string describe() const override;
 
-    const std::unique_ptr<SDL_Texture, TextureDeleter> Handle;
-    const std::string FontDescription;
-    const SDL_Color Colour{0, 0, 0, 0};
-    const SDL_Rect Size{0, 0, 0, 0};
-    const std::string Text;
+    const std::unique_ptr<SDL_Texture, TextureDeleter> handle;
+    const std::string fontDescription;
+    const SDL_Color colour{0, 0, 0, 0};
+    const SDL_Rect size{0, 0, 0, 0};
+    const std::string text;
 };
 
 } // namespace Engine::Resource

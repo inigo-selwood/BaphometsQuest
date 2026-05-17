@@ -20,12 +20,12 @@ SoundEffect::loadSoundEffect(const std::string &path) {
 }
 
 SoundEffect::SoundEffect(const std::string &path)
-    : Handle(loadSoundEffect(path)), Path(path) {}
+    : handle(loadSoundEffect(path)), path(path) {}
 
 std::string SoundEffect::describe() const {
     ::YAML::Node name;
     name["type"] = "SoundEffect";
-    name["path"] = this->Path;
+    name["path"] = this->path;
 
     return this->formatDescription(name);
 }

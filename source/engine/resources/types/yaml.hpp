@@ -15,8 +15,8 @@ class YAML : public Engine::Resource::Base {
 
     std::string describe() const override;
 
-    const std::unique_ptr<::YAML::Node> Node;
-    const std::string Path;
+    const std::unique_ptr<::YAML::Node> node;
+    const std::string path;
 };
 
 } // namespace Engine::Resource

@@ -28,9 +28,9 @@ class ImageTexture : public Engine::Resource::Base {
 
     std::string describe() const override;
 
-    const std::unique_ptr<SDL_Texture, TextureDeleter> Handle;
-    const std::string Path;
-    const SDL_Rect Size{0, 0, 0, 0};
+    const std::unique_ptr<SDL_Texture, TextureDeleter> handle;
+    const std::string path;
+    const SDL_Rect size{0, 0, 0, 0};
 };
 
 } // namespace Engine::Resource

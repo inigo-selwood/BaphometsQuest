@@ -25,8 +25,8 @@ class SoundEffect : public Engine::Resource::Base {
 
     std::string describe() const override;
 
-    const std::unique_ptr<Mix_Chunk, SoundEffectDeleter> Handle;
-    const std::string Path;
+    const std::unique_ptr<Mix_Chunk, SoundEffectDeleter> handle;
+    const std::string path;
 };
 
 } // namespace Engine::Resource

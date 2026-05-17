@@ -16,10 +16,10 @@ namespace Logger {
 
 namespace {
 
-constexpr std::size_t MAX_LOG_FILES = 3;
+constexpr std::size_t maxLogFiles = 3;
 
 /** Return a filesystem-safe ISO-like timestamp for log filenames */
-std::string getISOTimestamp() {
+std::string getIsoTimestamp() {
     const auto now = std::chrono::system_clock::now();
     const std::time_t time = std::chrono::system_clock::to_time_t(now);
     std::tm localTime{};
@@ -51,7 +51,7 @@ void pruneLogs(const std::filesystem::path &logsDirectory) {
         }
     );
 
-    const std::size_t logsToKeepBeforeCurrent = MAX_LOG_FILES - 1;
+    const std::size_t logsToKeepBeforeCurrent = maxLogFiles - 1;
 
     // Keep room for the log file that will be created during this startup
     for(std::size_t index = logsToKeepBeforeCurrent; index < logFiles.size();
@@ -108,7 +108,7 @@ void start(
     pruneLogs(logsDirectory);
 
     const std::filesystem::path logPath =
-        logsDirectory / (getISOTimestamp() + ".txt");
+        logsDirectory / (getIsoTimestamp() + ".txt");
 
     // File logs are always trace-level; the CLI only controls console noise
     auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(

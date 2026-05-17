@@ -24,7 +24,7 @@ TextTexture::renderTextTexture(
     const std::string &text
 ) {
     std::unique_ptr<SDL_Surface, SurfaceDeleter> surface(
-        TTF_RenderUTF8_Blended(font.Handle.get(), text.c_str(), colour)
+        TTF_RenderUTF8_Blended(font.handle.get(), text.c_str(), colour)
     );
 
     if(!surface) {
@@ -65,16 +65,16 @@ TextTexture::TextTexture(
     SDL_Color colour,
     const std::string &text
 )
-    : Handle(renderTextTexture(renderer, font, colour, text)),
-      FontDescription(font.describe()), Colour(colour),
-      Size(queryTextureSize(this->Handle.get(), text)), Text(text) {}
+    : handle(renderTextTexture(renderer, font, colour, text)),
+      fontDescription(font.describe()), colour(colour),
+      size(queryTextureSize(this->handle.get(), text)), text(text) {}
 
 std::string TextTexture::describe() const {
     ::YAML::Node name;
     name["type"] = "TextTexture";
-    name["font"] = this->FontDescription;
-    name["colour"] = Engine::Format::colour(this->Colour);
-    name["text"] = this->Text;
+    name["font"] = this->fontDescription;
+    name["colour"] = Engine::Format::colour(this->colour);
+    name["text"] = this->text;
 
     return this->formatDescription(name);
 }

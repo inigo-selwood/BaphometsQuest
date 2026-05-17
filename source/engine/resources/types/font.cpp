@@ -20,13 +20,13 @@ Font::loadFont(const std::string &path, int size) {
 }
 
 Font::Font(const std::string &path, int size)
-    : Handle(loadFont(path, size)), Path(path), Size(size) {}
+    : handle(loadFont(path, size)), path(path), size(size) {}
 
 std::string Font::describe() const {
     ::YAML::Node name;
     name["type"] = "Font";
-    name["path"] = this->Path;
-    name["size"] = this->Size;
+    name["path"] = this->path;
+    name["size"] = this->size;
 
     return this->formatDescription(name);
 }

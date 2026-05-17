@@ -25,9 +25,9 @@ class Font : public Engine::Resource::Base {
 
     std::string describe() const override;
 
-    const std::unique_ptr<TTF_Font, FontDeleter> Handle;
-    const std::string Path;
-    const int Size = 0;
+    const std::unique_ptr<TTF_Font, FontDeleter> handle;
+    const std::string path;
+    const int size = 0;
 };
 
 } // namespace Engine::Resource
