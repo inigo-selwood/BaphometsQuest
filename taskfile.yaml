@@ -1,67 +1,6 @@
 version: '3'
 
 tasks:
-  configure-debug:
-    internal: true
-    method: timestamp
-    sources:
-      - CMakeLists.txt
-    generates:
-      - build/debug/Makefile
-    cmds:
-      - cmake -S . -B build/debug
-
-  build-debug:
-    desc: Configure and build the debug game
-    deps:
-      - configure-debug
-    method: checksum
-    sources:
-      - CMakeLists.txt
-      - source/**/*.cpp
-      - source/**/*.hpp
-    generates:
-      - build/debug/baphomets_quest
-      - build/debug/.task-build-debug.stamp
-    cmds:
-      - cmake --build build/debug
-      - cmake -E touch build/debug/.task-build-debug.stamp
-
-  configure-release:
-    internal: true
-    method: timestamp
-    sources:
-      - CMakeLists.txt
-    generates:
-      - build/release/Makefile
-    cmds:
-      - >-
-        cmake -S . -B build/release
-        -DCMAKE_BUILD_TYPE=Release
-        -DBAPHOMETS_QUEST_RELEASE_OPTIMISATION=ON
-
-  build-release:
-    desc: Build an optimised release and bundle release resources
-    deps:
-      - configure-release
-    method: checksum
-    sources:
-      - CMakeLists.txt
-      - source/**/*.cpp
-      - source/**/*.hpp
-      - resources/**/*
-    generates:
-      - build/release/baphomets_quest
-      - build/release/.task-build-release.stamp
-    cmds:
-      - cmake --build build/release --target bundle_resources --config Release
-      - cmake -E touch build/release/.task-build-release.stamp
-
-  clean:
-    desc: Remove generated build output
-    cmds:
-      - rm -rf build
-
   format:
     desc: Format source and resource files
     cmds:
@@ -71,9 +10,50 @@ tasks:
           tidy -config .tidyrc -m "$file"
         done
 
+  build-debug:
+    desc: Configure and build the debug game
+    method: checksum
+    sources:
+      - CMakeLists.txt
+      - source/**/*.cpp
+      - source/**/*.hpp
+    generates:
+      - build/debug/Makefile
+      - build/debug/baphomets_quest
+      - build/debug/.task-build-debug.stamp
+    cmds:
+      - cmake -S . -B build/debug
+      - cmake --build build/debug
+      - cmake -E touch build/debug/.task-build-debug.stamp
+
+  build-release:
+    desc: Build an optimised release and bundle release resources
+    method: checksum
+    sources:
+      - CMakeLists.txt
+      - source/**/*.cpp
+      - source/**/*.hpp
+      - resources/**/*
+    generates:
+      - build/release/Makefile
+      - build/release/baphomets_quest
+      - build/release/.task-build-release.stamp
+    cmds:
+      - >-
+        cmake -S . -B build/release
+        -DCMAKE_BUILD_TYPE=Release
+        -DBAPHOMETS_QUEST_RELEASE_OPTIMISATION=ON
+      - cmake --build build/release --target bundle_resources --config Release
+      - cmake -E touch build/release/.task-build-release.stamp
+
   run:
     desc: Build and run the game, forwarding arguments after --
     deps:
       - build-debug
     cmds:
       - ./build/debug/baphomets_quest {{.CLI_ARGS}}
+
+  clean:
+    desc: Remove generated build output
+    cmds:
+      - rm -rf build
