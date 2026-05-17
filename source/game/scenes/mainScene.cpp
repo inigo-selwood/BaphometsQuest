@@ -1,6 +1,7 @@
 #include "mainScene.hpp"
 
 #include "../../engine/game/game.hpp"
+#include "../../engine/node/graphicNode.hpp"
 #include "../../engine/scenes/sceneLoader.hpp"
 #include "../nodes/clickableRedBox.hpp"
 #include "../nodes/colourChangeBox.hpp"
@@ -13,7 +14,8 @@ void MainScene::onEnterTree() {
         "resources/scenes/main.xml"
     );
 
-    auto &blueBox = this->getChild<ColourChangeBox>("blueBox");
+    auto &mainLayout = this->getChild<Engine::GraphicNode>("mainLayout");
+    auto &blueBox = mainLayout.getChild<ColourChangeBox>("blueBox");
     auto &redBox = blueBox.getChild<ClickableRedBox>("redBox");
 
     redBox.connectSignal<int, int, int>(

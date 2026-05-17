@@ -1,5 +1,7 @@
 #include "cli.hpp"
 #include "engine/components/box.hpp"
+#include "engine/components/layoutNode.hpp"
+#include "engine/components/music.hpp"
 #include "engine/components/text.hpp"
 #include "engine/components/texture.hpp"
 #include "engine/components/timer.hpp"
@@ -44,6 +46,8 @@ int main(int argumentCount, const char *arguments[]) {
         Box::registerType();
         ClickableRedBox::registerType();
         ColourChangeBox::registerType();
+        Engine::LayoutNode::registerType();
+        Engine::Music::registerType();
         Text::registerType();
         Engine::Timer::registerType();
         Texture::registerType();
