@@ -2,7 +2,11 @@
 
 #include <SDL.h>
 
+#include <algorithm>
+#include <cstdint>
 #include <filesystem>
+#include <iomanip>
+#include <sstream>
 #include <stdexcept>
 
 namespace Engine {
@@ -18,6 +22,23 @@ struct SDLBasePathDeleter {
 bool pathExists(const std::filesystem::path &path) {
     std::error_code error;
     return std::filesystem::exists(path, error);
+}
+
+std::uint32_t hashAssetUID(
+    AssetRegistry::AssetID id,
+    const std::string &lookupKey,
+    std::uint32_t salt
+) {
+    std::uint32_t hash = 2166136261U;
+    const std::string input =
+        std::to_string(id) + ":" + lookupKey + ":" + std::to_string(salt);
+
+    for(unsigned char character : input) {
+        hash ^= character;
+        hash *= 16777619U;
+    }
+
+    return hash;
 }
 
 } // namespace
@@ -84,20 +105,40 @@ std::string AssetRegistry::typeName(AssetType type) {
     return "unknown";
 }
 
-void AssetRegistry::clearActiveGroup() {
-    this->activeAssetGroup.reset();
+std::string AssetRegistry::displayTypeName(AssetType type) {
+    switch(type) {
+    case AssetType::Font:
+        return "Font";
+    case AssetType::ImageTexture:
+        return "Image texture";
+    case AssetType::TextTexture:
+        return "Text texture";
+    case AssetType::Music:
+        return "Music";
+    case AssetType::SoundEffect:
+        return "Sound effect";
+    case AssetType::XML:
+        return "XML";
+    case AssetType::YAML:
+        return "YAML";
+    }
+
+    return "Unknown";
 }
 
-AssetRegistry::AssetGroupID
-AssetRegistry::createGroup(const std::string &name) {
-    const AssetGroupID group{this->nextAssetGroupUID++};
-    this->assetGroupNames.emplace(group.UID, name);
-    spdlog::debug("Created asset group '{}' for '{}'.", group.UID, name);
-    return group;
+std::string makeAssetUID(
+    AssetRegistry::AssetID id,
+    const std::string &lookupKey,
+    std::uint32_t salt
+) {
+    std::ostringstream stream;
+    stream << std::hex << std::nouppercase << std::setfill('0') << std::setw(8)
+           << hashAssetUID(id, lookupKey, salt);
+    return stream.str();
 }
 
 void AssetRegistry::forgetAsset(const AssetID &id) {
-    const auto assetIterator = this->assets.find(id.UID);
+    const auto assetIterator = this->assets.find(id);
 
     if(assetIterator == this->assets.end()) {
         return;
@@ -114,48 +155,42 @@ void AssetRegistry::forgetAsset(const AssetID &id) {
 
 const AssetRegistry::AssetRecord &
 AssetRegistry::getRecord(const AssetID &id) const {
-    const auto iterator = this->assets.find(id.UID);
+    const auto iterator = this->assets.find(id);
 
-    if(id.UID == 0 || iterator == this->assets.end()) {
-        throw std::runtime_error(
-            "Asset is not loaded: " + std::to_string(id.UID)
-        );
+    if(id == 0 || iterator == this->assets.end()) {
+        throw std::runtime_error("Asset is not loaded: " + std::to_string(id));
     }
 
     return iterator->second;
 }
 
-AssetRegistry::AssetID
-AssetRegistry::getOrCreateID(AssetType type, const std::string &key) {
+AssetRegistry::AssetID AssetRegistry::getOrCreateID(
+    AssetType type,
+    const std::string &key,
+    const std::string &metadata
+) {
     const std::string lookupKey = AssetRegistry::makeLookupKey(type, key);
     const auto existingIterator = this->assetIDs.find(lookupKey);
 
     if(existingIterator != this->assetIDs.end()) {
-        return AssetID{existingIterator->second};
+        return existingIterator->second;
     }
 
-    const AssetID id{this->nextAssetUID++};
-    this->assetIDs.emplace(lookupKey, id.UID);
-    this->assets.emplace(
-        id.UID,
-        AssetRecord{
-            type,
-            key,
-            this->activeAssetGroup.value_or(AssetGroupID{}),
-        }
-    );
+    const AssetID id = this->nextAssetUID++;
+    std::uint32_t salt = 0;
+    std::string UID = makeAssetUID(id, lookupKey, salt);
+
+    while(std::ranges::any_of(this->assets, [&UID](const auto &asset) {
+        return asset.second.UID == UID;
+    })) {
+        salt++;
+        UID = makeAssetUID(id, lookupKey, salt);
+    }
+
+    this->assetIDs.emplace(lookupKey, id);
+    this->assets.emplace(id, AssetRecord{UID, type, key, metadata});
 
     return id;
-}
-
-void AssetRegistry::setActiveGroup(AssetGroupID group) {
-    if(group.UID == 0 || !this->assetGroupNames.contains(group.UID)) {
-        throw std::runtime_error(
-            "Unknown asset group: " + std::to_string(group.UID)
-        );
-    }
-
-    this->activeAssetGroup = group;
 }
 
 bool AssetRegistry::isTextureType(AssetType type) {

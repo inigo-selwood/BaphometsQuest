@@ -131,7 +131,6 @@ class Game {
 
     AssetRegistry assets;
     std::unique_ptr<Node> activeScene;
-    std::optional<AssetRegistry::AssetGroupID> activeSceneAssetGroup;
     InputState input;
     LoopTimer loopTimer;
     std::optional<std::string> queuedSceneName;

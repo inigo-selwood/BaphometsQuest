@@ -6,7 +6,6 @@
 
 #include <cstdint>
 #include <memory>
-#include <optional>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
@@ -36,22 +35,10 @@ class AssetRegistry {
         YAML,
     };
 
-    struct AssetID {
-        std::uint64_t UID = 0;
-    };
-
-    struct AssetGroupID {
-        std::uint64_t UID = 0;
-    };
+    using AssetID = std::uint64_t;
 
     /** Destroy all cached assets and parsed documents. */
     void clear();
-
-    /** Stop assigning new assets to an asset group. */
-    void clearActiveGroup();
-
-    /** Create a group that can own newly loaded assets. */
-    AssetGroupID createGroup(const std::string &name);
 
     /** Return a cached asset by ID. */
     template <typename Asset> Asset &get(const AssetID &id) {
@@ -102,10 +89,6 @@ class AssetRegistry {
     /** Resolve a resource path against bundled resources when possible. */
     std::string resolvePath(const std::string &path) const;
 
-    /** Assign newly loaded assets to a group until the active group changes.
-     */
-    void setActiveGroup(AssetGroupID group);
-
     /** Return the pixel size for a loaded texture asset. */
     SDL_Point getTextureSize(const AssetID &id) const;
 
@@ -118,9 +101,6 @@ class AssetRegistry {
     /** Destroy all cached assets of one type. */
     void unloadAll(AssetType type);
 
-    /** Destroy all cached assets owned by a group. */
-    void unloadGroup(AssetGroupID group);
-
   private:
     struct FontDeleter {
         void operator()(TTF_Font *font) const {
@@ -129,9 +109,11 @@ class AssetRegistry {
     };
 
     struct AssetRecord {
+        std::string UID;
+
         AssetType type;
         std::string key;
-        AssetGroupID group;
+        std::string metadata;
     };
 
     struct MusicDeleter {
@@ -166,11 +148,17 @@ class AssetRegistry {
         SDL_Color colour,
         const std::string &text
     );
+    static std::string displayTypeName(AssetType type);
     static std::string typeName(AssetType type);
 
+    static std::string describeAsset(const AssetRecord &asset);
     void forgetAsset(const AssetID &id);
     const AssetRecord &getRecord(const AssetID &id) const;
-    AssetID getOrCreateID(AssetType type, const std::string &key);
+    AssetID getOrCreateID(
+        AssetType type,
+        const std::string &key,
+        const std::string &metadata
+    );
     TTF_Font *getFont(const AssetID &id);
     Mix_Music *getMusic(const AssetID &id);
     Mix_Chunk *getSoundEffect(const AssetID &id);
@@ -180,7 +168,6 @@ class AssetRegistry {
     static bool isTextureType(AssetType type);
 
     std::unordered_map<std::uint64_t, AssetRecord> assets;
-    std::unordered_map<std::uint64_t, std::string> assetGroupNames;
     std::unordered_map<std::string, std::uint64_t> assetIDs;
     std::unordered_map<std::string, std::unique_ptr<TTF_Font, FontDeleter>>
         fonts;
@@ -194,8 +181,6 @@ class AssetRegistry {
     std::unordered_map<std::string, std::unique_ptr<tinyxml2::XMLDocument>>
         XMLDocuments;
     std::unordered_map<std::string, YAML::Node> YAMLDocuments;
-    std::optional<AssetGroupID> activeAssetGroup;
-    std::uint64_t nextAssetGroupUID = 1;
     std::uint64_t nextAssetUID = 1;
 };
 

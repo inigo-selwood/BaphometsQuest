@@ -1,5 +1,7 @@
 #include "assetRegistry.hpp"
 
+#include "../format/format.hpp"
+
 #include <SDL.h>
 #include <SDL_image.h>
 
@@ -51,41 +53,40 @@ std::string assetLogType(AssetRegistry::AssetType type) {
 }
 
 void logAssetLoad(
-    AssetRegistry::AssetID id,
+    const std::string &UID,
     AssetRegistry::AssetType type,
-    const std::string &context = ""
+    const std::string &metadata = "",
+    bool includeDomain = false
 ) {
-    if(context.empty()) {
-        spdlog::debug(
-            "Loading {}:{} ({})",
-            assetLogDomain(context),
-            id.UID,
-            assetLogType(type)
+    const std::string name =
+        includeDomain ? assetLogDomain(metadata) + ":" + UID : UID;
+
+    if(metadata.empty()) {
+        spdlog::debug("Loading {} ({})", name, assetLogType(type));
+        return;
+    }
+
+    if(includeDomain) {
+        spdlog::info(
+            "Loading {} ({}, {})",
+            name,
+            assetLogType(type),
+            metadata
         );
         return;
     }
 
-    spdlog::info(
-        "Loading {}:{} ({}, {})",
-        assetLogDomain(context),
-        id.UID,
-        assetLogType(type),
-        context
-    );
+    spdlog::debug("Loading {} ({}, {})", name, assetLogType(type), metadata);
 }
 
 void logAssetLoaded(
-    AssetRegistry::AssetID id,
+    const std::string &UID,
     AssetRegistry::AssetType type,
-    const std::string &context
+    const std::string &metadata
 ) {
-    spdlog::info(
-        "Loaded {}:{} ({}, {})",
-        assetLogDomain(context),
-        id.UID,
-        assetLogType(type),
-        context
-    );
+    const std::string name = assetLogDomain(metadata) + ":" + UID;
+
+    spdlog::info("Loaded {} ({}, {})", name, assetLogType(type), metadata);
 }
 
 } // namespace
@@ -94,7 +95,11 @@ AssetRegistry::AssetID
 AssetRegistry::loadFont(const std::string &path, int size) {
     const std::string resolvedPath = this->resolvePath(path);
     const std::string key = AssetRegistry::makeFontKey(resolvedPath, size);
-    const AssetID id = this->getOrCreateID(AssetType::Font, key);
+    const AssetID id = this->getOrCreateID(
+        AssetType::Font,
+        key,
+        Format::filePath(resolvedPath) + ", size " + std::to_string(size)
+    );
     auto &fontCache = this->fonts;
     const auto fontIterator = fontCache.find(key);
 
@@ -102,7 +107,8 @@ AssetRegistry::loadFont(const std::string &path, int size) {
         return id;
     }
 
-    logAssetLoad(id, AssetType::Font);
+    const auto &record = this->getRecord(id);
+    logAssetLoad(record.UID, record.type, record.metadata);
 
     std::unique_ptr<TTF_Font, FontDeleter> font(
         TTF_OpenFont(resolvedPath.c_str(), size)
@@ -126,8 +132,11 @@ AssetRegistry::AssetID AssetRegistry::loadImageTexture(
     const std::string &path
 ) {
     const std::string resolvedPath = this->resolvePath(path);
-    const AssetID id =
-        this->getOrCreateID(AssetType::ImageTexture, resolvedPath);
+    const AssetID id = this->getOrCreateID(
+        AssetType::ImageTexture,
+        resolvedPath,
+        Format::filePath(resolvedPath)
+    );
     auto &textureCache = this->textures;
     const auto textureIterator = textureCache.find(resolvedPath);
 
@@ -135,7 +144,8 @@ AssetRegistry::AssetID AssetRegistry::loadImageTexture(
         return id;
     }
 
-    logAssetLoad(id, AssetType::ImageTexture);
+    const auto &record = this->getRecord(id);
+    logAssetLoad(record.UID, record.type, record.metadata);
 
     std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface(
         IMG_Load(resolvedPath.c_str()),
@@ -170,7 +180,11 @@ AssetRegistry::AssetID AssetRegistry::loadImageTexture(
 
 AssetRegistry::AssetID AssetRegistry::loadMusic(const std::string &path) {
     const std::string resolvedPath = this->resolvePath(path);
-    const AssetID id = this->getOrCreateID(AssetType::Music, resolvedPath);
+    const AssetID id = this->getOrCreateID(
+        AssetType::Music,
+        resolvedPath,
+        Format::filePath(resolvedPath)
+    );
     auto &musicCache = this->music;
     const auto musicIterator = musicCache.find(resolvedPath);
 
@@ -178,7 +192,8 @@ AssetRegistry::AssetID AssetRegistry::loadMusic(const std::string &path) {
         return id;
     }
 
-    logAssetLoad(id, AssetType::Music);
+    const auto &record = this->getRecord(id);
+    logAssetLoad(record.UID, record.type, record.metadata);
 
     std::unique_ptr<Mix_Music, MusicDeleter> music(
         Mix_LoadMUS(resolvedPath.c_str())
@@ -200,8 +215,11 @@ AssetRegistry::AssetID AssetRegistry::loadMusic(const std::string &path) {
 AssetRegistry::AssetID
 AssetRegistry::loadSoundEffect(const std::string &path) {
     const std::string resolvedPath = this->resolvePath(path);
-    const AssetID id =
-        this->getOrCreateID(AssetType::SoundEffect, resolvedPath);
+    const AssetID id = this->getOrCreateID(
+        AssetType::SoundEffect,
+        resolvedPath,
+        Format::filePath(resolvedPath)
+    );
     auto &soundEffectCache = this->soundEffects;
     const auto soundEffectIterator = soundEffectCache.find(resolvedPath);
 
@@ -209,7 +227,8 @@ AssetRegistry::loadSoundEffect(const std::string &path) {
         return id;
     }
 
-    logAssetLoad(id, AssetType::SoundEffect);
+    const auto &record = this->getRecord(id);
+    logAssetLoad(record.UID, record.type, record.metadata);
 
     std::unique_ptr<Mix_Chunk, SoundEffectDeleter> soundEffect(
         Mix_LoadWAV(resolvedPath.c_str())
@@ -231,14 +250,16 @@ AssetRegistry::loadSoundEffect(const std::string &path) {
 AssetRegistry::AssetID
 AssetRegistry::loadXML(const std::string &path, const std::string &context) {
     const std::string resolvedPath = this->resolvePath(path);
-    const AssetID id = this->getOrCreateID(AssetType::XML, resolvedPath);
+    const AssetID id =
+        this->getOrCreateID(AssetType::XML, resolvedPath, context);
     const auto XMLIterator = this->XMLDocuments.find(resolvedPath);
 
     if(XMLIterator != this->XMLDocuments.end()) {
         return id;
     }
 
-    logAssetLoad(id, AssetType::XML, context);
+    const auto &record = this->getRecord(id);
+    logAssetLoad(record.UID, record.type, record.metadata, true);
 
     auto document = std::make_unique<tinyxml2::XMLDocument>();
     const tinyxml2::XMLError loadResult =
@@ -252,7 +273,7 @@ AssetRegistry::loadXML(const std::string &path, const std::string &context) {
         );
     }
 
-    logAssetLoaded(id, AssetType::XML, context);
+    logAssetLoaded(record.UID, record.type, record.metadata);
 
     const auto [documentIterator, inserted] =
         this->XMLDocuments.emplace(resolvedPath, std::move(document));
@@ -276,7 +297,11 @@ AssetRegistry::AssetID AssetRegistry::loadTextTexture(
         colour,
         text
     );
-    const AssetID id = this->getOrCreateID(AssetType::TextTexture, key);
+    const AssetID id = this->getOrCreateID(
+        AssetType::TextTexture,
+        key,
+        "text '" + text + "'"
+    );
     auto &textureCache = this->textures;
     const auto textureIterator = textureCache.find(key);
 
@@ -284,7 +309,8 @@ AssetRegistry::AssetID AssetRegistry::loadTextTexture(
         return id;
     }
 
-    logAssetLoad(id, AssetType::TextTexture);
+    const auto &record = this->getRecord(id);
+    logAssetLoad(record.UID, record.type, record.metadata);
 
     TTF_Font *font = nullptr;
 
@@ -329,14 +355,16 @@ AssetRegistry::AssetID AssetRegistry::loadTextTexture(
 AssetRegistry::AssetID
 AssetRegistry::loadYAML(const std::string &path, const std::string &context) {
     const std::string resolvedPath = this->resolvePath(path);
-    const AssetID id = this->getOrCreateID(AssetType::YAML, resolvedPath);
+    const AssetID id =
+        this->getOrCreateID(AssetType::YAML, resolvedPath, context);
     const auto YAMLIterator = this->YAMLDocuments.find(resolvedPath);
 
     if(YAMLIterator != this->YAMLDocuments.end()) {
         return id;
     }
 
-    logAssetLoad(id, AssetType::YAML, context);
+    const auto &record = this->getRecord(id);
+    logAssetLoad(record.UID, record.type, record.metadata, true);
 
     try {
         auto [documentIterator, inserted] = this->YAMLDocuments.emplace(
@@ -346,7 +374,7 @@ AssetRegistry::loadYAML(const std::string &path, const std::string &context) {
         (void)documentIterator;
         (void)inserted;
 
-        logAssetLoaded(id, AssetType::YAML, context);
+        logAssetLoaded(record.UID, record.type, record.metadata);
 
         return id;
     } catch(const YAML::Exception &exception) {

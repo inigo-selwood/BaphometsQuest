@@ -22,9 +22,6 @@ void Game::loadQueuedScene() {
     }
 
     spdlog::info("Loading scene '{}'.", *this->queuedSceneName);
-    this->activeSceneAssetGroup =
-        this->assets.createGroup("scene:" + *this->queuedSceneName);
-    this->assets.setActiveGroup(*this->activeSceneAssetGroup);
     this->activeScene = this->sceneFactories.at(*this->queuedSceneName)();
     this->activeScene->enterTree();
     spdlog::info("Scene '{}' loaded.", *this->queuedSceneName);
@@ -42,12 +39,6 @@ void Game::destroyActiveScene() {
 }
 
 void Game::unloadActiveSceneAssets() {
-    if(this->activeSceneAssetGroup.has_value()) {
-        this->assets.unloadGroup(*this->activeSceneAssetGroup);
-        this->activeSceneAssetGroup.reset();
-        return;
-    }
-
     this->assets.unloadAll(AssetRegistry::AssetType::ImageTexture);
     this->assets.unloadAll(AssetRegistry::AssetType::TextTexture);
 }

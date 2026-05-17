@@ -1,28 +1,38 @@
 #include "assetRegistry.hpp"
 
 #include <stdexcept>
-#include <vector>
 
 namespace Engine {
+
+std::string AssetRegistry::describeAsset(const AssetRecord &asset) {
+    std::string label =
+        asset.UID + " (" + AssetRegistry::displayTypeName(asset.type);
+
+    if(!asset.metadata.empty()) {
+        label += ", " + asset.metadata;
+    }
+
+    label += ")";
+    return label;
+}
 
 void AssetRegistry::clear() {
     this->unloadAll();
 }
 
 void AssetRegistry::unload(const AssetID &id) {
-    const auto assetIterator = this->assets.find(id.UID);
+    const auto assetIterator = this->assets.find(id);
 
-    if(id.UID == 0 || assetIterator == this->assets.end()) {
-        spdlog::debug("Cached asset '{}' was already unloaded.", id.UID);
+    if(id == 0 || assetIterator == this->assets.end()) {
+        spdlog::debug("Cached asset '{}' was already unloaded.", id);
         return;
     }
 
     const AssetType type = assetIterator->second.type;
     const std::string key = assetIterator->second.key;
     spdlog::debug(
-        "Unloading cached {} asset '{}'.",
-        AssetRegistry::typeName(type),
-        id.UID
+        "Unloading {}",
+        AssetRegistry::describeAsset(assetIterator->second)
     );
 
     std::size_t removed = 0;
@@ -51,9 +61,8 @@ void AssetRegistry::unload(const AssetID &id) {
 
     if(removed == 0) {
         spdlog::debug(
-            "Cached {} asset '{}' was already unloaded.",
-            AssetRegistry::typeName(type),
-            id.UID
+            "Cached asset {} was already unloaded.",
+            AssetRegistry::describeAsset(assetIterator->second)
         );
         this->forgetAsset(id);
         return;
@@ -64,15 +73,9 @@ void AssetRegistry::unload(const AssetID &id) {
 
 void AssetRegistry::unloadAll() {
     for(const auto &[UID, asset] : this->assets) {
-        spdlog::debug(
-            "Unloading cached {} asset '{}'.",
-            AssetRegistry::typeName(asset.type),
-            UID
-        );
+        spdlog::debug("Unloading {}", AssetRegistry::describeAsset(asset));
     }
 
-    this->activeAssetGroup.reset();
-    this->assetGroupNames.clear();
     this->assetIDs.clear();
     this->assets.clear();
     this->fonts.clear();
@@ -81,37 +84,6 @@ void AssetRegistry::unloadAll() {
     this->textures.clear();
     this->XMLDocuments.clear();
     this->YAMLDocuments.clear();
-}
-
-void AssetRegistry::unloadGroup(AssetGroupID group) {
-    if(group.UID == 0) {
-        return;
-    }
-
-    std::vector<AssetID> assetsToUnload;
-
-    for(const auto &[UID, asset] : this->assets) {
-        if(asset.group.UID == group.UID) {
-            assetsToUnload.push_back(AssetID{UID});
-        }
-    }
-
-    spdlog::debug(
-        "Unloading {} asset(s) from group '{}'.",
-        assetsToUnload.size(),
-        group.UID
-    );
-
-    for(const AssetID &id : assetsToUnload) {
-        this->unload(id);
-    }
-
-    this->assetGroupNames.erase(group.UID);
-
-    if(this->activeAssetGroup.has_value()
-        && this->activeAssetGroup->UID == group.UID) {
-        this->activeAssetGroup.reset();
-    }
 }
 
 void AssetRegistry::unloadAll(AssetType type) {
@@ -125,8 +97,8 @@ void AssetRegistry::unloadAll(AssetType type) {
             }
 
             spdlog::debug(
-                "Unloading cached font asset '{}'.",
-                iterator->first
+                "Unloading {}",
+                AssetRegistry::describeAsset(iterator->second)
             );
             this->assetIDs.erase(
                 AssetRegistry::makeLookupKey(
@@ -159,11 +131,13 @@ void AssetRegistry::unloadAll(AssetType type) {
                     UID = assetIDIterator->second;
                 }
 
-                spdlog::debug(
-                    "Unloading cached {} asset '{}'.",
-                    AssetRegistry::typeName(type),
-                    UID
-                );
+                const auto assetIterator = this->assets.find(UID);
+                if(assetIterator != this->assets.end()) {
+                    spdlog::debug(
+                        "Unloading {}",
+                        AssetRegistry::describeAsset(assetIterator->second)
+                    );
+                }
                 this->assetIDs.erase(AssetRegistry::makeLookupKey(type, key));
 
                 if(UID != 0) {
@@ -187,8 +161,8 @@ void AssetRegistry::unloadAll(AssetType type) {
             }
 
             spdlog::debug(
-                "Unloading cached music asset '{}'.",
-                iterator->first
+                "Unloading {}",
+                AssetRegistry::describeAsset(iterator->second)
             );
             this->assetIDs.erase(
                 AssetRegistry::makeLookupKey(
@@ -210,8 +184,8 @@ void AssetRegistry::unloadAll(AssetType type) {
             }
 
             spdlog::debug(
-                "Unloading cached sound effect asset '{}'.",
-                iterator->first
+                "Unloading {}",
+                AssetRegistry::describeAsset(iterator->second)
             );
             this->assetIDs.erase(
                 AssetRegistry::makeLookupKey(
@@ -232,7 +206,10 @@ void AssetRegistry::unloadAll(AssetType type) {
                 continue;
             }
 
-            spdlog::debug("Unloading cached XML asset '{}'.", iterator->first);
+            spdlog::debug(
+                "Unloading {}",
+                AssetRegistry::describeAsset(iterator->second)
+            );
             this->assetIDs.erase(
                 AssetRegistry::makeLookupKey(
                     iterator->second.type,
@@ -253,8 +230,8 @@ void AssetRegistry::unloadAll(AssetType type) {
             }
 
             spdlog::debug(
-                "Unloading cached YAML asset '{}'.",
-                iterator->first
+                "Unloading {}",
+                AssetRegistry::describeAsset(iterator->second)
             );
             this->assetIDs.erase(
                 AssetRegistry::makeLookupKey(
@@ -281,7 +258,7 @@ TTF_Font *AssetRegistry::getFont(const AssetID &id) {
 
     if(iterator == this->fonts.end()) {
         throw std::runtime_error(
-            "Font asset is not loaded: " + std::to_string(id.UID)
+            "Font asset is not loaded: " + std::to_string(id)
         );
     }
 
@@ -299,7 +276,7 @@ Mix_Music *AssetRegistry::getMusic(const AssetID &id) {
 
     if(iterator == this->music.end()) {
         throw std::runtime_error(
-            "Music asset is not loaded: " + std::to_string(id.UID)
+            "Music asset is not loaded: " + std::to_string(id)
         );
     }
 
@@ -317,7 +294,7 @@ Mix_Chunk *AssetRegistry::getSoundEffect(const AssetID &id) {
 
     if(iterator == this->soundEffects.end()) {
         throw std::runtime_error(
-            "Sound effect asset is not loaded: " + std::to_string(id.UID)
+            "Sound effect asset is not loaded: " + std::to_string(id)
         );
     }
 
@@ -335,7 +312,7 @@ SDL_Texture *AssetRegistry::getTexture(const AssetID &id) {
 
     if(iterator == this->textures.end()) {
         throw std::runtime_error(
-            "Texture asset is not loaded: " + std::to_string(id.UID)
+            "Texture asset is not loaded: " + std::to_string(id)
         );
     }
 
@@ -357,7 +334,7 @@ tinyxml2::XMLDocument *AssetRegistry::getXML(const AssetID &id) {
 
     if(iterator == this->XMLDocuments.end()) {
         throw std::runtime_error(
-            "XML asset is not loaded: " + std::to_string(id.UID)
+            "XML asset is not loaded: " + std::to_string(id)
         );
     }
 
@@ -375,7 +352,7 @@ YAML::Node *AssetRegistry::getYAML(const AssetID &id) {
 
     if(iterator == this->YAMLDocuments.end()) {
         throw std::runtime_error(
-            "YAML asset is not loaded: " + std::to_string(id.UID)
+            "YAML asset is not loaded: " + std::to_string(id)
         );
     }
 
@@ -393,7 +370,7 @@ SDL_Point AssetRegistry::getTextureSize(const AssetID &id) const {
 
     if(iterator == this->textures.end()) {
         throw std::runtime_error(
-            "Texture asset is not loaded: " + std::to_string(id.UID)
+            "Texture asset is not loaded: " + std::to_string(id)
         );
     }
 
