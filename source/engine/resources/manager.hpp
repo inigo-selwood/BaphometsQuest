@@ -10,18 +10,15 @@
 #include <unordered_map>
 #include <utility>
 
+#include <spdlog/spdlog.h>
+#include <yaml-cpp/yaml.h>
+
 namespace Engine::Resource {
 
 using ID = std::uint64_t;
 
 class Manager {
   public:
-    Manager() = default;
-    Manager(const Manager &) = delete;
-    Manager &operator=(const Manager &) = delete;
-    Manager(Manager &&) = default;
-    Manager &operator=(Manager &&) = default;
-
     void clear();
     Base &get(ID id);
     const Base &get(ID id) const;
@@ -36,11 +33,19 @@ class Manager {
 
         const ID id = this->nextResourceId++;
 
-        this->resources.emplace(
-            id,
-            std::make_unique<ResourceType>(
-                std::forward<Arguments>(arguments)...
-            )
+        auto resource = std::make_unique<ResourceType>(
+            std::forward<Arguments>(arguments)...
+        );
+
+        const Base &loadedResource = *resource;
+        this->resources.emplace(id, std::move(resource));
+
+        const std::string description = loadedResource.describe();
+        const ::YAML::Node details = ::YAML::Load(description);
+        spdlog::debug(
+            "loaded {}:\n{}",
+            details["type"].as<std::string>("resource"),
+            description
         );
 
         return id;

@@ -9,12 +9,6 @@ namespace Engine::Resource {
 
 class Base {
   public:
-    Base() = default;
-    Base(const Base &) = delete;
-    Base &operator=(const Base &) = delete;
-    Base(Base &&) = default;
-    Base &operator=(Base &&) = default;
-
     virtual ~Base() = default;
 
     virtual std::string describe() const = 0;
