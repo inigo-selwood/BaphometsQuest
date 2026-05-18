@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../logger.hpp"
 #include "resource/base.hpp"
 
 #include <cstdint>
@@ -11,7 +12,6 @@
 #include <utility>
 
 #include <spdlog/spdlog.h>
-#include <yaml-cpp/yaml.h>
 
 namespace Engine::Resource {
 
@@ -19,6 +19,8 @@ using ID = std::uint64_t;
 
 class Manager {
   public:
+    ~Manager();
+
     void clear();
     Base &get(ID id);
     const Base &get(ID id) const;
@@ -31,21 +33,20 @@ class Manager {
             "ResourceType must inherit from Engine::Resource::Base."
         );
 
-        const ID id = this->nextResourceId++;
+        const ID id = this->nextResourceID++;
 
         auto resource = std::make_unique<ResourceType>(
             std::forward<Arguments>(arguments)...
         );
 
-        const Base &loadedResource = *resource;
         this->resources.emplace(id, std::move(resource));
 
+        const Base &loadedResource = *this->resources.at(id);
         const std::string description = loadedResource.describe();
-        const ::YAML::Node details = ::YAML::Load(description);
         spdlog::debug(
             "loaded {}:\n{}",
-            details["type"].as<std::string>("resource"),
-            description
+            loadedResource.ID,
+            Logger::indentPayload(description)
         );
 
         return id;
@@ -92,7 +93,7 @@ class Manager {
 
   private:
     std::unordered_map<ID, std::unique_ptr<Base>> resources;
-    ID nextResourceId = 1;
+    ID nextResourceID = 1;
 };
 
 } // namespace Engine::Resource

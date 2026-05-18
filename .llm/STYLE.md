@@ -9,7 +9,7 @@ project. Prefer these conventions over generic C++ defaults when they differ.
 - Types use `PascalCase`
 - Namespaces use `PascalCase`
 - Functions, methods, variables, and members use `camelCase`
-- Acronyms in identifiers: use `getISOTimestamp`, not `getIsoTimestamp`
+- Acronyms in identifiers stay uppercase, such as `getISOTimestamp` and `nextResourceID`
 - Constants use `UPPER_CASE` unless an external API or macro requires otherwise
 - External/library names keep their native casing, such as `SDL_*`, `TTF_*`, `Mix_*`, `CLI`, and `YAML::Node`
 - YAML keys use `kebab-case`

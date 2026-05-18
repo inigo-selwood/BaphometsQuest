@@ -1,18 +1,22 @@
 #include "resource_manager.hpp"
 
+#include "../logger.hpp"
+
 #include <spdlog/spdlog.h>
-#include <yaml-cpp/yaml.h>
 
 namespace Engine::Resource {
+
+Manager::~Manager() {
+    this->clear();
+}
 
 void Manager::clear() {
     for(const auto &resource : this->resources) {
         const std::string description = resource.second->describe();
-        const ::YAML::Node details = ::YAML::Load(description);
         spdlog::debug(
-            "freeing {}:\n{}",
-            details["type"].as<std::string>("resource"),
-            description
+            "unloaded {}:\n{}",
+            resource.second->ID,
+            Logger::indentPayload(description)
         );
     }
 
@@ -53,11 +57,10 @@ void Manager::remove(ID id) {
     }
 
     const std::string description = resource->second->describe();
-    const ::YAML::Node details = ::YAML::Load(description);
     spdlog::debug(
-        "freeing {}:\n{}",
-        details["type"].as<std::string>("resource"),
-        description
+        "unloaded {}:\n{}",
+        resource->second->ID,
+        Logger::indentPayload(description)
     );
     this->resources.erase(resource);
 }
