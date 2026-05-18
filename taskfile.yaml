@@ -18,12 +18,15 @@ tasks:
       - source/**/*.cpp
       - source/**/*.hpp
     generates:
-      - build/debug/Makefile
+      - build/debug/build.ninja
       - build/debug/baphomets_quest
       - build/debug/.task-build-debug.stamp
     cmds:
-      - cmake -S . -B build/debug
-      - cmake --build build/debug
+      - >-
+        cmake -S . -B build/debug
+        -G Ninja
+        -DCMAKE_MAKE_PROGRAM=/opt/homebrew/bin/ninja
+      - cmake --build build/debug --parallel
       - cmake -E touch build/debug/.task-build-debug.stamp
 
   build-release:
@@ -35,15 +38,21 @@ tasks:
       - source/**/*.hpp
       - resources/**/*
     generates:
-      - build/release/Makefile
+      - build/release/build.ninja
       - build/release/baphomets_quest
       - build/release/.task-build-release.stamp
     cmds:
       - >-
         cmake -S . -B build/release
+        -G Ninja
+        -DCMAKE_MAKE_PROGRAM=/opt/homebrew/bin/ninja
         -DCMAKE_BUILD_TYPE=Release
         -DBAPHOMETS_QUEST_RELEASE_OPTIMISATION=ON
-      - cmake --build build/release --target bundle_resources --config Release
+      - >-
+        cmake --build build/release
+        --target bundle_resources
+        --config Release
+        --parallel
       - cmake -E touch build/release/.task-build-release.stamp
 
   run:
