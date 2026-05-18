@@ -26,8 +26,8 @@ std::string Base::formatDescription(const ::YAML::Node &node) {
 std::string Base::generateID() {
     std::ostringstream stream;
 
-    stream << std::hex << std::nouppercase << std::setfill('0')
-           << std::setw(4) << nextID++;
+    stream << std::hex << std::nouppercase << std::setfill('0') << std::setw(4)
+           << nextID++;
 
     return stream.str();
 }

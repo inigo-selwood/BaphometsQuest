@@ -1,11 +1,11 @@
 #pragma once
 
-#include "managers/node.hpp"
-#include "managers/resource.hpp"
-#include "managers/signal.hpp"
 #include "../nodes/base.hpp"
 #include "../resources/types/yaml.hpp"
 #include "lifecycle.hpp"
+#include "managers/node.hpp"
+#include "managers/resource.hpp"
+#include "managers/signal.hpp"
 
 #include <filesystem>
 #include <functional>
@@ -51,8 +51,7 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Queue the active game loop to stop */
     void queueQuit();
 
-    template <typename SceneType>
-    void registerScene(const std::string &name) {
+    template <typename SceneType> void registerScene(const std::string &name) {
         static_assert(
             std::is_base_of_v<Engine::Nodes::Base, SceneType>,
             "SceneType must inherit from Engine::Nodes::Base."

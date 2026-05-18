@@ -129,10 +129,8 @@ class Manager {
     };
 
     Signal &
-    get(
-        const std::shared_ptr<Engine::Nodes::Base> &owner,
-        const std::string &name
-    ) {
+    get(const std::shared_ptr<Engine::Nodes::Base> &owner,
+        const std::string &name) {
         if(!this->has(owner, name)) {
             throw std::runtime_error("Unknown signal '" + name + "'");
         }

@@ -102,8 +102,8 @@ std::string Base::describe() const {
 std::string Base::generateID() {
     std::ostringstream stream;
 
-    stream << std::hex << std::nouppercase << std::setfill('0')
-           << std::setw(4) << nextID++;
+    stream << std::hex << std::nouppercase << std::setfill('0') << std::setw(4)
+           << nextID++;
 
     return stream.str();
 }
