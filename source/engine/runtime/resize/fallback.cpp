@@ -1,4 +1,4 @@
-#include "resize_handler.hpp"
+#include "handler.hpp"
 
 namespace Engine::ResizeHandler {
 

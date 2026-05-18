@@ -1,8 +1,8 @@
-#include "resize_handler.hpp"
+#include "../handler.hpp"
 
 #if !BAPHOMETS_QUEST_NATIVE_ASPECT_LOCK || !BAPHOMETS_QUEST_PLATFORM_MACOS
 #error                                                                        \
-    "resize_handler_macos.cpp should only be compiled for native macOS aspect locking"
+    "resize/macos.cpp should only be compiled for native macOS aspect locking"
 #endif
 
 #include <SDL_syswm.h>

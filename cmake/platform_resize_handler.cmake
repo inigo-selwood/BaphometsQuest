@@ -5,10 +5,10 @@ option(BAPHOMETS_QUEST_NATIVE_ASPECT_LOCK
 
 function(exclude_resize_handler_platform_sources sourceFiles)
     set(platformSources
-        ${CMAKE_SOURCE_DIR}/source/engine/runtime/platform/resize_handler_fallback.cpp
-        ${CMAKE_SOURCE_DIR}/source/engine/runtime/platform/resize_handler_macos.cpp
-        ${CMAKE_SOURCE_DIR}/source/engine/runtime/platform/resize_handler_windows.cpp
-        ${CMAKE_SOURCE_DIR}/source/engine/runtime/platform/resize_handler_x11.cpp
+        ${CMAKE_SOURCE_DIR}/source/engine/runtime/resize/fallback.cpp
+        ${CMAKE_SOURCE_DIR}/source/engine/runtime/resize/platform/macos.cpp
+        ${CMAKE_SOURCE_DIR}/source/engine/runtime/resize/platform/windows.cpp
+        ${CMAKE_SOURCE_DIR}/source/engine/runtime/resize/platform/x11.cpp
     )
 
     list(REMOVE_ITEM ${sourceFiles} ${platformSources})
@@ -23,7 +23,7 @@ function(configure_resize_handler targetName)
     set(platformName "unknown")
     set(handlerName "fallback")
     set(platformSource
-        ${CMAKE_SOURCE_DIR}/source/engine/runtime/platform/resize_handler_fallback.cpp
+        ${CMAKE_SOURCE_DIR}/source/engine/runtime/resize/fallback.cpp
     )
     set(usesMacos OFF)
     set(usesWindows OFF)
@@ -35,7 +35,7 @@ function(configure_resize_handler targetName)
         if(BAPHOMETS_QUEST_NATIVE_ASPECT_LOCK)
             set(handlerName "macos")
             set(platformSource
-                ${CMAKE_SOURCE_DIR}/source/engine/runtime/platform/resize_handler_macos.cpp
+                ${CMAKE_SOURCE_DIR}/source/engine/runtime/resize/platform/macos.cpp
             )
             set(usesMacos ON)
         endif()
@@ -45,7 +45,7 @@ function(configure_resize_handler targetName)
         if(BAPHOMETS_QUEST_NATIVE_ASPECT_LOCK)
             set(handlerName "windows")
             set(platformSource
-                ${CMAKE_SOURCE_DIR}/source/engine/runtime/platform/resize_handler_windows.cpp
+                ${CMAKE_SOURCE_DIR}/source/engine/runtime/resize/platform/windows.cpp
             )
             set(usesWindows ON)
         endif()
@@ -58,7 +58,7 @@ function(configure_resize_handler targetName)
             if(X11_FOUND)
                 set(handlerName "x11")
                 set(platformSource
-                    ${CMAKE_SOURCE_DIR}/source/engine/runtime/platform/resize_handler_x11.cpp
+                    ${CMAKE_SOURCE_DIR}/source/engine/runtime/resize/platform/x11.cpp
                 )
                 set(usesX11 ON)
             endif()

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../resources/types/yaml.hpp"
-#include "platform/resize_handler.hpp"
+#include "resize/handler.hpp"
 
 #include <memory>
 #include <stdexcept>

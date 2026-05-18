@@ -1,7 +1,7 @@
 #include "game.hpp"
 
 #include "../../logger.hpp"
-#include "platform/resize_handler.hpp"
+#include "resize/handler.hpp"
 
 #include <stdexcept>
 #include <string>

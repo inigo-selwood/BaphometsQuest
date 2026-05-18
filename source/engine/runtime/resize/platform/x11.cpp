@@ -1,8 +1,7 @@
-#include "resize_handler.hpp"
+#include "../handler.hpp"
 
 #if !BAPHOMETS_QUEST_NATIVE_ASPECT_LOCK || !BAPHOMETS_QUEST_PLATFORM_X11
-#error                                                                        \
-    "resize_handler_x11.cpp should only be compiled for native X11 aspect locking"
+#error "resize/x11.cpp should only be compiled for native X11 aspect locking"
 #endif
 
 #include <SDL_syswm.h>

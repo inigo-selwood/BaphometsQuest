@@ -1,8 +1,8 @@
-#include "resize_handler.hpp"
+#include "../handler.hpp"
 
 #if !BAPHOMETS_QUEST_NATIVE_ASPECT_LOCK || !BAPHOMETS_QUEST_PLATFORM_WINDOWS
 #error                                                                        \
-    "resize_handler_windows.cpp should only be compiled for native Windows aspect locking"
+    "resize/windows.cpp should only be compiled for native Windows aspect locking"
 #endif
 
 #include <windows.h>
