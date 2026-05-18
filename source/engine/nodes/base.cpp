@@ -1,6 +1,20 @@
 #include "base.hpp"
 
+#include <atomic>
+#include <iomanip>
+#include <sstream>
+
+#include <spdlog/spdlog.h>
+
 namespace Engine::Nodes {
+
+namespace {
+
+std::atomic<std::uint32_t> nextID = 1;
+
+} // namespace
+
+Base::Base() : ID(generateID()) {}
 
 Game &Base::getGame() {
     const std::shared_ptr<Game> game = this->game.lock();
@@ -22,7 +36,10 @@ const Game &Base::getGame() const {
     return *game;
 }
 
-void Base::addChild(const std::shared_ptr<Base> &child) {
+void Base::addChild(
+    const std::string &name,
+    const std::shared_ptr<Base> &child
+) {
     if(child == nullptr) {
         throw std::runtime_error("Node child must not be null");
     }
@@ -31,9 +48,16 @@ void Base::addChild(const std::shared_ptr<Base> &child) {
         throw std::runtime_error("Node cannot be added as its own child");
     }
 
+    child->name = name;
     child->parent = this->weak_from_this();
     child->attach(this->game);
     this->children.push_back(child);
+
+    spdlog::debug(
+        "Added node {} to parent {}",
+        child->describe(),
+        this->describe()
+    );
 }
 
 bool Base::hasProperty(const std::string &name) const {
@@ -65,6 +89,23 @@ void Base::attach(const std::weak_ptr<Game> &game) {
         child->parent = this->weak_from_this();
         child->attach(this->game);
     }
+}
+
+std::string Base::describe() const {
+    if(this->name.empty()) {
+        return this->ID;
+    }
+
+    return this->ID + " '" + this->name + "'";
+}
+
+std::string Base::generateID() {
+    std::ostringstream stream;
+
+    stream << std::hex << std::nouppercase << std::setfill('0')
+           << std::setw(4) << nextID++;
+
+    return stream.str();
 }
 
 } // namespace Engine::Nodes

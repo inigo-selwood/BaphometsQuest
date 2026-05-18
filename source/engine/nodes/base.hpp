@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <SDL.h>
+#include <spdlog/spdlog.h>
 
 namespace Engine {
 
@@ -31,7 +32,10 @@ enum class Hook {
 /** Base class for objects that can participate in the game tree */
 class Base : public std::enable_shared_from_this<Base> {
   public:
+    Base();
     virtual ~Base() = default;
+
+    const std::string ID;
 
     /** Return the game this node is attached to */
     Game &getGame();
@@ -40,7 +44,10 @@ class Base : public std::enable_shared_from_this<Base> {
     const Game &getGame() const;
 
     /** Add a child node to this node */
-    void addChild(const std::shared_ptr<Base> &child);
+    void addChild(
+        const std::string &name,
+        const std::shared_ptr<Base> &child
+    );
 
     /** Return true when this node has declared a property */
     bool hasProperty(const std::string &name) const;
@@ -84,6 +91,12 @@ class Base : public std::enable_shared_from_this<Base> {
         }
 
         *static_cast<StoredValue *>(property->second.value) = value;
+
+        spdlog::debug(
+            "Set node property '{}' on '{}'",
+            name,
+            this->describe()
+        );
     }
 
     virtual void enter();
@@ -121,7 +134,10 @@ class Base : public std::enable_shared_from_this<Base> {
     };
 
     void attach(const std::weak_ptr<Game> &game);
+    std::string describe() const;
+    static std::string generateID();
 
+    std::string name;
     std::vector<std::shared_ptr<Base>> children;
     std::weak_ptr<Base> parent;
     std::weak_ptr<Game> game;
