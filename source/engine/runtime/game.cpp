@@ -75,18 +75,22 @@ void Game::run() {
         const Uint32 frameStartedAt = SDL_GetTicks();
 
         if(this->queuedScene.has_value()) {
+            const std::string sceneName = *this->queuedScene;
+
             if(sceneEntered) {
                 this->nodeManager.exit();
             }
 
             this->currentScene =
-                this->sceneFactories.at(*this->queuedScene)();
+                this->sceneFactories.at(sceneName)();
             this->queuedScene.reset();
             this->nodeManager.setRoot(this->currentScene);
+            spdlog::debug("Entering scene '{}'", sceneName);
             this->nodeManager.enter();
             sceneEntered = true;
         } else if(!sceneEntered) {
             this->nodeManager.setRoot(this->currentScene);
+            spdlog::debug("Entering current scene");
             this->nodeManager.enter();
             sceneEntered = true;
         }

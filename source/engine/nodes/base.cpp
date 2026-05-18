@@ -1,8 +1,8 @@
-#include "node.hpp"
+#include "base.hpp"
 
-namespace Engine {
+namespace Engine::Nodes {
 
-Game &Node::getGame() {
+Game &Base::getGame() {
     const std::shared_ptr<Game> game = this->game.lock();
 
     if(game == nullptr) {
@@ -12,7 +12,7 @@ Game &Node::getGame() {
     return *game;
 }
 
-const Game &Node::getGame() const {
+const Game &Base::getGame() const {
     const std::shared_ptr<Game> game = this->game.lock();
 
     if(game == nullptr) {
@@ -22,7 +22,7 @@ const Game &Node::getGame() const {
     return *game;
 }
 
-void Node::addChild(const std::shared_ptr<Node> &child) {
+void Base::addChild(const std::shared_ptr<Base> &child) {
     if(child == nullptr) {
         throw std::runtime_error("Node child must not be null");
     }
@@ -36,29 +36,29 @@ void Node::addChild(const std::shared_ptr<Node> &child) {
     this->children.push_back(child);
 }
 
-bool Node::hasProperty(const std::string &name) const {
+bool Base::hasProperty(const std::string &name) const {
     return this->properties.contains(name);
 }
 
-bool Node::hasHook(Hook hook) const {
+bool Base::hasHook(Hook hook) const {
     return this->hooks.contains(hook);
 }
 
-void Node::enter() {}
+void Base::enter() {}
 
-void Node::exit() {}
+void Base::exit() {}
 
-void Node::input(const SDL_Event &) {}
+void Base::input(const SDL_Event &) {}
 
-void Node::process(float) {}
+void Base::process(float) {}
 
-void Node::render(SDL_Renderer &) {}
+void Base::render(SDL_Renderer &) {}
 
-void Node::declareHook(Hook hook) {
+void Base::declareHook(Hook hook) {
     this->hooks.insert(hook);
 }
 
-void Node::attach(const std::weak_ptr<Game> &game) {
+void Base::attach(const std::weak_ptr<Game> &game) {
     this->game = game;
 
     for(const auto &child : this->children) {
@@ -67,4 +67,4 @@ void Node::attach(const std::weak_ptr<Game> &game) {
     }
 }
 
-} // namespace Engine
+} // namespace Engine::Nodes

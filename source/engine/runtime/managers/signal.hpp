@@ -11,11 +11,11 @@
 #include <utility>
 #include <vector>
 
-namespace Engine {
+namespace Engine::Nodes {
 
-class Node;
+class Base;
 
-} // namespace Engine
+} // namespace Engine::Nodes
 
 namespace Engine::Signal {
 
@@ -30,7 +30,7 @@ class Manager {
      */
     template <typename... Arguments, typename Callback>
     void connect(
-        const std::shared_ptr<Engine::Node> &owner,
+        const std::shared_ptr<Engine::Nodes::Base> &owner,
         const std::string &name,
         Callback &&callback
     ) {
@@ -60,7 +60,7 @@ class Manager {
      */
     template <typename... Arguments>
     void emit(
-        const std::shared_ptr<Engine::Node> &owner,
+        const std::shared_ptr<Engine::Nodes::Base> &owner,
         const std::string &name,
         Arguments &&...arguments
     ) {
@@ -79,7 +79,7 @@ class Manager {
 
     /** Return true when a signal has been registered on a node */
     bool
-    has(const std::shared_ptr<Engine::Node> &owner,
+    has(const std::shared_ptr<Engine::Nodes::Base> &owner,
         const std::string &name) const {
         this->validateOwner(owner);
 
@@ -102,7 +102,7 @@ class Manager {
      */
     template <typename... Arguments>
     void declare(
-        const std::shared_ptr<Engine::Node> &owner,
+        const std::shared_ptr<Engine::Nodes::Base> &owner,
         const std::string &name
     ) {
         this->validateOwner(owner);
@@ -129,7 +129,10 @@ class Manager {
     };
 
     Signal &
-    get(const std::shared_ptr<Engine::Node> &owner, const std::string &name) {
+    get(
+        const std::shared_ptr<Engine::Nodes::Base> &owner,
+        const std::string &name
+    ) {
         if(!this->has(owner, name)) {
             throw std::runtime_error("Unknown signal '" + name + "'");
         }
@@ -138,7 +141,7 @@ class Manager {
     }
 
     const Signal &
-    get(const std::shared_ptr<Engine::Node> &owner,
+    get(const std::shared_ptr<Engine::Nodes::Base> &owner,
         const std::string &name) const {
         if(!this->has(owner, name)) {
             throw std::runtime_error("Unknown signal '" + name + "'");
@@ -173,14 +176,15 @@ class Manager {
         );
     }
 
-    static void validateOwner(const std::shared_ptr<Engine::Node> &owner) {
+    static void
+    validateOwner(const std::shared_ptr<Engine::Nodes::Base> &owner) {
         if(owner == nullptr) {
             throw std::runtime_error("Signal owner must not be null");
         }
     }
 
     std::map<
-        std::weak_ptr<Engine::Node>,
+        std::weak_ptr<Engine::Nodes::Base>,
         std::map<std::string, Signal>,
         std::owner_less<>>
         signals;

@@ -1,6 +1,6 @@
-#include "resource_manager.hpp"
+#include "resource.hpp"
 
-#include "../logger.hpp"
+#include "../../../logger.hpp"
 
 #include <spdlog/spdlog.h>
 

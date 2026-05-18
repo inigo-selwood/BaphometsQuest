@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../node.hpp"
-#include "../node_manager.hpp"
-#include "../resource/types/yaml.hpp"
-#include "../resource_manager.hpp"
-#include "../signal_manager.hpp"
+#include "managers/node.hpp"
+#include "managers/resource.hpp"
+#include "managers/signal.hpp"
+#include "../nodes/base.hpp"
+#include "../resources/types/yaml.hpp"
 #include "lifecycle.hpp"
 
 #include <filesystem>
@@ -54,8 +54,8 @@ class Game : public std::enable_shared_from_this<Game> {
     template <typename SceneType>
     void registerScene(const std::string &name) {
         static_assert(
-            std::is_base_of_v<Engine::Node, SceneType>,
-            "SceneType must inherit from Engine::Node."
+            std::is_base_of_v<Engine::Nodes::Base, SceneType>,
+            "SceneType must inherit from Engine::Nodes::Base."
         );
 
         if(this->sceneFactories.contains(name)) {
@@ -79,10 +79,10 @@ class Game : public std::enable_shared_from_this<Game> {
     Engine::Signal::Manager signals;
 
     /** Active node tree manager */
-    Engine::NodeManager nodeManager;
+    Engine::Nodes::Manager nodeManager;
 
     /** Current active scene root */
-    std::shared_ptr<Engine::Node> currentScene;
+    std::shared_ptr<Engine::Nodes::Base> currentScene;
 
     /** Active SDL renderer */
     std::unique_ptr<SDL_Renderer, RendererDeleter> renderer;
@@ -99,7 +99,7 @@ class Game : public std::enable_shared_from_this<Game> {
 
     std::unordered_map<
         std::string,
-        std::function<std::shared_ptr<Engine::Node>()>>
+        std::function<std::shared_ptr<Engine::Nodes::Base>()>>
         sceneFactories;
     std::optional<std::string> queuedScene;
 };

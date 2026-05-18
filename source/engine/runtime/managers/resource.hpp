@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../logger.hpp"
-#include "resource/base.hpp"
+#include "../../../logger.hpp"
+#include "../../resources/base.hpp"
 
 #include <cstdint>
 #include <memory>

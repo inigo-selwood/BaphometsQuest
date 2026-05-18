@@ -1,6 +1,6 @@
 #pragma once
 
-#include "node.hpp"
+#include "../../nodes/base.hpp"
 
 #include <memory>
 
@@ -10,13 +10,15 @@ namespace Engine {
 
 class Game;
 
+namespace Nodes {
+
 /** Dispatcher for the active node tree */
-class NodeManager {
+class Manager {
   public:
-    explicit NodeManager(Game &game);
+    explicit Manager(Game &game);
 
     /** Set the active root node for dispatch */
-    void setRoot(const std::shared_ptr<Node> &root);
+    void setRoot(const std::shared_ptr<Base> &root);
 
     /** Dispatch enter hooks for the active tree */
     void enter();
@@ -35,7 +37,7 @@ class NodeManager {
 
   private:
     template <typename Callback>
-    void walk(const std::shared_ptr<Node> &node, Callback &&callback) {
+    void walk(const std::shared_ptr<Base> &node, Callback &&callback) {
         if(node == nullptr) {
             return;
         }
@@ -48,7 +50,9 @@ class NodeManager {
     }
 
     Game &game;
-    std::shared_ptr<Node> root;
+    std::shared_ptr<Base> root;
 };
+
+} // namespace Nodes
 
 } // namespace Engine
