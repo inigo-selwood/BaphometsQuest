@@ -1,11 +1,14 @@
 #pragma once
 
+#include <cstdint>
 #include <ostream>
 #include <string>
 
 #include <yaml-cpp/yaml.h>
 
 namespace Engine::Resource {
+
+using ID = std::uint64_t;
 
 class Base {
   public:

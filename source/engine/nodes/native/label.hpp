@@ -16,7 +16,6 @@ namespace Engine::Nodes {
 class Label : public Engine::Nodes::Base {
   public:
     Label() {
-        this->declareHook(Engine::Nodes::Hook::Exit);
         this->declareHook(Engine::Nodes::Hook::Render);
         this->declareProperty(
             "font",
@@ -45,30 +44,16 @@ class Label : public Engine::Nodes::Base {
         this->declareProperty("position", this->position);
     }
 
-    void exit() override {
-        Engine::Game &game = this->getGame();
-
-        if(this->textResource != 0) {
-            game.resources.remove(this->textResource);
-            this->textResource = 0;
-        }
-
-        if(this->fontResource != 0) {
-            game.resources.remove(this->fontResource);
-            this->fontResource = 0;
-        }
-    }
-
     void render(SDL_Renderer &renderer) override {
         Engine::Game &game = this->getGame();
 
-        if(this->textResource == 0) {
+        if(this->textResourceID == 0) {
             return;
         }
 
         const Engine::Resource::TextTexture &texture =
             game.resources.get<Engine::Resource::TextTexture>(
-                this->textResource
+                this->textResourceID
             );
         const SDL_Rect destination{
             this->position.x,
@@ -107,26 +92,14 @@ class Label : public Engine::Nodes::Base {
         this->colour = colour;
         this->text = text;
 
-        if(!textureChanged && this->textResource != 0) {
+        if(!textureChanged && this->textResourceID != 0) {
             return;
         }
 
-        if(textureChanged && this->textResource != 0) {
-            game.resources.remove(this->textResource);
-            this->textResource = 0;
-        }
-
-        if(fontChanged && this->fontResource != 0) {
-            game.resources.remove(this->fontResource);
-            this->fontResource = 0;
-        }
+        this->textResourceID = 0;
 
         if(this->font.empty() || this->size <= 0) {
-            if(this->fontResource != 0) {
-                game.resources.remove(this->fontResource);
-                this->fontResource = 0;
-            }
-
+            this->fontResourceID = 0;
             return;
         }
 
@@ -140,27 +113,24 @@ class Label : public Engine::Nodes::Base {
             );
         }
 
-        if(this->fontResource == 0) {
-            this->fontResource = game.resources.load<Engine::Resource::Font>(
+        if(fontChanged || this->fontResourceID == 0) {
+            this->fontResourceID = game.resources.load<Engine::Resource::Font>(
                 this->font,
                 this->size
             );
         }
 
-        const Engine::Resource::Font &loadedFont =
-            game.resources.get<Engine::Resource::Font>(this->fontResource);
-
-        this->textResource =
+        this->textResourceID =
             game.resources.load<Engine::Resource::TextTexture>(
                 game.renderer.get(),
-                loadedFont,
+                this->fontResourceID,
                 this->colour,
                 this->text
             );
     }
 
-    Engine::Resource::ID fontResource = 0;
-    Engine::Resource::ID textResource = 0;
+    Engine::Resource::ID fontResourceID = 0;
+    Engine::Resource::ID textResourceID = 0;
     std::string font;
     int size = 0;
     std::string text;

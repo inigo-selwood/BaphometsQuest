@@ -23,6 +23,8 @@ class Font : public Engine::Resource::Base {
   public:
     Font(const std::string &path, int size);
 
+    static std::string key(const std::string &path, int size);
+
     std::string describe() const override;
 
     const std::unique_ptr<TTF_Font, FontDeleter> handle;

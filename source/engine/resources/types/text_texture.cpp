@@ -2,6 +2,7 @@
 
 #include "../../utils/format.hpp"
 
+#include <sstream>
 #include <stdexcept>
 
 namespace Engine::Resource {
@@ -60,17 +61,31 @@ TextTexture::querySize(SDL_Texture *texture, const std::string &text) {
 
 TextTexture::TextTexture(
     SDL_Renderer *renderer,
+    Engine::Resource::ID fontID,
     const Engine::Resource::Font &font,
     SDL_Color colour,
     const std::string &text
 )
-    : handle(render(renderer, font, colour, text)), fontID(font.ID),
+    : handle(render(renderer, font, colour, text)), fontID(fontID),
       colour(colour), size(querySize(this->handle.get(), text)), text(text) {}
+
+std::string TextTexture::key(
+    SDL_Renderer *renderer,
+    Engine::Resource::ID fontID,
+    SDL_Color colour,
+    const std::string &text
+) {
+    std::ostringstream stream;
+    stream << "TextTexture:" << renderer << ":" << fontID << ":"
+           << Engine::Format::colour(colour) << ":" << text;
+
+    return stream.str();
+}
 
 std::string TextTexture::describe() const {
     ::YAML::Node name;
     name["type"] = "TextTexture";
-    name["font-id"] = this->fontID;
+    name["font-id"] = static_cast<std::uint64_t>(this->fontID);
     name["colour"] = Engine::Format::colour(this->colour);
     name["text"] = this->text;
 

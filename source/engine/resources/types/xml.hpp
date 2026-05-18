@@ -17,6 +17,8 @@ class XML : public Engine::Resource::Base {
   public:
     explicit XML(const std::string &path);
 
+    static std::string key(const std::string &path);
+
     std::string describe() const override;
 
     const std::unique_ptr<tinyxml2::XMLDocument> document;

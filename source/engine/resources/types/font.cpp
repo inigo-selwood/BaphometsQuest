@@ -22,6 +22,10 @@ Font::load(const std::string &path, int size) {
 Font::Font(const std::string &path, int size)
     : handle(load(path, size)), path(path), size(size) {}
 
+std::string Font::key(const std::string &path, int size) {
+    return "Font:" + path + ":" + std::to_string(size);
+}
+
 std::string Font::describe() const {
     ::YAML::Node name;
     name["type"] = "Font";

@@ -23,6 +23,8 @@ class Music : public Engine::Resource::Base {
   public:
     explicit Music(const std::string &path);
 
+    static std::string key(const std::string &path);
+
     std::string describe() const override;
 
     const std::unique_ptr<Mix_Music, MusicDeleter> handle;

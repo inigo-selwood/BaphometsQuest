@@ -15,7 +15,6 @@ namespace Engine::Nodes {
 class Image : public Engine::Nodes::Base {
   public:
     Image() {
-        this->declareHook(Engine::Nodes::Hook::Exit);
         this->declareHook(Engine::Nodes::Hook::Render);
         this->declareProperty(
             "path",
@@ -26,25 +25,16 @@ class Image : public Engine::Nodes::Base {
         this->declareProperty("region", this->region);
     }
 
-    void exit() override {
-        if(this->textureResource == 0) {
-            return;
-        }
-
-        this->getGame().resources.remove(this->textureResource);
-        this->textureResource = 0;
-    }
-
     void render(SDL_Renderer &renderer) override {
         Engine::Game &game = this->getGame();
 
-        if(this->textureResource == 0) {
+        if(this->textureResourceID == 0) {
             return;
         }
 
         const Engine::Resource::ImageTexture &image =
             game.resources.get<Engine::Resource::ImageTexture>(
-                this->textureResource
+                this->textureResourceID
             );
         SDL_Rect textureRegion = image.size;
 
@@ -78,16 +68,12 @@ class Image : public Engine::Nodes::Base {
 
         this->path = path;
 
-        if(!textureChanged && this->textureResource != 0) {
+        if(!textureChanged && this->textureResourceID != 0) {
             return;
         }
 
-        if(this->textureResource != 0) {
-            game.resources.remove(this->textureResource);
-            this->textureResource = 0;
-        }
-
         if(this->path.empty()) {
+            this->textureResourceID = 0;
             return;
         }
 
@@ -97,14 +83,14 @@ class Image : public Engine::Nodes::Base {
             );
         }
 
-        this->textureResource =
+        this->textureResourceID =
             game.resources.load<Engine::Resource::ImageTexture>(
                 game.renderer.get(),
                 this->path
             );
     }
 
-    Engine::Resource::ID textureResource = 0;
+    Engine::Resource::ID textureResourceID = 0;
     std::string path;
     SDL_Point position{0, 0};
     SDL_Rect region{0, 0, 0, 0};

@@ -19,10 +19,10 @@ constexpr char SETTINGS_PATH[] = "resources/configuration/settings.yaml";
 Game::Game() : nodeManager(*this) {}
 
 Game::~Game() {
-    Engine::Lifecycle::end(this->window, this->renderer);
-
     spdlog::info("Unloading game resources");
     this->resources.clear();
+
+    Engine::Lifecycle::end(this->window, this->renderer);
 }
 
 void Game::start(
@@ -119,6 +119,7 @@ void Game::run() {
         SDL_RenderClear(this->renderer.get());
         this->nodeManager.render(*this->renderer);
         SDL_RenderPresent(this->renderer.get());
+        this->resources.purgeExpired();
 
         const Uint32 frameDuration = SDL_GetTicks() - frameStartedAt;
 

@@ -25,6 +25,8 @@ class ImageTexture : public Engine::Resource::Base {
   public:
     ImageTexture(SDL_Renderer *renderer, const std::string &path);
 
+    static std::string key(SDL_Renderer *renderer, const std::string &path);
+
     std::string describe() const override;
 
     const std::unique_ptr<SDL_Texture, TextureDeleter> handle;
