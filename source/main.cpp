@@ -4,6 +4,7 @@
 #include <CLI/CLI.hpp>
 
 #include <exception>
+#include <memory>
 #include <spdlog/spdlog.h>
 
 int main(int argumentCount, const char *arguments[]) {
@@ -18,9 +19,9 @@ int main(int argumentCount, const char *arguments[]) {
     }
 
     try {
-        Engine::Game game;
-        game.start(parsedArguments.executablePath, parsedArguments.logLevel);
-        game.run();
+        auto game = std::make_shared<Engine::Game>();
+        game->start(parsedArguments.executablePath, parsedArguments.logLevel);
+        game->run();
     } catch(const std::exception &exception) {
         spdlog::error("{}", exception.what());
         return 1;

@@ -15,6 +15,8 @@ constexpr char SETTINGS_PATH[] = "resources/configuration/settings.yaml";
 
 } // namespace
 
+Game::Game() : nodeManager(*this) {}
+
 Game::~Game() {
     Engine::Lifecycle::end(this->window, this->renderer);
 
@@ -55,25 +57,58 @@ void Game::run() {
         throw std::runtime_error("Game must be started before it can run");
     }
 
+    if(this->currentScene == nullptr && !this->queuedScene.has_value()) {
+        throw std::runtime_error("Game must have a scene before it can run");
+    }
+
     spdlog::info("Starting game run");
 
     this->running = true;
+    bool sceneEntered = false;
 
     SDL_Event event;
     const Uint32 targetFrameDuration =
         static_cast<Uint32>(1000 / this->frameRate);
+    Uint32 previousFrameStartedAt = SDL_GetTicks();
 
     while(this->running) {
         const Uint32 frameStartedAt = SDL_GetTicks();
 
+        if(this->queuedScene.has_value()) {
+            if(sceneEntered) {
+                this->nodeManager.exit();
+            }
+
+            this->currentScene =
+                this->sceneFactories.at(*this->queuedScene)();
+            this->queuedScene.reset();
+            this->nodeManager.setRoot(this->currentScene);
+            this->nodeManager.enter();
+            sceneEntered = true;
+        } else if(!sceneEntered) {
+            this->nodeManager.setRoot(this->currentScene);
+            this->nodeManager.enter();
+            sceneEntered = true;
+        }
+
+        const float deltaSeconds =
+            static_cast<float>(frameStartedAt - previousFrameStartedAt)
+            / 1000.0F;
+        previousFrameStartedAt = frameStartedAt;
+
         while(SDL_PollEvent(&event) != 0) {
             if(event.type == SDL_QUIT) {
                 this->running = false;
+            } else {
+                this->nodeManager.input(event);
             }
         }
 
+        this->nodeManager.process(deltaSeconds);
+
         SDL_SetRenderDrawColor(this->renderer.get(), 0, 0, 0, 255);
         SDL_RenderClear(this->renderer.get());
+        this->nodeManager.render(*this->renderer);
         SDL_RenderPresent(this->renderer.get());
 
         const Uint32 frameDuration = SDL_GetTicks() - frameStartedAt;
@@ -83,11 +118,23 @@ void Game::run() {
         }
     }
 
+    if(sceneEntered) {
+        this->nodeManager.exit();
+    }
+
     spdlog::info("Finished game run");
 }
 
 void Game::queueQuit() {
     this->running = false;
+}
+
+void Game::queueScene(const std::string &name) {
+    if(!this->sceneFactories.contains(name)) {
+        throw std::runtime_error("Scene '" + name + "' is not registered");
+    }
+
+    this->queuedScene = name;
 }
 
 } // namespace Engine
