@@ -38,7 +38,7 @@ class TextTexture : public Engine::Resource::Base {
     std::string describe() const override;
 
     const std::unique_ptr<SDL_Texture, TextureDeleter> handle;
-    const std::string fontDescription;
+    const std::string fontID;
     const SDL_Color colour{0, 0, 0, 0};
     const SDL_Rect size{0, 0, 0, 0};
     const std::string text;

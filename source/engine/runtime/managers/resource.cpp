@@ -1,7 +1,5 @@
 #include "resource.hpp"
 
-#include "../../../core/logger.hpp"
-
 #include <spdlog/spdlog.h>
 
 namespace Engine::Resource {
@@ -12,12 +10,7 @@ Manager::~Manager() {
 
 void Manager::clear() {
     for(const auto &resource : this->resources) {
-        const std::string description = resource.second->describe();
-        spdlog::debug(
-            "Freed {}:\n{}",
-            resource.second->ID,
-            Logger::indentPayload(description)
-        );
+        spdlog::debug("Freed {}", resource.second->ID);
     }
 
     this->resources.clear();
@@ -56,12 +49,7 @@ void Manager::remove(ID id) {
         );
     }
 
-    const std::string description = resource->second->describe();
-    spdlog::debug(
-        "Freed {}:\n{}",
-        resource->second->ID,
-        Logger::indentPayload(description)
-    );
+    spdlog::debug("Freed {}", resource->second->ID);
     this->resources.erase(resource);
 }
 

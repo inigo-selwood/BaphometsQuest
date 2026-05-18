@@ -64,14 +64,13 @@ TextTexture::TextTexture(
     SDL_Color colour,
     const std::string &text
 )
-    : handle(render(renderer, font, colour, text)),
-      fontDescription(font.describe()), colour(colour),
-      size(querySize(this->handle.get(), text)), text(text) {}
+    : handle(render(renderer, font, colour, text)), fontID(font.ID),
+      colour(colour), size(querySize(this->handle.get(), text)), text(text) {}
 
 std::string TextTexture::describe() const {
     ::YAML::Node name;
     name["type"] = "TextTexture";
-    name["font"] = this->fontDescription;
+    name["font-id"] = this->fontID;
     name["colour"] = Engine::Format::colour(this->colour);
     name["text"] = this->text;
 
