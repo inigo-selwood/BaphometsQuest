@@ -14,7 +14,7 @@ void Manager::clear() {
     for(const auto &resource : this->resources) {
         const std::string description = resource.second->describe();
         spdlog::debug(
-            "unloaded {}:\n{}",
+            "Freed {}:\n{}",
             resource.second->ID,
             Logger::indentPayload(description)
         );
@@ -58,7 +58,7 @@ void Manager::remove(ID id) {
 
     const std::string description = resource->second->describe();
     spdlog::debug(
-        "unloaded {}:\n{}",
+        "Freed {}:\n{}",
         resource->second->ID,
         Logger::indentPayload(description)
     );

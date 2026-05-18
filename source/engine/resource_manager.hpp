@@ -44,7 +44,7 @@ class Manager {
         const Base &loadedResource = *this->resources.at(id);
         const std::string description = loadedResource.describe();
         spdlog::debug(
-            "loaded {}:\n{}",
+            "Loaded {}:\n{}",
             loadedResource.ID,
             Logger::indentPayload(description)
         );
