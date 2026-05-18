@@ -20,9 +20,9 @@ SoundEffect::load(const std::string &path) {
 }
 
 SoundEffect::SoundEffect(const std::string &path)
-    : handle(load(path)), path(path) {}
+    : Base("sound-effect"), handle(load(path)), path(path) {}
 
-Engine::Resource::Key SoundEffect::key(const std::string &path) {
+Engine::Resource::ID SoundEffect::key(const std::string &path) {
     return hashKey("SoundEffect:" + path);
 }
 

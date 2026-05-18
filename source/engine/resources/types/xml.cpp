@@ -17,9 +17,10 @@ std::unique_ptr<tinyxml2::XMLDocument> XML::load(const std::string &path) {
     return document;
 }
 
-XML::XML(const std::string &path) : document(load(path)), path(path) {}
+XML::XML(const std::string &path)
+    : Base("xml"), document(load(path)), path(path) {}
 
-Engine::Resource::Key XML::key(const std::string &path) {
+Engine::Resource::ID XML::key(const std::string &path) {
     return hashKey("XML:" + path);
 }
 

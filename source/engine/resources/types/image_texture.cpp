@@ -35,10 +35,10 @@ ImageTexture::querySize(SDL_Texture *texture, const std::string &path) {
 }
 
 ImageTexture::ImageTexture(SDL_Renderer *renderer, const std::string &path)
-    : handle(load(renderer, path)), path(path),
+    : Base("image-texture"), handle(load(renderer, path)), path(path),
       size(querySize(this->handle.get(), path)) {}
 
-Engine::Resource::Key
+Engine::Resource::ID
 ImageTexture::key(SDL_Renderer *, const std::string &path) {
     return hashKey("ImageTexture:" + path);
 }

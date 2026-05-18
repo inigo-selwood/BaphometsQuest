@@ -18,7 +18,7 @@
 namespace Engine::Resource {
 
 template <typename ResourceType, typename... Arguments> struct ResourceLoader {
-    static Engine::Resource::Key key(const Arguments &...arguments) {
+    static Engine::Resource::ID key(const Arguments &...arguments) {
         return ResourceType::key(arguments...);
     }
 
@@ -48,18 +48,15 @@ class Manager {
             ResourceLoader<ResourceType, std::decay_t<Arguments>...>;
         using StoredArguments = std::tuple<std::decay_t<Arguments>...>;
 
-        const Engine::Resource::Key key = Loader::key(arguments...);
-        const auto existingResource = this->ids.find(key);
+        const Engine::Resource::ID id = Loader::key(arguments...);
+        const auto existingResource = this->resources.find(id);
 
-        if(existingResource != this->ids.end()) {
-            ResourceEntry &entry =
-                this->resources.at(existingResource->second);
-            entry.lastAccessedAt = Clock::now();
+        if(existingResource != this->resources.end()) {
+            existingResource->second.lastAccessedAt = Clock::now();
 
-            return existingResource->second;
+            return id;
         }
 
-        const ID id = this->nextResourceID++;
         StoredArguments storedArguments(std::forward<Arguments>(arguments)...);
 
         auto factory = [this, storedArguments]() mutable {
@@ -73,7 +70,6 @@ class Manager {
 
         auto resource = factory();
         ResourceEntry entry{
-            key,
             std::move(resource),
             factory,
             ResourceType::TTL,
@@ -81,13 +77,12 @@ class Manager {
         };
 
         this->resources.emplace(id, std::move(entry));
-        this->ids.emplace(key, id);
 
         const Base &loadedResource = *this->resources.at(id).resource;
         const std::string description = loadedResource.describe();
         spdlog::debug(
-            "Loaded {}:\n{}",
-            loadedResource.ID,
+            "Loaded {:016x}:\n{}",
+            id,
             Logger::indentPayload(description)
         );
 
@@ -137,7 +132,6 @@ class Manager {
     using Clock = std::chrono::steady_clock;
 
     struct ResourceEntry {
-        Engine::Resource::Key key;
         std::unique_ptr<Base> resource;
         std::function<std::unique_ptr<Base>()> factory;
         std::chrono::seconds ttl;
@@ -145,8 +139,6 @@ class Manager {
     };
 
     std::unordered_map<ID, ResourceEntry> resources;
-    std::unordered_map<Engine::Resource::Key, ID> ids;
-    ID nextResourceID = 1;
 };
 
 } // namespace Engine::Resource

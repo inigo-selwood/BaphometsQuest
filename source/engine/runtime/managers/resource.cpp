@@ -9,16 +9,15 @@ Manager::~Manager() {
 }
 
 void Manager::clear() {
-    for(const auto &resource : this->resources) {
-        if(resource.second.resource == nullptr) {
+    for(const auto &[id, resource] : this->resources) {
+        if(resource.resource == nullptr) {
             continue;
         }
 
-        spdlog::debug("Freed {}", resource.second.resource->ID);
+        spdlog::debug("Freed {} {:016x}", resource.resource->name, id);
     }
 
     this->resources.clear();
-    this->ids.clear();
 }
 
 Base &Manager::get(ID id) {
@@ -36,8 +35,8 @@ Base &Manager::get(ID id) {
         resource->second.resource = resource->second.factory();
         const std::string description = resource->second.resource->describe();
         spdlog::debug(
-            "Loaded {}:\n{}",
-            resource->second.resource->ID,
+            "Loaded {:016x}:\n{}",
+            id,
             Logger::indentPayload(description)
         );
     }
@@ -52,7 +51,7 @@ const Base &Manager::get(ID id) const {
 void Manager::purgeExpired() {
     const Clock::time_point now = Clock::now();
 
-    for(auto &[_, resource] : this->resources) {
+    for(auto &[id, resource] : this->resources) {
         if(resource.resource == nullptr) {
             continue;
         }
@@ -61,7 +60,7 @@ void Manager::purgeExpired() {
             continue;
         }
 
-        spdlog::debug("Freed {}", resource.resource->ID);
+        spdlog::debug("Freed {} {:016x}", resource.resource->name, id);
         resource.resource.reset();
     }
 }

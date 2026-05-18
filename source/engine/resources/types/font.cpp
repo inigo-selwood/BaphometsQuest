@@ -20,9 +20,9 @@ Font::load(const std::string &path, int size) {
 }
 
 Font::Font(const std::string &path, int size)
-    : handle(load(path, size)), path(path), size(size) {}
+    : Base("font"), handle(load(path, size)), path(path), size(size) {}
 
-Engine::Resource::Key Font::key(const std::string &path, int size) {
+Engine::Resource::ID Font::key(const std::string &path, int size) {
     return hashKey("Font:" + path + ":" + std::to_string(size));
 }
 

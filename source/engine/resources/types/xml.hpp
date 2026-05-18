@@ -25,7 +25,7 @@ class XML : public Engine::Resource::Base {
         return std::make_unique<XML>(path);
     }
 
-    static Engine::Resource::Key key(const std::string &path);
+    static Engine::Resource::ID key(const std::string &path);
 
     std::string describe() const override;
 

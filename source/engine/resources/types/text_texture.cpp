@@ -67,8 +67,9 @@ TextTexture::TextTexture(
     SDL_Color colour,
     const std::string &text
 )
-    : handle(render(renderer, font, colour, text)), fontID(fontID),
-      colour(colour), size(querySize(this->handle.get(), text)), text(text) {}
+    : Base("text-texture"), handle(render(renderer, font, colour, text)),
+      fontID(fontID), colour(colour),
+      size(querySize(this->handle.get(), text)), text(text) {}
 
 std::unique_ptr<Engine::Resource::Base> TextTexture::create(
     Engine::Resource::Manager &manager,
@@ -83,7 +84,7 @@ std::unique_ptr<Engine::Resource::Base> TextTexture::create(
     return std::make_unique<TextTexture>(renderer, fontID, font, colour, text);
 }
 
-Engine::Resource::Key TextTexture::key(
+Engine::Resource::ID TextTexture::key(
     SDL_Renderer *,
     Engine::Resource::ID fontID,
     SDL_Color colour,

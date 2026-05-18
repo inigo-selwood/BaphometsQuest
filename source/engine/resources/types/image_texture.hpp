@@ -36,7 +36,7 @@ class ImageTexture : public Engine::Resource::Base {
         return std::make_unique<ImageTexture>(renderer, path);
     }
 
-    static Engine::Resource::Key
+    static Engine::Resource::ID
     key(SDL_Renderer *renderer, const std::string &path);
 
     std::string describe() const override;

@@ -31,7 +31,7 @@ class Font : public Engine::Resource::Base {
         return std::make_unique<Font>(path, size);
     }
 
-    static Engine::Resource::Key key(const std::string &path, int size);
+    static Engine::Resource::ID key(const std::string &path, int size);
 
     std::string describe() const override;
 

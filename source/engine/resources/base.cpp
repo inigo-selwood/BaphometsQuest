@@ -1,19 +1,11 @@
 #include "base.hpp"
 
-#include <atomic>
 #include <functional>
-#include <iomanip>
-#include <sstream>
+#include <utility>
 
 namespace Engine::Resource {
 
-namespace {
-
-std::atomic<std::uint32_t> nextID = 1;
-
-} // namespace
-
-Base::Base() : ID(generateID()) {}
+Base::Base(std::string name) : name(std::move(name)) {}
 
 std::string Base::formatDescription(const ::YAML::Node &node) {
     ::YAML::Emitter emitter;
@@ -24,17 +16,8 @@ std::string Base::formatDescription(const ::YAML::Node &node) {
     return emitter.c_str();
 }
 
-Engine::Resource::Key Base::hashKey(const std::string &value) {
-    return static_cast<Engine::Resource::Key>(std::hash<std::string>{}(value));
-}
-
-std::string Base::generateID() {
-    std::ostringstream stream;
-
-    stream << std::hex << std::nouppercase << std::setfill('0') << std::setw(4)
-           << nextID++;
-
-    return stream.str();
+Engine::Resource::ID Base::hashKey(const std::string &value) {
+    return static_cast<Engine::Resource::ID>(std::hash<std::string>{}(value));
 }
 
 } // namespace Engine::Resource

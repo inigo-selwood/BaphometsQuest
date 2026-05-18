@@ -47,7 +47,7 @@ class TextTexture : public Engine::Resource::Base {
         const std::string &text
     );
 
-    static Engine::Resource::Key
+    static Engine::Resource::ID
     key(SDL_Renderer *renderer,
         Engine::Resource::ID fontID,
         SDL_Color colour,

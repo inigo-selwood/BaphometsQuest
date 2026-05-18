@@ -3,10 +3,11 @@
 namespace Engine::Resource {
 
 YAML::YAML(const std::string &path)
-    : node(std::make_unique<::YAML::Node>(::YAML::LoadFile(path))),
+    : Base("yaml"),
+      node(std::make_unique<::YAML::Node>(::YAML::LoadFile(path))),
       path(path) {}
 
-Engine::Resource::Key YAML::key(const std::string &path) {
+Engine::Resource::ID YAML::key(const std::string &path) {
     return hashKey("YAML:" + path);
 }
 
