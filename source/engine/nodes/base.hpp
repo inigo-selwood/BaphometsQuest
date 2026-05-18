@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <set>
@@ -36,7 +37,7 @@ class Base : public std::enable_shared_from_this<Base> {
     Base();
     virtual ~Base() = default;
 
-    const std::string ID;
+    const std::uint32_t id;
 
     /** Return the game this node is attached to */
     Game &getGame();
@@ -94,11 +95,7 @@ class Base : public std::enable_shared_from_this<Base> {
             *static_cast<StoredValue *>(property->second.value) = value;
         }
 
-        spdlog::debug(
-            "Set node property '{}' on '{}'",
-            name,
-            this->describe()
-        );
+        spdlog::trace("Set node property '{}' on {}", name, this->describe());
     }
 
     virtual void enter();
@@ -165,8 +162,15 @@ class Base : public std::enable_shared_from_this<Base> {
     };
 
     void attach(const std::weak_ptr<Game> &game);
-    std::string describe() const;
-    static std::string generateID();
+    std::string describe() const {
+        if(this->name.empty()) {
+            return "#" + std::to_string(this->id);
+        }
+
+        return "'" + this->name + "' #" + std::to_string(this->id);
+    }
+
+    static std::uint32_t generateID();
 
     std::string name;
     std::vector<std::shared_ptr<Base>> children;

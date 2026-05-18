@@ -1,8 +1,6 @@
 #include "base.hpp"
 
 #include <atomic>
-#include <iomanip>
-#include <sstream>
 
 #include <spdlog/spdlog.h>
 
@@ -14,7 +12,7 @@ std::atomic<std::uint32_t> nextID = 1;
 
 } // namespace
 
-Base::Base() : ID(generateID()) {}
+Base::Base() : id(generateID()) {}
 
 Game &Base::getGame() {
     const std::shared_ptr<Game> game = this->game.lock();
@@ -91,21 +89,8 @@ void Base::attach(const std::weak_ptr<Game> &game) {
     }
 }
 
-std::string Base::describe() const {
-    if(this->name.empty()) {
-        return this->ID;
-    }
-
-    return this->ID + " '" + this->name + "'";
-}
-
-std::string Base::generateID() {
-    std::ostringstream stream;
-
-    stream << std::hex << std::nouppercase << std::setfill('0') << std::setw(4)
-           << nextID++;
-
-    return stream.str();
+std::uint32_t Base::generateID() {
+    return nextID++;
 }
 
 } // namespace Engine::Nodes
