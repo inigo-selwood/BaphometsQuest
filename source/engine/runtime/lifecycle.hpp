@@ -1,5 +1,6 @@
 #pragma once
 
+#include "resize_handler.hpp"
 #include "../resources/types/yaml.hpp"
 
 #include <stdexcept>
@@ -73,14 +74,23 @@ void start(
 
         const std::string windowTitle =
             (*settings.node)["window"]["title"].as<std::string>();
+        const int windowWidth = (*settings.node)["window"]["width"].as<int>();
+        const int windowHeight =
+            (*settings.node)["window"]["height"].as<int>();
+        const float rendererScale =
+            (*settings.node)["renderer"]["scale"].as<float>();
+
+        if(rendererScale <= 0) {
+            throw std::runtime_error("Renderer scale must be greater than zero");
+        }
 
         window.reset(SDL_CreateWindow(
             windowTitle.c_str(),
             SDL_WINDOWPOS_CENTERED,
             SDL_WINDOWPOS_CENTERED,
-            (*settings.node)["window"]["width"].as<int>(),
-            (*settings.node)["window"]["height"].as<int>(),
-            SDL_WINDOW_SHOWN
+            static_cast<int>(static_cast<float>(windowWidth) * rendererScale),
+            static_cast<int>(static_cast<float>(windowHeight) * rendererScale),
+            SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
         ));
 
         if(window == nullptr) {
@@ -110,18 +120,21 @@ void start(
             );
         }
 
-        const int rendererScale =
-            (*settings.node)["renderer"]["scale"].as<int>();
-
-        if(SDL_RenderSetScale(
+        if(SDL_RenderSetLogicalSize(
                renderer.get(),
-               static_cast<float>(rendererScale),
-               static_cast<float>(rendererScale)
+               windowWidth,
+               windowHeight
            ) != 0) {
             throw std::runtime_error(
-                std::string("Failed to set renderer scale: ") + SDL_GetError()
+                std::string("Failed to set renderer logical size: ")
+                + SDL_GetError()
             );
         }
+
+        Engine::ResizeHandler::lockAspectRatio(
+            window.get(),
+            renderer.get()
+        );
     } catch(...) {
         renderer.reset();
         window.reset();

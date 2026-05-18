@@ -1,6 +1,7 @@
 #include "game.hpp"
 
 #include "../../logger.hpp"
+#include "resize_handler.hpp"
 
 #include <stdexcept>
 #include <string>
@@ -103,6 +104,13 @@ void Game::run() {
         while(SDL_PollEvent(&event) != 0) {
             if(event.type == SDL_QUIT) {
                 this->running = false;
+            } else if(event.type == SDL_WINDOWEVENT) {
+                Engine::ResizeHandler::handle(
+                    this->window.get(),
+                    this->renderer.get(),
+                    event
+                );
+                this->nodeManager.input(event);
             } else {
                 this->nodeManager.input(event);
             }

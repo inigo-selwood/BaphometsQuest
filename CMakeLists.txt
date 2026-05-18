@@ -19,6 +19,10 @@ option(BAPHOMETS_QUEST_NATIVE_RELEASE_ARCH
     "Optimise Release builds for the current machine architecture"
     ON
 )
+option(BAPHOMETS_QUEST_NATIVE_ASPECT_LOCK
+    "Use native platform APIs to constrain window aspect ratio during resize"
+    ON
+)
 
 find_package(spdlog REQUIRED)
 find_package(CLI11 REQUIRED)
@@ -86,6 +90,66 @@ target_link_libraries(baphomets_quest
         tinyxml2::tinyxml2
         yaml-cpp::yaml-cpp
 )
+
+target_compile_definitions(baphomets_quest
+    PRIVATE
+        BAPHOMETS_QUEST_NATIVE_ASPECT_LOCK=$<BOOL:${BAPHOMETS_QUEST_NATIVE_ASPECT_LOCK}>
+)
+
+if(APPLE)
+    target_compile_definitions(baphomets_quest
+        PRIVATE
+            BAPHOMETS_QUEST_PLATFORM_MACOS=1
+            BAPHOMETS_QUEST_PLATFORM_NAME=\"macos\"
+    )
+
+    target_link_libraries(baphomets_quest
+        PRIVATE
+            "-framework Cocoa"
+            objc
+    )
+elseif(WIN32)
+    target_compile_definitions(baphomets_quest
+        PRIVATE
+            BAPHOMETS_QUEST_PLATFORM_WINDOWS=1
+            BAPHOMETS_QUEST_PLATFORM_NAME=\"windows\"
+    )
+
+    target_link_libraries(baphomets_quest
+        PRIVATE
+            user32
+    )
+elseif(UNIX)
+    target_compile_definitions(baphomets_quest
+        PRIVATE
+            BAPHOMETS_QUEST_PLATFORM_LINUX=1
+            BAPHOMETS_QUEST_PLATFORM_NAME=\"linux\"
+    )
+
+    find_package(X11 QUIET)
+
+    if(X11_FOUND)
+        target_compile_definitions(baphomets_quest
+            PRIVATE
+                BAPHOMETS_QUEST_PLATFORM_X11=1
+        )
+
+        target_include_directories(baphomets_quest
+            PRIVATE
+                ${X11_INCLUDE_DIR}
+        )
+
+        target_link_libraries(baphomets_quest
+            PRIVATE
+                ${X11_LIBRARIES}
+        )
+    endif()
+else()
+    target_compile_definitions(baphomets_quest
+        PRIVATE
+            BAPHOMETS_QUEST_PLATFORM_NAME=\"unknown\"
+    )
+endif()
 
 add_custom_target(bundle_resources
     COMMAND ${CMAKE_COMMAND} -E copy_directory

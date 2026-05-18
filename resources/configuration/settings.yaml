@@ -7,7 +7,7 @@ window:
   height: 480
 
 renderer:
-  scale: 1
+  scale: 1.5
 
 audio:
   frequency: 44100
