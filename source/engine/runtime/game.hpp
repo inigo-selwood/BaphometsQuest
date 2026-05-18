@@ -1,9 +1,9 @@
 #pragma once
 
-#include "lifecycle.hpp"
 #include "../resource/types/yaml.hpp"
 #include "../resource_manager.hpp"
 #include "../signal_manager.hpp"
+#include "lifecycle.hpp"
 
 #include <filesystem>
 #include <memory>
@@ -28,8 +28,6 @@ class Game {
         }
     };
 
-    Engine::Resource::ID settingsId = 0;
-
   public:
     ~Game();
 
@@ -42,6 +40,9 @@ class Game {
     /** Create a window and renderer for the current run stub */
     void run();
 
+    /** Queue the active game loop to stop */
+    void queueQuit();
+
     /** Shared resource manager */
     Engine::Resource::Manager resources;
 
@@ -53,6 +54,14 @@ class Game {
 
     /** Active SDL window */
     std::unique_ptr<SDL_Window, WindowDeleter> window;
+
+  private:
+
+    /** Whether the game loop is currently running */
+    bool running = false;
+
+    /** Target frames per second for the game loop */
+    int frameRate = 0;
 };
 
 } // namespace Engine

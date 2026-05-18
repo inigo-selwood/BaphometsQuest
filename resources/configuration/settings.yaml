@@ -1,5 +1,5 @@
-logger:
-  application-name: baphomets_quest
+game:
+  target-frame-rate: 60
 
 window:
   title: Baphomet's Quest

@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <memory>
 #include <sstream>
+#include <string_view>
 #include <vector>
 
 #include <spdlog/sinks/basic_file_sink.h>
@@ -16,7 +17,9 @@ namespace Logger {
 
 namespace {
 
+constexpr char APPLICATION_NAME[] = "baphomets_quest";
 constexpr std::size_t MAX_LOG_FILES = 3;
+constexpr std::size_t TEXT_INDENT = 20;
 
 /** Return a filesystem-safe ISO-like timestamp for log filenames */
 std::string getISOTimestamp() {
@@ -93,8 +96,7 @@ spdlog::level::level_enum parseLevel(const std::string &level) {
 
 void start(
     const std::filesystem::path &executablePath,
-    const std::string &consoleLevel,
-    const std::string &applicationName
+    const std::string &consoleLevel
 ) {
     const spdlog::level::level_enum consoleLogLevel = parseLevel(consoleLevel);
 
@@ -129,7 +131,7 @@ void start(
 
     // The logger itself stays at trace so sink levels decide what is emitted
     auto logger = std::make_shared<spdlog::logger>(
-        applicationName,
+        APPLICATION_NAME,
         sinks.begin(),
         sinks.end()
     );
@@ -141,6 +143,23 @@ void start(
     spdlog::flush_on(spdlog::level::warn);
 
     spdlog::info("Logging to '{}'.", logPath.string());
+}
+
+std::string indentPayload(std::string_view text) {
+    const std::string padding(TEXT_INDENT, ' ');
+    std::string formatted;
+    formatted.reserve(text.size() + TEXT_INDENT);
+    formatted += padding;
+
+    for(const char character : text) {
+        formatted += character;
+
+        if(character == '\n') {
+            formatted += padding;
+        }
+    }
+
+    return formatted;
 }
 
 } // namespace Logger
