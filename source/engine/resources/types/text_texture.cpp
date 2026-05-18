@@ -84,14 +84,14 @@ std::unique_ptr<Engine::Resource::Base> TextTexture::create(
 }
 
 Engine::Resource::Key TextTexture::key(
-    SDL_Renderer *renderer,
+    SDL_Renderer *,
     Engine::Resource::ID fontID,
     SDL_Color colour,
     const std::string &text
 ) {
     std::ostringstream stream;
-    stream << "TextTexture:" << renderer << ":" << fontID << ":"
-           << Engine::Format::colour(colour) << ":" << text;
+    stream << "TextTexture:" << fontID << ":" << Engine::Format::colour(colour)
+           << ":" << text;
 
     return hashKey(stream.str());
 }

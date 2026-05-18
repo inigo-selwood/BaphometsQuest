@@ -2,7 +2,6 @@
 
 #include <SDL_image.h>
 
-#include <sstream>
 #include <stdexcept>
 
 namespace Engine::Resource {
@@ -40,11 +39,8 @@ ImageTexture::ImageTexture(SDL_Renderer *renderer, const std::string &path)
       size(querySize(this->handle.get(), path)) {}
 
 Engine::Resource::Key
-ImageTexture::key(SDL_Renderer *renderer, const std::string &path) {
-    std::ostringstream stream;
-    stream << "ImageTexture:" << renderer << ":" << path;
-
-    return hashKey(stream.str());
+ImageTexture::key(SDL_Renderer *, const std::string &path) {
+    return hashKey("ImageTexture:" + path);
 }
 
 std::string ImageTexture::describe() const {
