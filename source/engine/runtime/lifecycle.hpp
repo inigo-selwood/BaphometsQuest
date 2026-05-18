@@ -3,6 +3,7 @@
 #include "../resources/types/yaml.hpp"
 #include "platform/resize_handler.hpp"
 
+#include <memory>
 #include <stdexcept>
 #include <string>
 
@@ -100,6 +101,21 @@ void start(
                 std::string("Failed to create window: ") + SDL_GetError()
             );
         }
+
+        constexpr char WINDOW_ICON_PATH[] = "resources/textures/Favicon.png";
+        std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> windowIcon(
+            IMG_Load(WINDOW_ICON_PATH),
+            SDL_FreeSurface
+        );
+
+        if(windowIcon == nullptr) {
+            throw std::runtime_error(
+                std::string("Failed to load window icon: ") + IMG_GetError()
+            );
+        }
+
+        SDL_SetWindowIcon(window.get(), windowIcon.get());
+        spdlog::debug("Set window icon '{}'", WINDOW_ICON_PATH);
 
         renderer.reset(
             SDL_CreateRenderer(window.get(), -1, SDL_RENDERER_ACCELERATED)
