@@ -15,6 +15,12 @@ namespace Engine::Nodes {
 /** Render text into the node tree */
 class Label : public Engine::Nodes::Base {
   public:
+    enum class Justification {
+        Left,
+        Centre,
+        Right,
+    };
+
     Label() {
         this->declareHook(Engine::Nodes::Hook::Render);
         this->declareProperty(
@@ -42,6 +48,7 @@ class Label : public Engine::Nodes::Base {
             }
         );
         this->declareProperty("position", this->position);
+        this->declareProperty("justification", this->justification);
     }
 
     void render(SDL_Renderer &renderer) override {
@@ -55,12 +62,24 @@ class Label : public Engine::Nodes::Base {
             game.resources.get<Engine::Resource::TextTexture>(
                 this->textResourceID
             );
-        const SDL_Rect destination{
-            this->position.x,
+        SDL_Rect destination{
+            0,
             this->position.y,
             texture.size.w,
             texture.size.h,
         };
+
+        switch(this->justification) {
+        case Justification::Left:
+            destination.x = this->position.x;
+            break;
+        case Justification::Centre:
+            destination.x = this->position.x - (texture.size.w / 2);
+            break;
+        case Justification::Right:
+            destination.x = this->position.x - texture.size.w;
+            break;
+        }
 
         if(SDL_RenderCopy(
                &renderer,
@@ -136,6 +155,7 @@ class Label : public Engine::Nodes::Base {
     std::string text;
     SDL_Color colour{255, 255, 255, 255};
     SDL_Point position{0, 0};
+    Justification justification = Justification::Left;
 };
 
 } // namespace Engine::Nodes
