@@ -1,11 +1,12 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <set>
 #include <stdexcept>
 #include <string>
-#include <typeindex>
 #include <type_traits>
+#include <typeindex>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -44,10 +45,7 @@ class Base : public std::enable_shared_from_this<Base> {
     const Game &getGame() const;
 
     /** Add a child node to this node */
-    void addChild(
-        const std::string &name,
-        const std::shared_ptr<Base> &child
-    );
+    void addChild(const std::string &name, const std::shared_ptr<Base> &child);
 
     /** Return true when this node has declared a property */
     bool hasProperty(const std::string &name) const;
@@ -90,7 +88,11 @@ class Base : public std::enable_shared_from_this<Base> {
             );
         }
 
-        *static_cast<StoredValue *>(property->second.value) = value;
+        if(property->second.setter) {
+            property->second.setter(&value);
+        } else {
+            *static_cast<StoredValue *>(property->second.value) = value;
+        }
 
         spdlog::debug(
             "Set node property '{}' on '{}'",
@@ -122,6 +124,34 @@ class Base : public std::enable_shared_from_this<Base> {
         );
     }
 
+    template <typename Value, typename Callback>
+    void declareProperty(
+        const std::string &name,
+        Value &member,
+        Callback &&callback
+    ) {
+        if(this->hasProperty(name)) {
+            throw std::runtime_error(
+                "Node property '" + name + "' already exists"
+            );
+        }
+
+        using StoredValue = std::decay_t<Value>;
+
+        this->properties.emplace(
+            name,
+            Property{
+                std::type_index(typeid(StoredValue)),
+                &member,
+                [callback = std::forward<Callback>(callback)](
+                    const void *value
+                ) mutable {
+                    callback(*static_cast<const StoredValue *>(value));
+                },
+            }
+        );
+    }
+
     /** Declare that this node participates in a game-loop hook */
     void declareHook(Hook hook);
 
@@ -131,6 +161,7 @@ class Base : public std::enable_shared_from_this<Base> {
     struct Property {
         std::type_index type;
         void *value;
+        std::function<void(const void *)> setter;
     };
 
     void attach(const std::weak_ptr<Game> &game);
