@@ -4,15 +4,16 @@
 
 #include <SDL.h>
 
-namespace Engine::Nodes::Native {
+namespace Engine::Nodes {
 
 /** Simple filled rectangle node for render testing */
-class ColourBox : public Engine::Nodes::Base {
+class Box : public Engine::Nodes::Base {
   public:
-    ColourBox() {
+    Box() {
         this->declareHook(Engine::Nodes::Hook::Render);
         this->declareProperty("colour", this->colour);
-        this->declareProperty("rectangle", this->rectangle);
+        this->declareProperty("position", this->position);
+        this->declareProperty("size", this->size);
     }
 
     void render(SDL_Renderer &renderer) override {
@@ -23,11 +24,17 @@ class ColourBox : public Engine::Nodes::Base {
             this->colour.b,
             this->colour.a
         );
-        SDL_RenderFillRect(&renderer, &this->rectangle);
+        const SDL_Rect drawArea{this->position.x,
+            this->position.y,
+            this->size.w,
+            this->size.h};
+        SDL_RenderFillRect(&renderer, &drawArea);
     }
 
+  private:
+    SDL_Point position{0, 0};
     SDL_Color colour{255, 255, 255, 255};
-    SDL_Rect rectangle{32, 32, 128, 128};
+    SDL_Rect size{0, 0, 0, 0};
 };
 
-} // namespace Engine::Nodes::Native
+} // namespace Engine::Nodes
