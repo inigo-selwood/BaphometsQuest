@@ -9,6 +9,9 @@
 namespace Engine::Resource {
 
 using ID = std::uint64_t;
+using Key = std::uint64_t;
+
+class Manager;
 
 class Base {
   public:
@@ -21,6 +24,7 @@ class Base {
 
   protected:
     static std::string formatDescription(const ::YAML::Node &node);
+    static Engine::Resource::Key hashKey(const std::string &value);
 
   private:
     static std::string generateID();

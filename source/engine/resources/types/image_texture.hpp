@@ -4,6 +4,7 @@
 
 #include <SDL.h>
 
+#include <chrono>
 #include <memory>
 #include <string>
 
@@ -25,7 +26,18 @@ class ImageTexture : public Engine::Resource::Base {
   public:
     ImageTexture(SDL_Renderer *renderer, const std::string &path);
 
-    static std::string key(SDL_Renderer *renderer, const std::string &path);
+    static constexpr std::chrono::seconds TTL{10};
+
+    static std::unique_ptr<Engine::Resource::Base> create(
+        Engine::Resource::Manager &,
+        SDL_Renderer *renderer,
+        const std::string &path
+    ) {
+        return std::make_unique<ImageTexture>(renderer, path);
+    }
+
+    static Engine::Resource::Key
+    key(SDL_Renderer *renderer, const std::string &path);
 
     std::string describe() const override;
 

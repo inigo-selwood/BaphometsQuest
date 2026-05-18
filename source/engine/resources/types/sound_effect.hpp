@@ -4,6 +4,7 @@
 
 #include <SDL_mixer.h>
 
+#include <chrono>
 #include <memory>
 #include <string>
 
@@ -23,7 +24,14 @@ class SoundEffect : public Engine::Resource::Base {
   public:
     explicit SoundEffect(const std::string &path);
 
-    static std::string key(const std::string &path);
+    static constexpr std::chrono::seconds TTL{60};
+
+    static std::unique_ptr<Engine::Resource::Base>
+    create(Engine::Resource::Manager &, const std::string &path) {
+        return std::make_unique<SoundEffect>(path);
+    }
+
+    static Engine::Resource::Key key(const std::string &path);
 
     std::string describe() const override;
 

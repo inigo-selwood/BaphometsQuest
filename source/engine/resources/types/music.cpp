@@ -19,8 +19,8 @@ Music::load(const std::string &path) {
 
 Music::Music(const std::string &path) : handle(load(path)), path(path) {}
 
-std::string Music::key(const std::string &path) {
-    return "Music:" + path;
+Engine::Resource::Key Music::key(const std::string &path) {
+    return hashKey("Music:" + path);
 }
 
 std::string Music::describe() const {

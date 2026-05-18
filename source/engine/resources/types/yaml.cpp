@@ -6,8 +6,8 @@ YAML::YAML(const std::string &path)
     : node(std::make_unique<::YAML::Node>(::YAML::LoadFile(path))),
       path(path) {}
 
-std::string YAML::key(const std::string &path) {
-    return "YAML:" + path;
+Engine::Resource::Key YAML::key(const std::string &path) {
+    return hashKey("YAML:" + path);
 }
 
 std::string YAML::describe() const {

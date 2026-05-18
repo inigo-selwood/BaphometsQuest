@@ -5,6 +5,7 @@
 
 #include <SDL.h>
 
+#include <chrono>
 #include <memory>
 #include <string>
 
@@ -36,7 +37,17 @@ class TextTexture : public Engine::Resource::Base {
         const std::string &text
     );
 
-    static std::string
+    static constexpr std::chrono::seconds TTL{10};
+
+    static std::unique_ptr<Engine::Resource::Base> create(
+        Engine::Resource::Manager &manager,
+        SDL_Renderer *renderer,
+        Engine::Resource::ID fontID,
+        SDL_Color colour,
+        const std::string &text
+    );
+
+    static Engine::Resource::Key
     key(SDL_Renderer *renderer,
         Engine::Resource::ID fontID,
         SDL_Color colour,

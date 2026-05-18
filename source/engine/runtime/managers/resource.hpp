@@ -2,8 +2,6 @@
 
 #include "../../../core/logger.hpp"
 #include "../../resources/base.hpp"
-#include "../../resources/types/font.hpp"
-#include "../../resources/types/text_texture.hpp"
 
 #include <chrono>
 #include <functional>
@@ -19,46 +17,15 @@
 
 namespace Engine::Resource {
 
-class Manager;
-
 template <typename ResourceType, typename... Arguments> struct ResourceLoader {
-    static std::string key(const Arguments &...arguments) {
+    static Engine::Resource::Key key(const Arguments &...arguments) {
         return ResourceType::key(arguments...);
     }
 
     static std::unique_ptr<Base>
-    create(Manager &, const Arguments &...arguments) {
-        return std::make_unique<ResourceType>(arguments...);
+    create(Manager &manager, const Arguments &...arguments) {
+        return ResourceType::create(manager, arguments...);
     }
-};
-
-template <>
-struct ResourceLoader<
-    Engine::Resource::TextTexture,
-    SDL_Renderer *,
-    Engine::Resource::ID,
-    SDL_Color,
-    std::string> {
-    static std::string
-    key(SDL_Renderer *renderer,
-        Engine::Resource::ID fontID,
-        SDL_Color colour,
-        const std::string &text) {
-        return Engine::Resource::TextTexture::key(
-            renderer,
-            fontID,
-            colour,
-            text
-        );
-    }
-
-    static std::unique_ptr<Base> create(
-        Manager &manager,
-        SDL_Renderer *renderer,
-        Engine::Resource::ID fontID,
-        SDL_Color colour,
-        const std::string &text
-    );
 };
 
 class Manager {
@@ -81,7 +48,7 @@ class Manager {
             ResourceLoader<ResourceType, std::decay_t<Arguments>...>;
         using StoredArguments = std::tuple<std::decay_t<Arguments>...>;
 
-        const std::string key = Loader::key(arguments...);
+        const Engine::Resource::Key key = Loader::key(arguments...);
         const auto existingResource = this->ids.find(key);
 
         if(existingResource != this->ids.end()) {
@@ -109,6 +76,7 @@ class Manager {
             key,
             std::move(resource),
             factory,
+            ResourceType::TTL,
             Clock::now(),
         };
 
@@ -168,17 +136,16 @@ class Manager {
   private:
     using Clock = std::chrono::steady_clock;
 
-    static constexpr std::chrono::seconds EXPIRY{30};
-
     struct ResourceEntry {
-        std::string key;
+        Engine::Resource::Key key;
         std::unique_ptr<Base> resource;
         std::function<std::unique_ptr<Base>()> factory;
+        std::chrono::seconds ttl;
         Clock::time_point lastAccessedAt;
     };
 
     std::unordered_map<ID, ResourceEntry> resources;
-    std::unordered_map<std::string, ID> ids;
+    std::unordered_map<Engine::Resource::Key, ID> ids;
     ID nextResourceID = 1;
 };
 

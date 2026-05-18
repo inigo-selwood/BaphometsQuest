@@ -4,6 +4,7 @@
 
 #include <SDL_ttf.h>
 
+#include <chrono>
 #include <memory>
 #include <string>
 
@@ -23,7 +24,14 @@ class Font : public Engine::Resource::Base {
   public:
     Font(const std::string &path, int size);
 
-    static std::string key(const std::string &path, int size);
+    static constexpr std::chrono::seconds TTL{120};
+
+    static std::unique_ptr<Engine::Resource::Base>
+    create(Engine::Resource::Manager &, const std::string &path, int size) {
+        return std::make_unique<Font>(path, size);
+    }
+
+    static Engine::Resource::Key key(const std::string &path, int size);
 
     std::string describe() const override;
 

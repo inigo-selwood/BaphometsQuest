@@ -1,5 +1,6 @@
 #include "text_texture.hpp"
 
+#include "../../runtime/managers/resource.hpp"
 #include "../../utils/format.hpp"
 
 #include <sstream>
@@ -69,7 +70,20 @@ TextTexture::TextTexture(
     : handle(render(renderer, font, colour, text)), fontID(fontID),
       colour(colour), size(querySize(this->handle.get(), text)), text(text) {}
 
-std::string TextTexture::key(
+std::unique_ptr<Engine::Resource::Base> TextTexture::create(
+    Engine::Resource::Manager &manager,
+    SDL_Renderer *renderer,
+    Engine::Resource::ID fontID,
+    SDL_Color colour,
+    const std::string &text
+) {
+    const Engine::Resource::Font &font =
+        manager.get<Engine::Resource::Font>(fontID);
+
+    return std::make_unique<TextTexture>(renderer, fontID, font, colour, text);
+}
+
+Engine::Resource::Key TextTexture::key(
     SDL_Renderer *renderer,
     Engine::Resource::ID fontID,
     SDL_Color colour,
@@ -79,7 +93,7 @@ std::string TextTexture::key(
     stream << "TextTexture:" << renderer << ":" << fontID << ":"
            << Engine::Format::colour(colour) << ":" << text;
 
-    return stream.str();
+    return hashKey(stream.str());
 }
 
 std::string TextTexture::describe() const {

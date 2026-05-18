@@ -4,27 +4,6 @@
 
 namespace Engine::Resource {
 
-std::unique_ptr<Base>
-ResourceLoader<TextTexture, SDL_Renderer *, ID, SDL_Color, std::string>::
-    create(
-        Manager &manager,
-        SDL_Renderer *renderer,
-        ID fontID,
-        SDL_Color colour,
-        const std::string &text
-    ) {
-    const Engine::Resource::Font &font =
-        manager.get<Engine::Resource::Font>(fontID);
-
-    return std::make_unique<Engine::Resource::TextTexture>(
-        renderer,
-        fontID,
-        font,
-        colour,
-        text
-    );
-}
-
 Manager::~Manager() {
     this->clear();
 }
@@ -78,7 +57,7 @@ void Manager::purgeExpired() {
             continue;
         }
 
-        if(now - resource.lastAccessedAt < EXPIRY) {
+        if(now - resource.lastAccessedAt < resource.ttl) {
             continue;
         }
 

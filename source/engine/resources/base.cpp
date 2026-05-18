@@ -1,6 +1,7 @@
 #include "base.hpp"
 
 #include <atomic>
+#include <functional>
 #include <iomanip>
 #include <sstream>
 
@@ -21,6 +22,10 @@ std::string Base::formatDescription(const ::YAML::Node &node) {
     emitter << node;
 
     return emitter.c_str();
+}
+
+Engine::Resource::Key Base::hashKey(const std::string &value) {
+    return static_cast<Engine::Resource::Key>(std::hash<std::string>{}(value));
 }
 
 std::string Base::generateID() {

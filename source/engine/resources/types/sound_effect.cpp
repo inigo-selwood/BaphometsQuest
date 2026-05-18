@@ -22,8 +22,8 @@ SoundEffect::load(const std::string &path) {
 SoundEffect::SoundEffect(const std::string &path)
     : handle(load(path)), path(path) {}
 
-std::string SoundEffect::key(const std::string &path) {
-    return "SoundEffect:" + path;
+Engine::Resource::Key SoundEffect::key(const std::string &path) {
+    return hashKey("SoundEffect:" + path);
 }
 
 std::string SoundEffect::describe() const {

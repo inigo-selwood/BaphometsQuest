@@ -39,12 +39,12 @@ ImageTexture::ImageTexture(SDL_Renderer *renderer, const std::string &path)
     : handle(load(renderer, path)), path(path),
       size(querySize(this->handle.get(), path)) {}
 
-std::string
+Engine::Resource::Key
 ImageTexture::key(SDL_Renderer *renderer, const std::string &path) {
     std::ostringstream stream;
     stream << "ImageTexture:" << renderer << ":" << path;
 
-    return stream.str();
+    return hashKey(stream.str());
 }
 
 std::string ImageTexture::describe() const {
