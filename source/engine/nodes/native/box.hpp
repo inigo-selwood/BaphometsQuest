@@ -17,6 +17,7 @@ class Box : public Engine::Nodes::Base {
     }
 
     void render(SDL_Renderer &renderer) override {
+        SDL_SetRenderDrawBlendMode(&renderer, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(
             &renderer,
             this->colour.r,
