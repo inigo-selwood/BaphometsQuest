@@ -1,13 +1,13 @@
 game:
-  target-frame-rate: 60
+  target-frame-rate: 24
 
 window:
   title: Baphomet's Quest
-  width: 640
-  height: 480
+  width: 160
+  height: 144
 
 renderer:
-  scale: 1.5
+  scale: 4
 
 audio:
   frequency: 44100
