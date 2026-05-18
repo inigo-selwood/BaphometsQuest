@@ -96,6 +96,9 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Target frames per second for the game loop */
     int frameRate = 0;
 
+    /** Renderer clear colour */
+    SDL_Color renderClearColour{0, 0, 0, 255};
+
     std::unordered_map<
         std::string,
         std::function<std::shared_ptr<Engine::Nodes::Base>()>>

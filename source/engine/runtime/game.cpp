@@ -1,6 +1,7 @@
 #include "game.hpp"
 
 #include "../../core/logger.hpp"
+#include "../utils/format.hpp"
 #include "resize/handler.hpp"
 
 #include <stdexcept>
@@ -39,6 +40,9 @@ void Game::start(
     const ::YAML::Node &settings = *settingsResource.node;
 
     this->frameRate = settings["game"]["target-frame-rate"].as<int>();
+    this->renderClearColour = Engine::Format::colour(
+        settings["renderer"]["clear-colour"].as<std::string>()
+    );
 
     if(this->frameRate <= 0) {
         throw std::runtime_error(
@@ -115,7 +119,13 @@ void Game::run() {
 
         this->nodeManager.process(deltaSeconds);
 
-        SDL_SetRenderDrawColor(this->renderer.get(), 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(
+            this->renderer.get(),
+            this->renderClearColour.r,
+            this->renderClearColour.g,
+            this->renderClearColour.b,
+            this->renderClearColour.a
+        );
         SDL_RenderClear(this->renderer.get());
         this->nodeManager.render(*this->renderer);
         SDL_RenderPresent(this->renderer.get());

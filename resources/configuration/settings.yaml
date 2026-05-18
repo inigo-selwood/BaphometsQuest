@@ -8,6 +8,7 @@ window:
 
 renderer:
   scale: 4
+  clear-colour: '#20283dff'
 
 audio:
   frequency: 44100
