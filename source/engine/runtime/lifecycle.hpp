@@ -1,7 +1,7 @@
 #pragma once
 
-#include "resize_handler.hpp"
 #include "../resources/types/yaml.hpp"
+#include "platform/resize_handler.hpp"
 
 #include <stdexcept>
 #include <string>
@@ -81,7 +81,9 @@ void start(
             (*settings.node)["renderer"]["scale"].as<float>();
 
         if(rendererScale <= 0) {
-            throw std::runtime_error("Renderer scale must be greater than zero");
+            throw std::runtime_error(
+                "Renderer scale must be greater than zero"
+            );
         }
 
         window.reset(SDL_CreateWindow(
@@ -120,21 +122,15 @@ void start(
             );
         }
 
-        if(SDL_RenderSetLogicalSize(
-               renderer.get(),
-               windowWidth,
-               windowHeight
-           ) != 0) {
+        if(SDL_RenderSetLogicalSize(renderer.get(), windowWidth, windowHeight)
+            != 0) {
             throw std::runtime_error(
                 std::string("Failed to set renderer logical size: ")
                 + SDL_GetError()
             );
         }
 
-        Engine::ResizeHandler::lockAspectRatio(
-            window.get(),
-            renderer.get()
-        );
+        Engine::ResizeHandler::lockAspectRatio(window.get(), renderer.get());
     } catch(...) {
         renderer.reset();
         window.reset();

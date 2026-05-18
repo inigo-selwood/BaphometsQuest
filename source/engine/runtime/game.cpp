@@ -1,7 +1,7 @@
 #include "game.hpp"
 
 #include "../../logger.hpp"
-#include "resize_handler.hpp"
+#include "platform/resize_handler.hpp"
 
 #include <stdexcept>
 #include <string>
@@ -41,16 +41,14 @@ void Game::start(
     this->frameRate = settings["game"]["target-frame-rate"].as<int>();
 
     if(this->frameRate <= 0) {
-        throw std::runtime_error("Target frame rate must be greater than zero");
+        throw std::runtime_error(
+            "Target frame rate must be greater than zero"
+        );
     }
 
     spdlog::info("Starting game services");
 
-    Engine::Lifecycle::start(
-        this->window,
-        this->renderer,
-        settingsResource
-    );
+    Engine::Lifecycle::start(this->window, this->renderer, settingsResource);
 }
 
 void Game::run() {
@@ -82,8 +80,7 @@ void Game::run() {
                 this->nodeManager.exit();
             }
 
-            this->currentScene =
-                this->sceneFactories.at(sceneName)();
+            this->currentScene = this->sceneFactories.at(sceneName)();
             this->queuedScene.reset();
             this->nodeManager.setRoot(this->currentScene);
             spdlog::debug("Entering scene '{}'", sceneName);
