@@ -51,6 +51,9 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Queue the active game loop to stop */
     void queueQuit();
 
+    /** Return the logical screen area currently used for rendering */
+    SDL_Rect getScreenSize() const;
+
     template <typename SceneType> void registerScene(const std::string &name) {
         static_assert(
             std::is_base_of_v<Engine::Nodes::Base, SceneType>,

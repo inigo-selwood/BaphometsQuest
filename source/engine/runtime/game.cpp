@@ -149,6 +149,31 @@ void Game::queueQuit() {
     this->running = false;
 }
 
+SDL_Rect Game::getScreenSize() const {
+    if(this->renderer == nullptr) {
+        throw std::runtime_error(
+            "Game must be started before querying screen size"
+        );
+    }
+
+    SDL_Rect screenSize{0, 0, 0, 0};
+    SDL_RenderGetLogicalSize(
+        this->renderer.get(),
+        &screenSize.w,
+        &screenSize.h
+    );
+
+    if(screenSize.w <= 0 || screenSize.h <= 0) {
+        SDL_GetRendererOutputSize(
+            this->renderer.get(),
+            &screenSize.w,
+            &screenSize.h
+        );
+    }
+
+    return screenSize;
+}
+
 void Game::queueScene(const std::string &name) {
     if(!this->sceneFactories.contains(name)) {
         throw std::runtime_error("Scene '" + name + "' is not registered");
