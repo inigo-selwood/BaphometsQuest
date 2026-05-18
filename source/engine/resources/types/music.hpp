@@ -24,7 +24,7 @@ class Music : public Engine::Resource::Base {
   public:
     explicit Music(const std::string &path);
 
-    static constexpr std::chrono::seconds TTL{60};
+    static constexpr std::chrono::seconds TTL{-1};
 
     static std::unique_ptr<Engine::Resource::Base>
     create(Engine::Resource::Manager &, const std::string &path) {

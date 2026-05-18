@@ -56,6 +56,10 @@ void Manager::purgeExpired() {
             continue;
         }
 
+        if(resource.ttl.count() < 0) {
+            continue;
+        }
+
         if(now - resource.lastAccessedAt < resource.ttl) {
             continue;
         }

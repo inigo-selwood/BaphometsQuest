@@ -1,0 +1,98 @@
+#pragma once
+
+#include "../../resources/types/music.hpp"
+#include "../../runtime/game.hpp"
+#include "../base.hpp"
+
+#include <SDL_mixer.h>
+
+#include <stdexcept>
+#include <string>
+
+namespace Engine::Nodes {
+
+/** Play music from the node tree */
+class Music : public Engine::Nodes::Base {
+  public:
+    Music() {
+        this->declareHook(Engine::Nodes::Hook::Exit);
+        this->declareProperty(
+            "path",
+            this->path,
+            [this](const std::string &value) { this->update(value); }
+        );
+        this->declareProperty("loop", this->loop);
+    }
+
+    void exit() override {
+        this->stop();
+    }
+
+    void start() {
+        if(this->musicResourceID == 0) {
+            throw std::runtime_error("Music requires a path before starting");
+        }
+
+        Engine::Game &game = this->getGame();
+
+        Engine::Resource::Music &music =
+            game.resources.get<Engine::Resource::Music>(this->musicResourceID);
+
+        if(Mix_PlayMusic(music.handle.get(), this->loop ? -1 : 0) != 0) {
+            throw std::runtime_error(
+                std::string("Failed to play music node: ") + Mix_GetError()
+            );
+        }
+
+        this->active = true;
+    }
+
+    void stop() {
+        if(this->active || Mix_PlayingMusic() != 0) {
+            Mix_HaltMusic();
+        }
+
+        this->active = false;
+    }
+
+    void pause() {
+        if(!this->active) {
+            return;
+        }
+
+        Mix_PauseMusic();
+    }
+
+  private:
+    void update(const std::string &path) {
+        const bool musicChanged = path != this->path;
+
+        this->path = path;
+
+        if(!musicChanged) {
+            return;
+        }
+
+        this->musicResourceID = 0;
+
+        if(this->path.empty()) {
+            return;
+        }
+
+        Engine::Game &game = this->getGame();
+
+        this->musicResourceID =
+            game.resources.load<Engine::Resource::Music>(this->path);
+
+        if(this->active) {
+            this->start();
+        }
+    }
+
+    Engine::Resource::ID musicResourceID = 0;
+    std::string path;
+    bool loop = false;
+    bool active = false;
+};
+
+} // namespace Engine::Nodes
