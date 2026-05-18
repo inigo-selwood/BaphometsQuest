@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../logger.hpp"
+#include "../../../core/logger.hpp"
 #include "../../resources/base.hpp"
 
 #include <cstdint>

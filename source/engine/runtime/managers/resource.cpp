@@ -1,6 +1,6 @@
 #include "resource.hpp"
 
-#include "../../../logger.hpp"
+#include "../../../core/logger.hpp"
 
 #include <spdlog/spdlog.h>
 

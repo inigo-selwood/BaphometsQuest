@@ -1,6 +1,6 @@
 #include "game.hpp"
 
-#include "../../logger.hpp"
+#include "../../core/logger.hpp"
 #include "resize/handler.hpp"
 
 #include <stdexcept>
