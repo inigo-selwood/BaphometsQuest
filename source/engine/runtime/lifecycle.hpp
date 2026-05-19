@@ -59,11 +59,9 @@ void start(
 
         spdlog::debug("Initialized SDL_mixer with OGG support");
 
-        int audioFrequency =
-            (*settings.node)["audio"]["frequency"].as<int>();
+        int audioFrequency = (*settings.node)["audio"]["frequency"].as<int>();
         int audioChannels = (*settings.node)["audio"]["channels"].as<int>();
-        int audioChunkSize =
-            (*settings.node)["audio"]["chunk-size"].as<int>();
+        int audioChunkSize = (*settings.node)["audio"]["chunk-size"].as<int>();
 
         if(audioFrequency <= 0) {
             spdlog::warn(
@@ -119,8 +117,7 @@ void start(
         const std::string windowTitle =
             (*settings.node)["window"]["title"].as<std::string>();
         int windowWidth = (*settings.node)["window"]["width"].as<int>();
-        int windowHeight =
-            (*settings.node)["window"]["height"].as<int>();
+        int windowHeight = (*settings.node)["window"]["height"].as<int>();
         float rendererScale =
             (*settings.node)["renderer"]["scale"].as<float>();
 

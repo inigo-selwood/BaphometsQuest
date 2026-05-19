@@ -38,22 +38,17 @@ void Timer::recordFrameDuration(Uint32 frameDuration) {
     const int previousFrameRate = this->activeFrameRate;
     const float targetFrameDuration = this->getTargetFrameDuration();
 
-    if(this->averageFrameDuration
-        > targetFrameDuration * SLOW_THRESHOLD) {
+    if(this->averageFrameDuration > targetFrameDuration * SLOW_THRESHOLD) {
         this->activeFrameRate =
             std::max(MIN_FRAME_RATE, this->activeFrameRate - 1);
-    } else if(
-        this->averageFrameDuration < targetFrameDuration * STABLE_THRESHOLD
-    ) {
+    } else if(this->averageFrameDuration
+        < targetFrameDuration * STABLE_THRESHOLD) {
         this->activeFrameRate =
             std::min(this->targetFrameRate, this->activeFrameRate + 1);
     }
 
     if(this->activeFrameRate != previousFrameRate) {
-        spdlog::debug(
-            "Adjusted frame rate to {} FPS",
-            this->activeFrameRate
-        );
+        spdlog::debug("Adjusted frame rate to {} FPS", this->activeFrameRate);
     }
 }
 
