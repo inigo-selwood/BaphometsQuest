@@ -4,6 +4,6 @@
   "semi": false,
   "singleQuote": true,
   "singleAttributePerLine": true,
-  "plugins": ["@prettier/plugin-xml", "prettier-plugin-organize-attributes"],
-  "attributeSort": "ASC"
+  "plugins": ["@prettier/plugin-xml"],
+  "xmlSortAttributesByKey": true
 }

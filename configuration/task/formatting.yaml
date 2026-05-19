@@ -6,7 +6,12 @@ tasks:
     cmds:
       - find source -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i --style=file:configuration/formatting/.clang-format
       - npm --prefix configuration/formatting install
-      - find resources -name '*.xml' -type f -exec configuration/formatting/node_modules/.bin/prettier --config configuration/formatting/.prettierrc --write {} +
+      - task: format-xml
+
+  format-xml:
+    dir: ../formatting
+    cmds:
+      - find ../../source ../../resources -name '*.xml' -type f -exec npm exec prettier -- --config .prettierrc --write {} +
 
   clean:
     dir: ../..
