@@ -8,7 +8,6 @@
 #include "../../engine/runtime/scene_loader.hpp"
 
 #include <memory>
-#include <stdexcept>
 #include <vector>
 
 namespace Scenes::MainMenu {
@@ -31,13 +30,7 @@ class Scene : public Engine::Nodes::Base {
         loader.registerNode<Components::Cursor>("cursor");
         loader.load("source/scenes/main_menu/main_menu.xml");
 
-        const auto cursor = std::dynamic_pointer_cast<Components::Cursor>(
-            this->getChild("cursor")
-        );
-
-        if(cursor == nullptr) {
-            throw std::runtime_error("Main menu XML created invalid nodes");
-        }
+        const auto cursor = this->getChild<Components::Cursor>("cursor");
 
         cursor->setProperty(
             "options",

@@ -52,6 +52,26 @@ class Base : public std::enable_shared_from_this<Base> {
     /** Return a named direct child */
     std::shared_ptr<Base> getChild(const std::string &name) const;
 
+    /** Return a named direct child with a checked node type */
+    template <typename NodeType>
+    std::shared_ptr<NodeType> getChild(const std::string &name) const {
+        static_assert(
+            std::is_base_of_v<Base, NodeType>,
+            "NodeType must inherit from Engine::Nodes::Base"
+        );
+
+        std::shared_ptr<NodeType> child =
+            std::dynamic_pointer_cast<NodeType>(this->getChild(name));
+
+        if(child == nullptr) {
+            throw std::runtime_error(
+                "Child node '" + name + "' type does not match"
+            );
+        }
+
+        return child;
+    }
+
     /** Return true when this node has declared a property */
     bool hasProperty(const std::string &name) const;
 
