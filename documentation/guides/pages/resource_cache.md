@@ -11,6 +11,9 @@ Each resource type owns its cache policy:
 - `TTL` controls how long an unused live resource can stay cached
 - `describe()` returns YAML-formatted details for logs
 
+A negative `TTL`, currently used by music, keeps the live resource cached until
+the manager is cleared.
+
 Using Resources
 ---------------
 

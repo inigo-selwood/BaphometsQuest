@@ -11,9 +11,10 @@ stable.
 XML Shape
 ---------
 
-The root element must be `<scene>`. Each child element is a node. The element
-name selects the registered node class, the `name` attribute becomes the child
-node name, and every other attribute is applied as a property.
+The root element must be `<scene>`. Each child element is a node unless the
+parent node consumes its own child XML. The element name selects the registered
+node class, the optional `name` attribute becomes the child node name, and every
+other attribute is applied as a property.
 
 ```xml
 <scene>
@@ -29,8 +30,9 @@ node name, and every other attribute is applied as a property.
 </scene>
 ```
 
-Nested node elements become children of the node created from their parent XML
-element.
+Nested XML normally becomes child nodes. Some nodes override that behaviour and
+parse their child XML as internal data instead. `Menu` owns `<option>` elements,
+and `Sprite` owns `<animation>` and `<frame>` elements.
 
 Registration
 ------------
@@ -55,18 +57,30 @@ XML attributes are converted through `Engine::Nodes::Base::setPropertyFromText`.
 Supported text-backed property types are strings, integers, booleans,
 `SDL_Point`, `SDL_Rect`, `SDL_Color`, and label justification values.
 
-Custom Typed Properties
------------------------
+Node-Owned Child XML
+--------------------
 
-Some values are intentionally not encoded as text. The main menu cursor keeps
-its selectable options as a typed vector, so the scene sets them after XML load.
+Nodes can consume their own nested XML by overriding `loadXmlChildren()`.
+Returning `true` tells the loader not to instantiate those child elements as
+nodes.
 
-```cpp
-cursor->setProperty(
-    "options",
-    std::vector<Components::Cursor::Option>{
-        {"play", {48, 76}},
-        {"quit", {48, 92}},
-    }
-);
+```xml
+<menu
+  cursor-path="resources/textures/tileset.png"
+  cursor-region="[232, 16, 8, 8]"
+  font="resources/fonts/04B_03.TTF"
+  name="main-menu"
+  position="[64, 76]"
+  size="8"
+>
+  <option
+    tag="play"
+    text="Play"
+  />
+
+  <option
+    tag="quit"
+    text="Quit"
+  />
+</menu>
 ```
