@@ -5,10 +5,10 @@ project(BaphometsQuest
     LANGUAGES CXX
 )
 
-include(cmake/compiler_options.cmake)
-include(cmake/dependencies.cmake)
-include(cmake/distribution.cmake)
-include(cmake/platform_resize_handler.cmake)
+include(configuration/cmake/compiler_options.cmake)
+include(configuration/cmake/dependencies.cmake)
+include(configuration/cmake/distribution.cmake)
+include(configuration/cmake/platform_resize_handler.cmake)
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
     source/*.cpp
