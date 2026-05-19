@@ -3,7 +3,6 @@
 #include "../../engine/nodes/base.hpp"
 #include "../../engine/nodes/native/label.hpp"
 #include "../../engine/nodes/native/menu.hpp"
-#include "../../engine/nodes/native/menu_cursor.hpp"
 #include "../../engine/nodes/native/menu_option.hpp"
 #include "../../engine/nodes/native/music.hpp"
 #include "../../engine/runtime/scene_loader.hpp"
@@ -20,7 +19,6 @@ class Scene : public Engine::Nodes::Base {
         Engine::SceneLoader loader{*this};
         loader.registerNode<Engine::Nodes::Label>("label");
         loader.registerNode<Engine::Nodes::Menu>("menu");
-        loader.registerNode<Engine::Nodes::MenuCursor>("menu-cursor");
         loader.registerNode<Engine::Nodes::MenuOption>("menu-option");
         loader.registerNode<Engine::Nodes::Music>("music");
         loader.load("source/scenes/main_menu/main_menu.xml");

@@ -22,6 +22,8 @@ class Menu : public Engine::Nodes::Base {
         this->declareProperty("size", this->size);
         this->declareProperty("colour", this->colour);
         this->declareProperty("position", this->position);
+        this->declareProperty("cursor-path", this->cursorPath);
+        this->declareProperty("cursor-region", this->cursorRegion);
     }
 
     /** Configure cursor options and declare the selected signal */
@@ -33,23 +35,12 @@ class Menu : public Engine::Nodes::Base {
         Engine::Game &game = this->getGame();
         const std::shared_ptr<Base> owner = this->shared_from_this();
         const std::weak_ptr<Base> ownerReference = owner;
-        std::shared_ptr<MenuCursor> cursor;
+        std::shared_ptr<MenuCursor> cursor =
+            std::make_shared<Engine::Nodes::MenuCursor>();
         std::vector<MenuCursor::Option> options;
         int optionIndex = 0;
 
         for(const auto &child : this->getChildren()) {
-            if(const auto childCursor =
-                   std::dynamic_pointer_cast<MenuCursor>(child)) {
-                if(cursor != nullptr) {
-                    throw std::runtime_error(
-                        "Menu must not contain multiple cursors"
-                    );
-                }
-
-                cursor = childCursor;
-                continue;
-            }
-
             if(const auto option =
                    std::dynamic_pointer_cast<MenuOption>(child)) {
                 const int verticalOffset = optionIndex * this->getRowHeight();
@@ -76,16 +67,19 @@ class Menu : public Engine::Nodes::Base {
             }
         }
 
-        if(cursor == nullptr) {
-            throw std::runtime_error("Menu requires a cursor child");
+        if(this->cursorPath.empty()) {
+            throw std::runtime_error("Menu requires a cursor path");
         }
 
         if(options.empty()) {
             throw std::runtime_error("Menu requires at least one option child");
         }
 
+        this->addChild("", cursor);
         game.signals.declare<std::string>(owner, "selected");
         cursor->configure();
+        cursor->setProperty("path", this->cursorPath);
+        cursor->setProperty("region", this->cursorRegion);
         cursor->setProperty("options", options);
         game.signals.connect<std::string>(
             cursor,
@@ -117,6 +111,8 @@ class Menu : public Engine::Nodes::Base {
     int size = 0;
     SDL_Color colour{255, 255, 255, 255};
     SDL_Point position{0, 0};
+    std::string cursorPath;
+    SDL_Rect cursorRegion{0, 0, 0, 0};
     bool configured = false;
 };
 

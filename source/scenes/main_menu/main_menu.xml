@@ -18,6 +18,8 @@
 
   <menu
     colour="#ffffffff"
+    cursor-path="resources/textures/tileset.png"
+    cursor-region="232,16,8,8"
     font="resources/fonts/04B_03.TTF"
     name="main-menu"
     position="64,76"
@@ -31,11 +33,6 @@
     <menu-option
       tag="quit"
       text="Quit"
-    />
-
-    <menu-cursor
-      path="resources/textures/tileset.png"
-      region="232,16,8,8"
     />
   </menu>
 </scene>
