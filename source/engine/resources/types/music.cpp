@@ -1,5 +1,7 @@
 #include "music.hpp"
 
+#include "../../utils/format.hpp"
+
 #include <stdexcept>
 
 namespace Engine::Resource {
@@ -27,7 +29,7 @@ Engine::Resource::ID Music::key(const std::string &path) {
 std::string Music::describe() const {
     ::YAML::Node name;
     name["type"] = "Music";
-    name["path"] = this->path;
+    name["path"] = Engine::Format::path(this->path);
 
     return this->formatDescription(name);
 }

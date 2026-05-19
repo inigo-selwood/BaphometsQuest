@@ -1,5 +1,7 @@
 #include "map_data.hpp"
 
+#include "../../utils/format.hpp"
+
 #include <cstddef>
 #include <fstream>
 #include <stdexcept>
@@ -134,7 +136,7 @@ std::size_t MapData::getTileCount() const {
 std::string MapData::describe() const {
     ::YAML::Node name;
     name["type"] = "MapData";
-    name["path"] = this->path;
+    name["path"] = Engine::Format::path(this->path);
     name["width"] = this->size.w;
     name["height"] = this->size.h;
     name["bytes"] = this->bytes.size();

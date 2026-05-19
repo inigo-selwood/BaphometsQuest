@@ -1,5 +1,7 @@
 #include "tileset.hpp"
 
+#include "../../utils/format.hpp"
+
 #include <fstream>
 #include <stdexcept>
 #include <string>
@@ -122,7 +124,7 @@ void Tileset::save() const {
 std::string Tileset::describe() const {
     ::YAML::Node name;
     name["type"] = "Tileset";
-    name["path"] = this->path;
+    name["path"] = Engine::Format::path(this->path);
     name["tile-width"] = this->tileSize.w;
     name["tile-height"] = this->tileSize.h;
     name["bytes"] = this->bytes.size();

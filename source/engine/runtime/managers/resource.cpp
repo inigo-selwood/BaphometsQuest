@@ -14,7 +14,7 @@ void Manager::clear() {
             continue;
         }
 
-        spdlog::debug("Freed {} {:016x}", resource.resource->name, id);
+        spdlog::debug("Freed {:016x} ({})", id, resource.resource->name);
     }
 
     this->resources.clear();
@@ -66,7 +66,7 @@ void Manager::purgeExpired() {
             continue;
         }
 
-        spdlog::debug("Freed {} {:016x}", resource.resource->name, id);
+        spdlog::debug("Freed {:016x} ({})", id, resource.resource->name);
         resource.resource.reset();
     }
 }

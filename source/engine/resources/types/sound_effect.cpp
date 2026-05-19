@@ -1,5 +1,7 @@
 #include "sound_effect.hpp"
 
+#include "../../utils/format.hpp"
+
 #include <stdexcept>
 
 namespace Engine::Resource {
@@ -29,7 +31,7 @@ Engine::Resource::ID SoundEffect::key(const std::string &path) {
 std::string SoundEffect::describe() const {
     ::YAML::Node name;
     name["type"] = "SoundEffect";
-    name["path"] = this->path;
+    name["path"] = Engine::Format::path(this->path);
 
     return this->formatDescription(name);
 }

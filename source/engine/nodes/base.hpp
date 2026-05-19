@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../utils/format.hpp"
+
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -129,7 +131,12 @@ class Base : public std::enable_shared_from_this<Base> {
             *static_cast<StoredValue *>(property->second.value) = value;
         }
 
-        spdlog::trace("Set node property '{}' on {}", name, this->describe());
+        spdlog::trace(
+            "Set property {}.{} to {}",
+            this->describePropertyOwner(),
+            name,
+            Engine::Format::propertyValue(name, value)
+        );
     }
 
     /** Update a typed property from text using its declared property type */
@@ -220,6 +227,15 @@ class Base : public std::enable_shared_from_this<Base> {
         }
 
         return "'" + this->name + "' #" + std::to_string(this->id);
+    }
+
+    /** Return the compact node label used in property logs */
+    std::string describePropertyOwner() const {
+        if(this->name.empty()) {
+            return "#" + std::to_string(this->id);
+        }
+
+        return this->name;
     }
 
     static std::uint32_t generateID();

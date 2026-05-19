@@ -1,5 +1,7 @@
 #include "image_texture.hpp"
 
+#include "../../utils/format.hpp"
+
 #include <SDL_image.h>
 
 #include <stdexcept>
@@ -46,7 +48,7 @@ ImageTexture::key(SDL_Renderer *, const std::string &path) {
 std::string ImageTexture::describe() const {
     ::YAML::Node name;
     name["type"] = "ImageTexture";
-    name["path"] = this->path;
+    name["path"] = Engine::Format::path(this->path);
 
     return this->formatDescription(name);
 }

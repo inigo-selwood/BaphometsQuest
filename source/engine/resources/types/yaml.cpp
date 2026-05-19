@@ -1,5 +1,7 @@
 #include "yaml.hpp"
 
+#include "../../utils/format.hpp"
+
 namespace Engine::Resource {
 
 YAML::YAML(const std::string &path)
@@ -14,7 +16,7 @@ Engine::Resource::ID YAML::key(const std::string &path) {
 std::string YAML::describe() const {
     ::YAML::Node name;
     name["type"] = "YAML";
-    name["path"] = this->path;
+    name["path"] = Engine::Format::path(this->path);
 
     return this->formatDescription(name);
 }

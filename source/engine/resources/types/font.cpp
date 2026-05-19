@@ -1,5 +1,7 @@
 #include "font.hpp"
 
+#include "../../utils/format.hpp"
+
 #include <stdexcept>
 
 namespace Engine::Resource {
@@ -29,7 +31,7 @@ Engine::Resource::ID Font::key(const std::string &path, int size) {
 std::string Font::describe() const {
     ::YAML::Node name;
     name["type"] = "Font";
-    name["path"] = this->path;
+    name["path"] = Engine::Format::path(this->path);
     name["size"] = this->size;
 
     return this->formatDescription(name);
