@@ -1,4 +1,5 @@
 /build/
+/.task/
 /configuration/formatting/node_modules/
 /configuration/formatting/package-lock.json
 /.llm/

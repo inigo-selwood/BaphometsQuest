@@ -2,13 +2,5 @@ version: '3'
 
 tasks:
   build:
-    method: checksum
-    sources:
-      - configuration/documentation/Doxyfile
-      - documentation/**/*.md
-      - source/**/*.cpp
-      - source/**/*.hpp
-    generates:
-      - build/docs/html/index.html
     cmds:
-      - doxygen configuration/documentation/Doxyfile
+      - doxygen documentation/Doxyfile

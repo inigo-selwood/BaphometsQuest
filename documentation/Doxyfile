@@ -1,9 +1,9 @@
 PROJECT_NAME = "Baphomet's Quest"
 OUTPUT_DIRECTORY = build/docs
 
-INPUT = source documentation/mainpage.md documentation/pages
+INPUT = source documentation/guides/mainpage.md documentation/guides/pages
 RECURSIVE = YES
-USE_MDFILE_AS_MAINPAGE = documentation/mainpage.md
+USE_MDFILE_AS_MAINPAGE = documentation/guides/mainpage.md
 
 EXTRACT_PRIVATE = YES
 EXTRACT_STATIC = YES

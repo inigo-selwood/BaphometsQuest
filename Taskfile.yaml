@@ -1,8 +1,5 @@
 version: '3'
 
-env:
-  TASK_TEMP_DIR: build/task
-
 includes:
   build:
     taskfile: configuration/task/build.yaml
