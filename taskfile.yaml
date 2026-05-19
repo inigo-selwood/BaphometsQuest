@@ -10,26 +10,6 @@ tasks:
           tidy -config .tidyrc -m "$file"
         done
 
-  build-docs:
-    desc: Build Doxygen documentation
-    method: checksum
-    sources:
-      - Doxyfile
-      - documentation/**/*.md
-      - source/**/*.cpp
-      - source/**/*.hpp
-    generates:
-      - build/docs/html/index.html
-    cmds:
-      - doxygen Doxyfile
-
-  docs:
-    desc: Build and open Doxygen documentation
-    deps:
-      - build-docs
-    cmds:
-      - open build/docs/html/index.html
-
   build-debug:
     desc: Configure and build the debug game
     method: checksum
@@ -75,12 +55,32 @@ tasks:
         --parallel
       - cmake -E touch build/release/.task-build-release.stamp
 
+  build-docs:
+    desc: Build Doxygen documentation
+    method: checksum
+    sources:
+      - Doxyfile
+      - documentation/**/*.md
+      - source/**/*.cpp
+      - source/**/*.hpp
+    generates:
+      - build/docs/html/index.html
+    cmds:
+      - doxygen Doxyfile
+
   run:
     desc: Build and run the game, forwarding arguments after --
     deps:
       - build-debug
     cmds:
       - ./build/debug/baphomets_quest {{.CLI_ARGS}}
+
+  docs:
+    desc: Build and open Doxygen documentation
+    deps:
+      - build-docs
+    cmds:
+      - open build/docs/html/index.html
 
   clean:
     desc: Remove generated build output
