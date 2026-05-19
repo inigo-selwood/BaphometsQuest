@@ -5,9 +5,9 @@
 #include "../../engine/nodes/native/menu.hpp"
 #include "../../engine/nodes/native/menu_option.hpp"
 #include "../../engine/nodes/native/music.hpp"
+#include "../../engine/nodes/native/sprite.hpp"
 #include "../../engine/runtime/scene_loader.hpp"
 
-#include <memory>
 #include <string>
 
 namespace Scenes::MainMenu {
@@ -21,11 +21,13 @@ class Scene : public Engine::Nodes::Base {
         loader.registerNode<Engine::Nodes::Menu>("menu");
         loader.registerNode<Engine::Nodes::MenuOption>("menu-option");
         loader.registerNode<Engine::Nodes::Music>("music");
+        loader.registerNode<Engine::Nodes::Sprite>("sprite");
         loader.load("source/scenes/main_menu/main_menu.xml");
 
         const auto menu = this->getChild<Engine::Nodes::Menu>("main-menu");
 
         menu->configure();
+
         this->getGame().signals.connect<std::string>(
             menu,
             "selected",

@@ -35,4 +35,26 @@
       text="Quit"
     />
   </menu>
+
+  <sprite
+    animation="idle"
+    name="example-sprite"
+    path="resources/textures/tileset.png"
+    position="124,76"
+  >
+    <animation name="idle">
+      <frame
+        duration="0.5"
+        region="232,16,8,8"
+      />
+      <frame
+        duration="0.5"
+        region="240,16,8,8"
+      />
+      <frame
+        duration="0.5"
+        region="248,16,8,8"
+      />
+    </animation>
+  </sprite>
 </scene>
