@@ -6,6 +6,7 @@
 #include "managers/node.hpp"
 #include "managers/resource.hpp"
 #include "managers/signal.hpp"
+#include "timer.hpp"
 
 #include <filesystem>
 #include <functional>
@@ -97,8 +98,8 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Whether the game loop is currently running */
     bool running = false;
 
-    /** Target frames per second for the game loop */
-    int frameRate = 0;
+    /** Adaptive frame limiter */
+    Timer timer;
 
     /** Renderer clear colour */
     SDL_Color renderClearColour{0, 0, 0, 255};

@@ -1,12 +1,10 @@
-game:
-  target-frame-rate: 24
-
 window:
   title: Baphomet's Quest
   width: 160
   height: 144
 
 renderer:
+  target-frame-rate: 24
   scale: 4
   clear-colour: '#20283dff'
 

@@ -39,16 +39,12 @@ void Game::start(
         this->resources.get<Engine::Resource::YAML>(settingsId);
     const ::YAML::Node &settings = *settingsResource.node;
 
-    this->frameRate = settings["game"]["target-frame-rate"].as<int>();
+    this->timer.setTargetFrameRate(
+        settings["renderer"]["target-frame-rate"].as<int>()
+    );
     this->renderClearColour = Engine::Format::colour(
         settings["renderer"]["clear-colour"].as<std::string>()
     );
-
-    if(this->frameRate <= 0) {
-        throw std::runtime_error(
-            "Target frame rate must be greater than zero"
-        );
-    }
 
     spdlog::info("Starting game services");
 
@@ -70,8 +66,6 @@ void Game::run() {
     bool sceneEntered = false;
 
     SDL_Event event;
-    const Uint32 targetFrameDuration =
-        static_cast<Uint32>(1000 / this->frameRate);
     Uint32 previousFrameStartedAt = SDL_GetTicks();
 
     while(this->running) {
@@ -134,9 +128,13 @@ void Game::run() {
 
         // Delay only after render and cache maintenance so frame work is counted
         const Uint32 frameDuration = SDL_GetTicks() - frameStartedAt;
+        this->timer.recordFrameDuration(frameDuration);
 
-        if(frameDuration < targetFrameDuration) {
-            SDL_Delay(targetFrameDuration - frameDuration);
+        const Uint32 delayDuration =
+            this->timer.getDelayDuration(frameDuration);
+
+        if(delayDuration > 0) {
+            SDL_Delay(delayDuration);
         }
     }
 
