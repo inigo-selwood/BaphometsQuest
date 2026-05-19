@@ -100,7 +100,7 @@ void start(
 ) {
     const spdlog::level::level_enum consoleLogLevel = parseLevel(consoleLevel);
 
-    // Logs live beside the executable so debug output follows each build
+    // Logs live beside the executable so each build profile owns its output
     const std::filesystem::path executableDirectory =
         std::filesystem::weakly_canonical(
             std::filesystem::absolute(executablePath)

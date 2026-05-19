@@ -10,9 +10,10 @@ namespace Logger {
  * Configure the default spdlog logger
  *
  * File logs are always written at trace level to
- * `{executable directory}/.logs/{ISO timestamp}.txt`, with only the three most
- * recent log files kept. Console logging is disabled when @p consoleLevel is
- * "off"; otherwise the console sink uses the requested level
+ * `{build profile}/.logs/{ISO timestamp}.txt` when running from a build
+ * directory, with only the three most recent log files kept. Console logging is
+ * disabled when @p consoleLevel is "off"; otherwise the console sink uses the
+ * requested level
  *
  * Logging convention:
  * - info: events that happen once
