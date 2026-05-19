@@ -11,9 +11,9 @@ namespace Logger {
  *
  * File logs are always written at trace level to
  * `{build profile}/.logs/{ISO timestamp}.txt` when running from a build
- * directory, with only the three most recent log files kept. Console logging is
- * disabled when @p consoleLevel is "off"; otherwise the console sink uses the
- * requested level
+ * directory, with only the three most recent log files kept. Console logging
+ * is disabled when @p consoleLevel is "off"; otherwise the console sink uses
+ * the requested level
  *
  * Logging convention:
  * - info: events that happen once

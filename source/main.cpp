@@ -1,6 +1,6 @@
-#include "scenes/main_menu/scene.hpp"
 #include "core/arguments.hpp"
 #include "engine/runtime/game.hpp"
+#include "scenes/main_menu/scene.hpp"
 
 #include <CLI/CLI.hpp>
 
