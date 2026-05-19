@@ -12,7 +12,6 @@ include(configuration/cmake/platform_resize_handler.cmake)
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
     source/*.cpp
-    source/*.hpp
 )
 
 exclude_resize_handler_platform_sources(SOURCE_FILES)
