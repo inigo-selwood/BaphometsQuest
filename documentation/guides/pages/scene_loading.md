@@ -23,7 +23,7 @@ node name, and every other attribute is applied as a property.
     size="8"
     text="baphomet's quest"
     colour="#ffffffff"
-    position="80,24"
+    position="[80, 24]"
     justification="centre"
   />
 </scene>

@@ -16,7 +16,45 @@ namespace Engine::Parse {
 
 namespace Detail {
 
+inline std::string_view trim(std::string_view text) {
+    const std::size_t start = text.find_first_not_of(" \t\n\r");
+
+    if(start == std::string_view::npos) {
+        return {};
+    }
+
+    const std::size_t end = text.find_last_not_of(" \t\n\r");
+
+    return text.substr(start, end - start + 1);
+}
+
+inline std::string_view arrayBody(
+    std::string_view text,
+    const std::string &typeName
+) {
+    text = trim(text);
+
+    if(text.empty()) {
+        throw std::runtime_error(typeName + " value must not be empty");
+    }
+
+    if(text.front() != '[' && text.back() != ']') {
+        return text;
+    }
+
+    if(text.front() != '[' || text.back() != ']') {
+        throw std::runtime_error(
+            typeName + " value has mismatched array brackets: '"
+            + std::string(text) + "'"
+        );
+    }
+
+    return text.substr(1, text.size() - 2);
+}
+
 inline int integer(std::string_view text, const std::string &typeName) {
+    text = trim(text);
+
     int value = 0;
     const auto result =
         std::from_chars(text.data(), text.data() + text.size(), value);
@@ -35,6 +73,8 @@ inline std::array<int, 4> integerList(
     std::size_t count,
     const std::string &typeName
 ) {
+    text = arrayBody(text, typeName);
+
     std::array<int, 4> values{0, 0, 0, 0};
     std::size_t offset = 0;
 

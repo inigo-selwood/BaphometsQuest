@@ -11,7 +11,7 @@
     font="resources/fonts/Early GameBoy.ttf"
     justification="centre"
     name="title"
-    position="80,24"
+    position="[80, 24]"
     size="8"
     text="baphomet's quest"
   />
@@ -19,10 +19,10 @@
   <menu
     colour="#ffffffff"
     cursor-path="resources/textures/tileset.png"
-    cursor-region="232,16,8,8"
+    cursor-region="[232, 16, 8, 8]"
     font="resources/fonts/04B_03.TTF"
     name="main-menu"
-    position="64,76"
+    position="[64, 76]"
     size="8"
   >
     <menu-option
@@ -40,20 +40,20 @@
     animation="idle"
     name="example-sprite"
     path="resources/textures/tileset.png"
-    position="124,76"
+    position="[124, 76]"
   >
     <animation name="idle">
       <frame
         duration="0.5"
-        region="232,16,8,8"
+        region="[232, 16, 8, 8]"
       />
       <frame
         duration="0.5"
-        region="240,16,8,8"
+        region="[240, 16, 8, 8]"
       />
       <frame
         duration="0.5"
-        region="248,16,8,8"
+        region="[248, 16, 8, 8]"
       />
     </animation>
   </sprite>

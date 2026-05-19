@@ -113,12 +113,14 @@ inline std::string value(Value value) {
 }
 
 inline std::string value(const SDL_Point &value) {
-    return std::to_string(value.x) + "," + std::to_string(value.y);
+    return "[" + std::to_string(value.x) + ", " + std::to_string(value.y)
+        + "]";
 }
 
 inline std::string value(const SDL_Rect &value) {
-    return std::to_string(value.x) + "," + std::to_string(value.y) + ","
-        + std::to_string(value.w) + "," + std::to_string(value.h);
+    return "[" + std::to_string(value.x) + ", " + std::to_string(value.y)
+        + ", " + std::to_string(value.w) + ", " + std::to_string(value.h)
+        + "]";
 }
 
 inline std::string value(const SDL_Color &value) {
