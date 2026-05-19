@@ -1,6 +1,10 @@
 #include "base.hpp"
 
+#include "../utils/parse.hpp"
+#include "native/label.hpp"
+
 #include <atomic>
+#include <typeindex>
 
 #include <spdlog/spdlog.h>
 
@@ -60,12 +64,56 @@ void Base::addChild(
     );
 }
 
+std::shared_ptr<Base> Base::getChild(const std::string &name) const {
+    for(const auto &child : this->children) {
+        if(child->name == name) {
+            return child;
+        }
+    }
+
+    throw std::runtime_error("Unknown child node '" + name + "'");
+}
+
 bool Base::hasProperty(const std::string &name) const {
     return this->properties.contains(name);
 }
 
 bool Base::hasHook(Hook hook) const {
     return this->hooks.contains(hook);
+}
+
+void Base::setPropertyFromText(
+    const std::string &name,
+    const std::string &value
+) {
+    const auto property = this->properties.find(name);
+
+    if(property == this->properties.end()) {
+        throw std::runtime_error("Unknown node property '" + name + "'");
+    }
+
+    const std::type_index &type = property->second.type;
+
+    if(type == std::type_index(typeid(std::string))) {
+        this->setProperty(name, value);
+    } else if(type == std::type_index(typeid(int))) {
+        this->setProperty(name, Engine::Parse::integer(value));
+    } else if(type == std::type_index(typeid(bool))) {
+        this->setProperty(name, Engine::Parse::boolean(value));
+    } else if(type == std::type_index(typeid(SDL_Point))) {
+        this->setProperty(name, Engine::Parse::point(value));
+    } else if(type == std::type_index(typeid(SDL_Rect))) {
+        this->setProperty(name, Engine::Parse::rect(value));
+    } else if(type == std::type_index(typeid(SDL_Color))) {
+        this->setProperty(name, Engine::Parse::colour(value));
+    } else if(type
+        == std::type_index(typeid(Engine::Nodes::Label::Justification))) {
+        this->setProperty(name, Engine::Parse::justification(value));
+    } else {
+        throw std::runtime_error(
+            "Node property '" + name + "' cannot be set from text"
+        );
+    }
 }
 
 void Base::enter() {}

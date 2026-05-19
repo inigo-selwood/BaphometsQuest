@@ -49,6 +49,9 @@ class Base : public std::enable_shared_from_this<Base> {
     /** Add a child node to this node */
     void addChild(const std::string &name, const std::shared_ptr<Base> &child);
 
+    /** Return a named direct child */
+    std::shared_ptr<Base> getChild(const std::string &name) const;
+
     /** Return true when this node has declared a property */
     bool hasProperty(const std::string &name) const;
 
@@ -105,6 +108,10 @@ class Base : public std::enable_shared_from_this<Base> {
 
         spdlog::trace("Set node property '{}' on {}", name, this->describe());
     }
+
+    /** Update a typed property from text using its declared property type */
+    void
+    setPropertyFromText(const std::string &name, const std::string &value);
 
     virtual void enter();
     virtual void exit();
