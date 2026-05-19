@@ -1,0 +1,47 @@
+version: '3'
+
+env:
+  TASK_TEMP_DIR: build/task
+
+includes:
+  build:
+    taskfile: configuration/task/build.yaml
+  formatting:
+    taskfile: configuration/task/formatting.yaml
+  documentation:
+    taskfile: configuration/task/documentation.yaml
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  build:
+    desc: Build an optimised release and bundle release resources
+    cmds:
+      - task build:release
+
+  format:
+    desc: Format source and resource files
+    cmds:
+      - task formatting:format
+
+  run:
+    desc: Build and run the game, forwarding arguments after --
+    deps:
+      - build:debug
+    cmds:
+      - ./build/debug/baphomets_quest {{.CLI_ARGS}}
+
+  docs:
+    desc: Build and open Doxygen documentation
+    deps:
+      - documentation:build
+    cmds:
+      - open build/docs/html/index.html
+
+  clean:
+    desc: Remove generated build and tooling output
+    cmds:
+      - task build:clean
+      - task formatting:clean
