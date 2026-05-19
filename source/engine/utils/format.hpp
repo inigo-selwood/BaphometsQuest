@@ -10,6 +10,7 @@
 
 namespace Engine::Format {
 
+/** Convert an SDL colour to #rrggbbaa text */
 inline std::string colour(const SDL_Color &colour) {
     std::ostringstream stream;
 
@@ -23,6 +24,7 @@ inline std::string colour(const SDL_Color &colour) {
     return stream.str();
 }
 
+/** Parse #rrggbbaa text into an SDL colour */
 inline SDL_Color colour(std::string_view colour) {
     if(colour.size() != 9 || colour[0] != '#') {
         throw std::runtime_error(

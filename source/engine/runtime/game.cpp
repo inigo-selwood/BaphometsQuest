@@ -77,6 +77,7 @@ void Game::run() {
     while(this->running) {
         const Uint32 frameStartedAt = SDL_GetTicks();
 
+        // Scene switches happen at frame boundaries so hooks are paired cleanly
         if(this->queuedScene.has_value()) {
             const std::string sceneName = *this->queuedScene;
 
@@ -131,6 +132,7 @@ void Game::run() {
         SDL_RenderPresent(this->renderer.get());
         this->resources.purgeExpired();
 
+        // Delay only after render and cache maintenance so frame work is counted
         const Uint32 frameDuration = SDL_GetTicks() - frameStartedAt;
 
         if(frameDuration < targetFrameDuration) {

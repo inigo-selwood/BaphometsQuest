@@ -32,6 +32,7 @@ Base &Manager::get(ID id) {
     resource->second.lastAccessedAt = Clock::now();
 
     if(resource->second.resource == nullptr) {
+        // Expired entries keep their factory so stable IDs can become live again
         resource->second.resource = resource->second.factory();
         const std::string description = resource->second.resource->describe();
         spdlog::debug(

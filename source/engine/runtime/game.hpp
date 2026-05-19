@@ -45,7 +45,7 @@ class Game : public std::enable_shared_from_this<Game> {
         const std::string &consoleLogLevel
     );
 
-    /** Run the active game loop */
+    /** Run the active scene loop until a quit event or queueQuit() stops it */
     void run();
 
     /** Queue the active game loop to stop */
@@ -54,6 +54,7 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Return the logical screen area currently used for rendering */
     SDL_Rect getScreenSize() const;
 
+    /** Register a default-constructible scene root factory */
     template <typename SceneType> void registerScene(const std::string &name) {
         static_assert(
             std::is_base_of_v<Engine::Nodes::Base, SceneType>,
@@ -102,10 +103,13 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Renderer clear colour */
     SDL_Color renderClearColour{0, 0, 0, 255};
 
+    /** Registered scene factories keyed by the names used with queueScene() */
     std::unordered_map<
         std::string,
         std::function<std::shared_ptr<Engine::Nodes::Base>()>>
         sceneFactories;
+
+    /** Scene name waiting to be applied at the next frame boundary */
     std::optional<std::string> queuedScene;
 };
 

@@ -17,6 +17,7 @@
 
 namespace Engine::Resource {
 
+/** Default resource construction adapter used by the cache manager */
 template <typename ResourceType, typename... Arguments> struct ResourceLoader {
     static Engine::Resource::ID key(const Arguments &...arguments) {
         return ResourceType::key(arguments...);
@@ -28,15 +29,29 @@ template <typename ResourceType, typename... Arguments> struct ResourceLoader {
     }
 };
 
+/** Timed resource cache that preserves stable IDs after resources expire */
 class Manager {
   public:
     ~Manager();
 
+    /** Destroy all cached resources and forget their IDs */
     void clear();
+
+    /** Return a cached resource, reconstructing it first if it expired */
     Base &get(ID id);
+
+    /** Return a cached resource, reconstructing it first if it expired */
     const Base &get(ID id) const;
+
+    /** Unload live resources that have exceeded their type-specific TTL */
     void purgeExpired();
 
+    /**
+     * Return the stable ID for a resource identity, loading it on first use
+     *
+     * ResourceType owns identity, construction, and TTL policy through key(),
+     * create(), and TTL
+     */
     template <typename ResourceType, typename... Arguments>
     ID load(Arguments &&...arguments) {
         static_assert(
@@ -131,6 +146,7 @@ class Manager {
   private:
     using Clock = std::chrono::steady_clock;
 
+    /** Cache ledger entry kept even when the live resource has expired */
     struct ResourceEntry {
         std::unique_ptr<Base> resource;
         std::function<std::unique_ptr<Base>()> factory;

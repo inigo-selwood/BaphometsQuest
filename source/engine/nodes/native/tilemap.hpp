@@ -18,13 +18,23 @@ class Tilemap : public Engine::Nodes::Base {
 
     void render(SDL_Renderer &renderer) override;
 
+    /** Return the tileset tile at a screen-space pixel position */
     Engine::Resource::Tile getTileAt(SDL_Point screenPixel) const;
 
   private:
+    /** Convert screen pixels to map cell coordinates */
     SDL_Point getCellAt(SDL_Point screenPixel) const;
+
+    /** Divide while rounding toward negative infinity for off-map pixels */
     static int divideFloor(int value, int divisor);
+
+    /** Update the cached atlas texture ID */
     void updateTexture(const std::string &texture);
+
+    /** Update the cached tileset ID */
     void updateTileset(const std::string &tileset);
+
+    /** Update the cached map data ID */
     void updateMap(const std::string &map);
 
     Engine::Resource::ID textureResourceID = 0;

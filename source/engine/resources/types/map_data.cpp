@@ -55,12 +55,14 @@ MapData::Data MapData::load(const std::string &path) {
         throw std::runtime_error("Failed to read map data '" + path + "'");
     }
 
+    // Map files are strict: metadata byte count must consume the whole stream
     if(file.peek() != std::char_traits<char>::eof()) {
         throw std::runtime_error(
             "Map data '" + path + "' has a stream length mismatch"
         );
     }
 
+    // Each map cell stores one little-endian uint16 tile ID
     const std::size_t expectedBytes =
         static_cast<std::size_t>(size.w * size.h) * TILE_ID_BYTES;
 

@@ -15,6 +15,7 @@ namespace Engine::Nodes {
 /** Render text into the node tree */
 class Label : public Engine::Nodes::Base {
   public:
+    /** Horizontal anchor used when drawing text at the node position */
     enum class Justification {
         Left,
         Centre,
@@ -94,6 +95,7 @@ class Label : public Engine::Nodes::Base {
     }
 
   private:
+    /** Rebuild cached font and text texture IDs after display input changes */
     void update(
         const std::string &font,
         int size,

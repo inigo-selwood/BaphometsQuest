@@ -23,6 +23,7 @@ namespace Nodes {
 
 class Manager;
 
+/** Game-loop hooks that a node can opt into */
 enum class Hook {
     Enter,
     Exit,
@@ -54,6 +55,7 @@ class Base : public std::enable_shared_from_this<Base> {
     /** Return true when this node has declared a hook */
     bool hasHook(Hook hook) const;
 
+    /** Return a read-only reference to a typed property */
     template <typename Value>
     const Value &getProperty(const std::string &name) const {
         const auto property = this->properties.find(name);
@@ -73,6 +75,12 @@ class Base : public std::enable_shared_from_this<Base> {
         return *static_cast<const StoredValue *>(property->second.value);
     }
 
+    /**
+     * Update a typed property through direct assignment or its declared setter
+     *
+     * Callback-backed properties are responsible for assigning their wrapped
+     * member so they can rebuild dependent state at the same time
+     */
     template <typename Value>
     void setProperty(const std::string &name, const Value &value) {
         const auto property = this->properties.find(name);
@@ -105,6 +113,7 @@ class Base : public std::enable_shared_from_this<Base> {
     virtual void render(SDL_Renderer &renderer);
 
   protected:
+    /** Declare a property backed by direct member assignment */
     template <typename Value>
     void declareProperty(const std::string &name, Value &member) {
         if(this->hasProperty(name)) {
@@ -121,6 +130,12 @@ class Base : public std::enable_shared_from_this<Base> {
         );
     }
 
+    /**
+     * Declare a property that delegates assignment to a typed setter callback
+     *
+     * The member is still registered so getProperty() can return the current
+     * value after the callback has performed its update
+     */
     template <typename Value, typename Callback>
     void declareProperty(
         const std::string &name,
@@ -161,7 +176,10 @@ class Base : public std::enable_shared_from_this<Base> {
         std::function<void(const void *)> setter;
     };
 
+    /** Attach this node and its descendants to a game context */
     void attach(const std::weak_ptr<Game> &game);
+
+    /** Return the compact node label used in trace logs */
     std::string describe() const {
         if(this->name.empty()) {
             return "#" + std::to_string(this->id);

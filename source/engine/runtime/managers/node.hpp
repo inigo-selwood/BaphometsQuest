@@ -36,6 +36,7 @@ class Manager {
     void render(SDL_Renderer &renderer);
 
   private:
+    /** Depth-first walk used by all hook dispatch methods */
     template <typename Callback>
     void walk(const std::shared_ptr<Base> &node, Callback &&callback) {
         if(node == nullptr) {

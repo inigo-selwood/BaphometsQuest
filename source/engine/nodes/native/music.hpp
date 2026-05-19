@@ -28,6 +28,7 @@ class Music : public Engine::Nodes::Base {
         this->stop();
     }
 
+    /** Start playback using the current music resource */
     void start() {
         if(this->musicResourceID == 0) {
             throw std::runtime_error("Music requires a path before starting");
@@ -47,6 +48,7 @@ class Music : public Engine::Nodes::Base {
         this->active = true;
     }
 
+    /** Stop playback when this node currently owns active music */
     void stop() {
         if(this->active || Mix_PlayingMusic() != 0) {
             Mix_HaltMusic();
@@ -55,6 +57,7 @@ class Music : public Engine::Nodes::Base {
         this->active = false;
     }
 
+    /** Pause playback without clearing the active state */
     void pause() {
         if(!this->active) {
             return;
@@ -64,6 +67,7 @@ class Music : public Engine::Nodes::Base {
     }
 
   private:
+    /** Update the cached music ID when the music path changes */
     void update(const std::string &path) {
         const bool musicChanged = path != this->path;
 

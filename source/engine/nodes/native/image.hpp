@@ -62,6 +62,7 @@ class Image : public Engine::Nodes::Base {
     }
 
   private:
+    /** Update the cached texture ID when the image path changes */
     void update(const std::string &path) {
         Engine::Game &game = this->getGame();
         const bool textureChanged = path != this->path;

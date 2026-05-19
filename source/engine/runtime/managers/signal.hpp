@@ -122,12 +122,14 @@ class Manager {
     }
 
   private:
+    /** Registered signal signature and callback list */
     struct Signal {
         std::vector<std::type_index> argumentTypes;
         std::vector<std::function<void(const std::vector<std::any> &)>>
             callbacks;
     };
 
+    /** Return a mutable signal or throw when it has not been declared */
     Signal &
     get(const std::shared_ptr<Engine::Nodes::Base> &owner,
         const std::string &name) {
@@ -138,6 +140,7 @@ class Manager {
         return this->signals.at(owner).at(name);
     }
 
+    /** Return a read-only signal or throw when it has not been declared */
     const Signal &
     get(const std::shared_ptr<Engine::Nodes::Base> &owner,
         const std::string &name) const {
@@ -148,6 +151,7 @@ class Manager {
         return this->signals.at(owner).at(name);
     }
 
+    /** Unpack stored arguments back into their declared callback types */
     template <typename... Arguments, std::size_t... Indexes>
     static void invokeCallback(
         const std::function<void(std::decay_t<Arguments>...)> &callback,
@@ -159,6 +163,7 @@ class Manager {
         );
     }
 
+    /** Check that a call site uses the signal's declared argument types */
     template <typename... Arguments>
     void
     validateArguments(const std::string &name, const Signal &signal) const {
@@ -174,6 +179,7 @@ class Manager {
         );
     }
 
+    /** Reject null node owners before using them as signal scopes */
     static void
     validateOwner(const std::shared_ptr<Engine::Nodes::Base> &owner) {
         if(owner == nullptr) {

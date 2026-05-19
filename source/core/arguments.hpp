@@ -57,7 +57,7 @@ struct Parsed {
  * @return Parsed startup arguments
  *
  * @throws CLI::ParseError when CLI11 handles help, validation, or parse
- * errors. Callers should pass the exception back to CLI::App::exit()
+ * errors; callers should pass the exception back to CLI::App::exit()
  */
 inline Parsed
 parse(CLI::App &application, int argumentCount, const char *arguments[]) {

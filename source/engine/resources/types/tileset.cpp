@@ -49,6 +49,7 @@ Tileset::Data Tileset::load(const std::string &path) {
         throw std::runtime_error("Failed to read tileset data '" + path + "'");
     }
 
+    // Tileset files are strict: metadata byte count must consume the stream
     if(file.peek() != std::char_traits<char>::eof()) {
         throw std::runtime_error(
             "Tileset '" + path + "' has a stream length mismatch"
@@ -70,6 +71,7 @@ std::unordered_map<std::uint16_t, Tile> Tileset::parseTiles(
 
     std::unordered_map<std::uint16_t, Tile> tiles;
 
+    // Records are id low, id high, origin tile x, origin tile y, walk mask
     for(std::size_t offset = 0; offset < bytes.size(); offset += TILE_BYTES) {
         Tile tile;
         tile.id = static_cast<std::uint16_t>(
