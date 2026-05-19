@@ -12,7 +12,9 @@ std::atomic<std::uint32_t> nextID = 1;
 
 } // namespace
 
-Base::Base() : id(generateID()) {}
+Base::Base() : id(generateID()) {
+    this->declareProperty("visible", this->visible);
+}
 
 Game &Base::getGame() {
     const std::shared_ptr<Game> game = this->game.lock();

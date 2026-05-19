@@ -194,6 +194,7 @@ class Base : public std::enable_shared_from_this<Base> {
     std::vector<std::shared_ptr<Base>> children;
     std::weak_ptr<Base> parent;
     std::weak_ptr<Game> game;
+    bool visible = true;
     std::unordered_map<std::string, Property> properties;
     std::set<Hook> hooks;
 };

@@ -43,6 +43,10 @@ class Manager {
             return;
         }
 
+        if(!node->visible) {
+            return;
+        }
+
         callback(*node);
 
         for(const auto &child : node->children) {
