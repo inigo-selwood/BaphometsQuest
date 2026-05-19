@@ -25,12 +25,12 @@
     position="[64, 76]"
     size="8"
   >
-    <menu-option
+    <option
       tag="play"
       text="Play"
     />
 
-    <menu-option
+    <option
       tag="quit"
       text="Quit"
     />

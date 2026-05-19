@@ -1,111 +1,44 @@
 #pragma once
 
-#include "../../runtime/game.hpp"
+#include "../../resources/base.hpp"
 #include "../base.hpp"
-#include "menu_cursor.hpp"
-#include "menu_option.hpp"
 
 #include <SDL.h>
 
-#include <memory>
-#include <stdexcept>
+#include <cstddef>
 #include <string>
 #include <vector>
 
+namespace tinyxml2 {
+class XMLElement;
+}
+
 namespace Engine::Nodes {
 
-/** Container that wires menu options to a cursor and selected signal */
+/** Menu node that owns its options, cursor, input, and rendering */
 class Menu : public Engine::Nodes::Base {
   public:
-    Menu() {
-        this->declareProperty("font", this->font);
-        this->declareProperty("size", this->size);
-        this->declareProperty("colour", this->colour);
-        this->declareProperty("position", this->position);
-        this->declareProperty("cursor-path", this->cursorPath);
-        this->declareProperty("cursor-region", this->cursorRegion);
-    }
+    /** Selectable menu option */
+    struct Option {
+        std::string tag;
+        std::string text;
+        Engine::Resource::ID textResourceID = 0;
+    };
 
-    /** Configure cursor options and declare the selected signal */
-    void configure() {
-        if(this->configured) {
-            return;
-        }
+    Menu();
 
-        Engine::Game &game = this->getGame();
-        const std::shared_ptr<Base> owner = this->shared_from_this();
-        const std::weak_ptr<Base> ownerReference = owner;
-        std::shared_ptr<MenuCursor> cursor =
-            std::make_shared<Engine::Nodes::MenuCursor>();
-        std::vector<MenuCursor::Option> options;
-        int optionIndex = 0;
+    bool loadXmlChildren(const tinyxml2::XMLElement &element) override;
 
-        for(const auto &child : this->getChildren()) {
-            if(const auto option =
-                   std::dynamic_pointer_cast<MenuOption>(child)) {
-                const int verticalOffset = optionIndex * this->getRowHeight();
-                const SDL_Point optionPosition{
-                    this->position.x,
-                    this->position.y + verticalOffset,
-                };
-                const SDL_Point cursorPosition{
-                    this->position.x - this->getCursorOffset(),
-                    this->position.y + verticalOffset,
-                };
+    void input(const SDL_Event &event) override;
 
-                option->setProperty("font", this->font);
-                option->setProperty("size", this->size);
-                option->setProperty("colour", this->colour);
-                option->setProperty("position", optionPosition);
-                options.push_back(
-                    MenuCursor::Option{
-                        option->getTag(),
-                        cursorPosition,
-                    }
-                );
-                optionIndex++;
-            }
-        }
-
-        if(this->cursorPath.empty()) {
-            throw std::runtime_error("Menu requires a cursor path");
-        }
-
-        if(options.empty()) {
-            throw std::runtime_error("Menu requires at least one option child");
-        }
-
-        this->addChild("", cursor);
-        game.signals.declare<std::string>(owner, "selected");
-        cursor->configure();
-        cursor->setProperty("path", this->cursorPath);
-        cursor->setProperty("region", this->cursorRegion);
-        cursor->setProperty("options", options);
-        game.signals.connect<std::string>(
-            cursor,
-            "selected",
-            [&game, ownerReference](std::string tag) {
-                const std::shared_ptr<Base> owner = ownerReference.lock();
-
-                if(owner == nullptr) {
-                    return;
-                }
-
-                game.signals.emit(owner, "selected", tag);
-            }
-        );
-
-        this->configured = true;
-    }
+    void render(SDL_Renderer &renderer) override;
 
   private:
-    int getRowHeight() const {
-        return this->size * 2;
-    }
+    void rebuild();
 
-    int getCursorOffset() const {
-        return this->size * 2;
-    }
+    void selectCurrent();
+
+    static Option parseOption(const tinyxml2::XMLElement &optionElement);
 
     std::string font;
     int size = 0;
@@ -113,7 +46,10 @@ class Menu : public Engine::Nodes::Base {
     SDL_Point position{0, 0};
     std::string cursorPath;
     SDL_Rect cursorRegion{0, 0, 0, 0};
-    bool configured = false;
+    Engine::Resource::ID fontResourceID = 0;
+    Engine::Resource::ID cursorResourceID = 0;
+    std::vector<Option> options;
+    std::size_t selectedOption = 0;
 };
 
 } // namespace Engine::Nodes
