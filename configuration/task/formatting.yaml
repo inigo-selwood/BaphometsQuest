@@ -2,12 +2,14 @@ version: '3'
 
 tasks:
   format:
+    dir: ../..
     cmds:
       - find source -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i --style=file:configuration/formatting/.clang-format
       - npm --prefix configuration/formatting install
       - find resources -name '*.xml' -type f -exec configuration/formatting/node_modules/.bin/prettier --config configuration/formatting/.prettierrc --write {} +
 
   clean:
+    dir: ../..
     cmds:
       - rm -rf configuration/formatting/node_modules
       - rm -f configuration/formatting/package-lock.json

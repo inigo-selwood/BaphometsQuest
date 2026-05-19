@@ -2,6 +2,7 @@ version: '3'
 
 tasks:
   debug:
+    dir: ../..
     cmds:
       - >-
         cmake -S . -B build/debug
@@ -10,6 +11,7 @@ tasks:
       - cmake --build build/debug --parallel
 
   release:
+    dir: ../..
     cmds:
       - >-
         cmake -S . -B build/release
@@ -24,5 +26,6 @@ tasks:
         --parallel
 
   clean:
+    dir: ../..
     cmds:
       - rm -rf build
