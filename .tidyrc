@@ -1,7 +1,0 @@
-input-xml: yes
-output-xml: yes
-indent: yes
-indent-spaces: 2
-indent-attributes: yes
-wrap: 0
-add-xml-decl: yes
