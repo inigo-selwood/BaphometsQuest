@@ -10,6 +10,26 @@ tasks:
           tidy -config .tidyrc -m "$file"
         done
 
+  build-docs:
+    desc: Build Doxygen documentation
+    method: checksum
+    sources:
+      - Doxyfile
+      - documentation/**/*.md
+      - source/**/*.cpp
+      - source/**/*.hpp
+    generates:
+      - build/docs/html/index.html
+    cmds:
+      - doxygen Doxyfile
+
+  docs:
+    desc: Build and open Doxygen documentation
+    deps:
+      - build-docs
+    cmds:
+      - open build/docs/html/index.html
+
   build-debug:
     desc: Configure and build the debug game
     method: checksum
