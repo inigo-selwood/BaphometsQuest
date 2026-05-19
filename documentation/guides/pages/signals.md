@@ -25,3 +25,16 @@ Scope
 Signals are scoped to their owner node. This keeps names local and avoids a
 single global signal namespace while still letting nodes communicate through the
 shared game services.
+
+Menu Cursor Example
+-------------------
+
+The main menu cursor declares a `selected` signal with a `std::string` payload.
+When Return is pressed, it emits the tag for the active option, such as `play`
+or `quit`.
+
+```cpp
+game.signals.connect<std::string>(cursor, "selected", [](std::string option) {
+    // Route the selected menu option
+});
+```

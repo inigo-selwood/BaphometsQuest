@@ -7,6 +7,7 @@ root that owns shared managers.
 Start with the guide pages when learning the shape of the engine:
 
 - @ref node_tree
+- @ref scene_loading
 - @ref resource_cache
 - @ref runtime_lifecycle
 - @ref signals
