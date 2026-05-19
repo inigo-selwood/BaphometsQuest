@@ -15,13 +15,21 @@ namespace Engine::Nodes {
 class Music : public Engine::Nodes::Base {
   public:
     Music() {
+        this->declareHook(Engine::Nodes::Hook::Enter);
         this->declareHook(Engine::Nodes::Hook::Exit);
         this->declareProperty(
             "path",
             this->path,
             [this](const std::string &value) { this->update(value); }
         );
+        this->declareProperty("autoplay", this->autoplay);
         this->declareProperty("loop", this->loop);
+    }
+
+    void enter() override {
+        if(this->autoplay) {
+            this->start();
+        }
     }
 
     void exit() override {
@@ -95,6 +103,7 @@ class Music : public Engine::Nodes::Base {
 
     Engine::Resource::ID musicResourceID = 0;
     std::string path;
+    bool autoplay = false;
     bool loop = false;
     bool active = false;
 };

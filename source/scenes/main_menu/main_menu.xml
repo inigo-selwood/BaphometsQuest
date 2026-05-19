@@ -1,0 +1,42 @@
+<scene>
+  <music
+    autoplay="true"
+    loop="true"
+    name="background-music"
+    path="resources/music/Koyaanisqatsi.wav"
+  />
+
+  <label
+    colour="#ffffffff"
+    font="resources/fonts/Early GameBoy.ttf"
+    justification="centre"
+    name="title"
+    position="80,24"
+    size="8"
+    text="baphomet's quest"
+  />
+
+  <label
+    colour="#ffffffff"
+    font="resources/fonts/04B_03.TTF"
+    name="play-option"
+    position="64,76"
+    size="8"
+    text="play"
+  />
+
+  <label
+    colour="#ffffffff"
+    font="resources/fonts/04B_03.TTF"
+    name="quit-option"
+    position="64,92"
+    size="8"
+    text="quit"
+  />
+
+  <cursor
+    name="cursor"
+    path="resources/textures/tileset.png"
+    region="0,0,8,8"
+  />
+</scene>

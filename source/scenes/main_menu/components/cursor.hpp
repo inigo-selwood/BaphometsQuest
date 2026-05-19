@@ -1,11 +1,12 @@
 #pragma once
 
 #include "../../../engine/nodes/native/image.hpp"
+#include "../../../engine/runtime/game.hpp"
 
 #include <SDL.h>
 
 #include <cstddef>
-#include <utility>
+#include <string>
 #include <vector>
 
 namespace Scenes::MainMenu::Components {
@@ -13,9 +14,29 @@ namespace Scenes::MainMenu::Components {
 /** Image cursor that tracks the selected main menu option */
 class Cursor : public Engine::Nodes::Image {
   public:
-    explicit Cursor(std::vector<SDL_Point> options)
-        : options(std::move(options)) {
+    /** Named position that the cursor can select */
+    struct Option {
+        std::string tag;
+        SDL_Point position;
+    };
+
+    Cursor() {
+        this->declareHook(Engine::Nodes::Hook::Enter);
         this->declareHook(Engine::Nodes::Hook::Input);
+        this->declareProperty(
+            "options",
+            this->options,
+            [this](const std::vector<Option> &value) {
+                this->updateOptions(value);
+            }
+        );
+    }
+
+    void enter() override {
+        this->getGame().signals.declare<std::string>(
+            this->shared_from_this(),
+            "selected"
+        );
     }
 
     void input(const SDL_Event &event) override {
@@ -30,6 +51,10 @@ class Cursor : public Engine::Nodes::Image {
         case SDLK_DOWN:
             this->selectNext();
             break;
+        case SDLK_RETURN:
+        case SDLK_KP_ENTER:
+            this->selectCurrent();
+            break;
         default:
             break;
         }
@@ -41,7 +66,10 @@ class Cursor : public Engine::Nodes::Image {
             return;
         }
 
-        this->setProperty("position", this->options[this->selectedOption]);
+        this->setProperty(
+            "position",
+            this->options[this->selectedOption].position
+        );
     }
 
   private:
@@ -56,11 +84,26 @@ class Cursor : public Engine::Nodes::Image {
     }
 
     void selectNext() {
-        this->selectedOption = (this->selectedOption + 1) % this->options.size();
+        this->selectedOption =
+            (this->selectedOption + 1) % this->options.size();
         this->align();
     }
 
-    std::vector<SDL_Point> options;
+    void selectCurrent() {
+        this->getGame().signals.emit(
+            this->shared_from_this(),
+            "selected",
+            this->options[this->selectedOption].tag
+        );
+    }
+
+    void updateOptions(const std::vector<Option> &value) {
+        this->options = value;
+        this->selectedOption = 0;
+        this->align();
+    }
+
+    std::vector<Option> options;
     std::size_t selectedOption = 0;
 };
 
