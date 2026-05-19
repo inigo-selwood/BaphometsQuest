@@ -6,6 +6,7 @@
 #include <tinyxml2.h>
 
 #include <exception>
+#include <string>
 
 namespace Engine {
 
@@ -101,7 +102,9 @@ void SceneLoader::loadNode(
         }
     }
 
-    this->loadChildren(*node, element);
+    if(!node->loadXmlChildren(element)) {
+        this->loadChildren(*node, element);
+    }
 }
 
 } // namespace Engine

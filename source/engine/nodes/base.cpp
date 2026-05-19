@@ -141,6 +141,10 @@ void Base::process(float) {}
 
 void Base::render(SDL_Renderer &) {}
 
+bool Base::loadXmlChildren(const tinyxml2::XMLElement &) {
+    return false;
+}
+
 void Base::declareHook(Hook hook) {
     this->hooks.insert(hook);
 }

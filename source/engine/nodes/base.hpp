@@ -17,6 +17,10 @@
 #include <SDL.h>
 #include <spdlog/spdlog.h>
 
+namespace tinyxml2 {
+class XMLElement;
+}
+
 namespace Engine {
 
 class Game;
@@ -152,6 +156,9 @@ class Base : public std::enable_shared_from_this<Base> {
     virtual void input(const SDL_Event &event);
     virtual void process(float deltaSeconds);
     virtual void render(SDL_Renderer &renderer);
+
+    /** Return true when this node consumed its own XML child elements */
+    virtual bool loadXmlChildren(const tinyxml2::XMLElement &element);
 
   protected:
     /** Declare a property backed by direct member assignment */
