@@ -120,6 +120,17 @@ void Base::setPropertyFromText(
     }
 }
 
+void Base::runSetup() {
+    if(this->setupComplete) {
+        return;
+    }
+
+    this->setupComplete = true;
+    this->setup();
+}
+
+void Base::setup() {}
+
 void Base::enter() {}
 
 void Base::exit() {}

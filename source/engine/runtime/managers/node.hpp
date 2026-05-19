@@ -49,8 +49,8 @@ class Manager {
 
         callback(*node);
 
-        for(const auto &child : node->children) {
-            this->walk(child, callback);
+        for(std::size_t index = 0; index < node->children.size(); index++) {
+            this->walk(node->children[index], callback);
         }
     }
 

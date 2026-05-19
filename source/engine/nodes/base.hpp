@@ -136,6 +136,10 @@ class Base : public std::enable_shared_from_this<Base> {
     void
     setPropertyFromText(const std::string &name, const std::string &value);
 
+    /** Run setup once for this node */
+    void runSetup();
+
+    virtual void setup();
     virtual void enter();
     virtual void exit();
     virtual void input(const SDL_Event &event);
@@ -225,6 +229,7 @@ class Base : public std::enable_shared_from_this<Base> {
     std::weak_ptr<Base> parent;
     std::weak_ptr<Game> game;
     bool visible = true;
+    bool setupComplete = false;
     std::unordered_map<std::string, Property> properties;
     std::set<Hook> hooks;
 };

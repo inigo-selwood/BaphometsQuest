@@ -16,15 +16,7 @@ namespace Scenes::MainMenu {
 /** Main menu scene used to boot the game */
 class Scene : public Engine::Nodes::Base {
   public:
-    Scene() {
-        this->declareHook(Engine::Nodes::Hook::Enter);
-    }
-
-    void enter() override {
-        if(this->loaded) {
-            return;
-        }
-
+    void setup() override {
         Engine::SceneLoader loader{*this};
         loader.registerNode<Engine::Nodes::Label>("label");
         loader.registerNode<Engine::Nodes::Menu>("menu");
@@ -45,12 +37,7 @@ class Scene : public Engine::Nodes::Base {
                 }
             }
         );
-
-        this->loaded = true;
     }
-
-  private:
-    bool loaded = false;
 };
 
 } // namespace Scenes::MainMenu
