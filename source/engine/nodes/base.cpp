@@ -74,6 +74,10 @@ std::shared_ptr<Base> Base::getChild(const std::string &name) const {
     throw std::runtime_error("Unknown child node '" + name + "'");
 }
 
+const std::vector<std::shared_ptr<Base>> &Base::getChildren() const {
+    return this->children;
+}
+
 bool Base::hasProperty(const std::string &name) const {
     return this->properties.contains(name);
 }

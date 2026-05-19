@@ -52,6 +52,9 @@ class Base : public std::enable_shared_from_this<Base> {
     /** Return a named direct child */
     std::shared_ptr<Base> getChild(const std::string &name) const;
 
+    /** Return direct children in tree order */
+    const std::vector<std::shared_ptr<Base>> &getChildren() const;
+
     /** Return a named direct child with a checked node type */
     template <typename NodeType>
     std::shared_ptr<NodeType> getChild(const std::string &name) const {

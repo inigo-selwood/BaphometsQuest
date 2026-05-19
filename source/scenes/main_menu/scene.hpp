@@ -1,14 +1,15 @@
 #pragma once
 
-#include "components/cursor.hpp"
-
 #include "../../engine/nodes/base.hpp"
 #include "../../engine/nodes/native/label.hpp"
+#include "../../engine/nodes/native/menu.hpp"
+#include "../../engine/nodes/native/menu_cursor.hpp"
+#include "../../engine/nodes/native/menu_option.hpp"
 #include "../../engine/nodes/native/music.hpp"
 #include "../../engine/runtime/scene_loader.hpp"
 
 #include <memory>
-#include <vector>
+#include <string>
 
 namespace Scenes::MainMenu {
 
@@ -26,17 +27,22 @@ class Scene : public Engine::Nodes::Base {
 
         Engine::SceneLoader loader{*this};
         loader.registerNode<Engine::Nodes::Label>("label");
+        loader.registerNode<Engine::Nodes::Menu>("menu");
+        loader.registerNode<Engine::Nodes::MenuCursor>("menu-cursor");
+        loader.registerNode<Engine::Nodes::MenuOption>("menu-option");
         loader.registerNode<Engine::Nodes::Music>("music");
-        loader.registerNode<Components::Cursor>("cursor");
         loader.load("source/scenes/main_menu/main_menu.xml");
 
-        const auto cursor = this->getChild<Components::Cursor>("cursor");
+        const auto menu = this->getChild<Engine::Nodes::Menu>("main-menu");
 
-        cursor->setProperty(
-            "options",
-            std::vector<Components::Cursor::Option>{
-                {"play", {48, 76}},
-                {"quit", {48, 92}},
+        menu->configure();
+        this->getGame().signals.connect<std::string>(
+            menu,
+            "selected",
+            [this](const std::string &tag) {
+                if(tag == "quit") {
+                    this->getGame().queueQuit();
+                }
             }
         );
 

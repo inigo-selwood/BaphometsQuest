@@ -69,15 +69,8 @@ void SceneLoader::loadNode(
     }
 
     const char *nameAttribute = element.Attribute("name");
-
-    if(nameAttribute == nullptr || std::string(nameAttribute).empty()) {
-        throw std::runtime_error(
-            "Scene XML element '" + elementName
-            + "' requires a non-empty name attribute"
-        );
-    }
-
-    const std::string nodeName = nameAttribute;
+    const std::string nodeName =
+        nameAttribute == nullptr ? std::string{} : nameAttribute;
     std::shared_ptr<Engine::Nodes::Base> node = nodeCreator->second();
 
     if(node == nullptr) {

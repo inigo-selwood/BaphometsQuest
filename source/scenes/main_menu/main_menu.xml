@@ -16,27 +16,26 @@
     text="baphomet's quest"
   />
 
-  <label
+  <menu
     colour="#ffffffff"
     font="resources/fonts/04B_03.TTF"
-    name="play-option"
+    name="main-menu"
     position="64,76"
     size="8"
-    text="play"
-  />
+  >
+    <menu-option
+      tag="play"
+      text="Play"
+    />
 
-  <label
-    colour="#ffffffff"
-    font="resources/fonts/04B_03.TTF"
-    name="quit-option"
-    position="64,92"
-    size="8"
-    text="quit"
-  />
+    <menu-option
+      tag="quit"
+      text="Quit"
+    />
 
-  <cursor
-    name="cursor"
-    path="resources/textures/tileset.png"
-    region="0,0,8,8"
-  />
+    <menu-cursor
+      path="resources/textures/tileset.png"
+      region="232,16,8,8"
+    />
+  </menu>
 </scene>

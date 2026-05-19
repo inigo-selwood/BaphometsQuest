@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../engine/nodes/native/image.hpp"
-#include "../../../engine/runtime/game.hpp"
+#include "../../runtime/game.hpp"
+#include "image.hpp"
 
 #include <SDL.h>
 
@@ -9,10 +9,10 @@
 #include <string>
 #include <vector>
 
-namespace Scenes::MainMenu::Components {
+namespace Engine::Nodes {
 
-/** Image cursor that tracks the selected main menu option */
-class Cursor : public Engine::Nodes::Image {
+/** Image cursor that tracks selectable menu options */
+class MenuCursor : public Engine::Nodes::Image {
   public:
     /** Named position that the cursor can select */
     struct Option {
@@ -20,7 +20,7 @@ class Cursor : public Engine::Nodes::Image {
         SDL_Point position;
     };
 
-    Cursor() {
+    MenuCursor() {
         this->declareHook(Engine::Nodes::Hook::Enter);
         this->declareHook(Engine::Nodes::Hook::Input);
         this->declareProperty(
@@ -33,10 +33,7 @@ class Cursor : public Engine::Nodes::Image {
     }
 
     void enter() override {
-        this->getGame().signals.declare<std::string>(
-            this->shared_from_this(),
-            "selected"
-        );
+        this->configure();
     }
 
     void input(const SDL_Event &event) override {
@@ -58,6 +55,14 @@ class Cursor : public Engine::Nodes::Image {
         default:
             break;
         }
+    }
+
+    /** Declare the cursor signal before external connection */
+    void configure() {
+        this->getGame().signals.declare<std::string>(
+            this->shared_from_this(),
+            "selected"
+        );
     }
 
     /** Align the cursor with its current option */
@@ -107,4 +112,4 @@ class Cursor : public Engine::Nodes::Image {
     std::size_t selectedOption = 0;
 };
 
-} // namespace Scenes::MainMenu::Components
+} // namespace Engine::Nodes
