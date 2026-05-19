@@ -9,12 +9,12 @@
 #include <memory>
 #include <string>
 
-namespace Game::Scenes {
+namespace Scenes::MainMenu {
 
-/** Default scene used to boot the game */
-class Main : public Engine::Nodes::Base {
+/** Main menu scene used to boot the game */
+class Scene : public Engine::Nodes::Base {
   public:
-    Main() {
+    Scene() {
         this->declareHook(Engine::Nodes::Hook::Enter);
     }
 
@@ -65,4 +65,4 @@ class Main : public Engine::Nodes::Base {
     bool loaded = false;
 };
 
-} // namespace Game::Scenes
+} // namespace Scenes::MainMenu
