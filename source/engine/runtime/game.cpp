@@ -42,9 +42,18 @@ void Game::start(
     this->timer.setTargetFrameRate(
         settings["renderer"]["target-frame-rate"].as<int>()
     );
-    this->renderClearColour = Engine::Format::colour(
-        settings["renderer"]["clear-colour"].as<std::string>()
-    );
+
+    const std::string renderClearColour =
+        settings["renderer"]["clear-colour"].as<std::string>();
+
+    try {
+        this->renderClearColour = Engine::Format::colour(renderClearColour);
+    } catch(const std::exception &) {
+        spdlog::warn(
+            "Renderer clear colour '{}' is invalid; using fallback #000000ff",
+            renderClearColour
+        );
+    }
 
     spdlog::info("Starting game services");
 
