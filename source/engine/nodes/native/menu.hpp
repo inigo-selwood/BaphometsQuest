@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../resources/base.hpp"
-#include "../base.hpp"
+#include "object.hpp"
 
 #include <SDL.h>
 
@@ -16,7 +16,7 @@ class XMLElement;
 namespace Engine::Nodes {
 
 /** Menu node that owns its options, cursor, input, and rendering */
-class Menu : public Engine::Nodes::Base {
+class Menu : public Engine::Nodes::Object {
   public:
     /** Selectable menu option */
     struct Option {
@@ -43,7 +43,6 @@ class Menu : public Engine::Nodes::Base {
     std::string font;
     int size = 0;
     SDL_Color colour{255, 255, 255, 255};
-    SDL_Point position{0, 0};
     int lineHeight = 0;
     int cursorOffset = 0;
     std::string cursorPath;

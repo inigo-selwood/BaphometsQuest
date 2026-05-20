@@ -8,7 +8,6 @@ namespace Engine::Nodes {
 
 Tilemap::Tilemap() {
     this->declareHook(Engine::Nodes::Hook::Render);
-    this->declareProperty("position", this->position);
     this->declareProperty(
         "texture",
         this->texture,

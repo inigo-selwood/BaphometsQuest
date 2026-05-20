@@ -1,18 +1,17 @@
 #pragma once
 
-#include "../base.hpp"
+#include "object.hpp"
 
 #include <SDL.h>
 
 namespace Engine::Nodes {
 
 /** Simple filled rectangle node for render testing */
-class Box : public Engine::Nodes::Base {
+class Box : public Engine::Nodes::Object {
   public:
     Box() {
         this->declareHook(Engine::Nodes::Hook::Render);
         this->declareProperty("colour", this->colour);
-        this->declareProperty("position", this->position);
         this->declareProperty("size", this->size);
     }
 
@@ -33,7 +32,6 @@ class Box : public Engine::Nodes::Base {
     }
 
   private:
-    SDL_Point position{0, 0};
     SDL_Color colour{255, 255, 255, 255};
     SDL_Rect size{0, 0, 0, 0};
 };

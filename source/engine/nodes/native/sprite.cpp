@@ -21,7 +21,6 @@ Sprite::Sprite() {
         this->path,
         [this](const std::string &value) { this->update(value); }
     );
-    this->declareProperty("position", this->position);
     this->declareProperty(
         "animations",
         this->animations,

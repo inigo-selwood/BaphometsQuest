@@ -19,20 +19,22 @@ assign directly to a member or call a setter callback that performs side
 effects before storing the value.
 
 ```cpp
-class Example : public Engine::Nodes::Base {
+class Example : public Engine::Nodes::Object {
   public:
     Example() {
-        this->declareProperty("position", this->position);
         this->declareProperty("path", this->path, [this](const auto &value) {
             this->updatePath(value);
         });
     }
 
   private:
-    SDL_Point position{0, 0};
     std::string path;
 };
 ```
+
+Native nodes that need a `position` property can inherit from
+`Engine::Nodes::Object`, which declares the property and stores the shared
+`SDL_Point` member.
 
 Hooks
 -----

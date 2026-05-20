@@ -3,7 +3,7 @@
 #include "../../resources/types/font.hpp"
 #include "../../resources/types/text_texture.hpp"
 #include "../../runtime/game.hpp"
-#include "../base.hpp"
+#include "object.hpp"
 
 #include <SDL.h>
 
@@ -13,7 +13,7 @@
 namespace Engine::Nodes {
 
 /** Render text into the node tree */
-class Label : public Engine::Nodes::Base {
+class Label : public Engine::Nodes::Object {
   public:
     /** Horizontal anchor used when drawing text at the node position */
     enum class Justification {
@@ -48,7 +48,6 @@ class Label : public Engine::Nodes::Base {
                 this->update(this->font, this->size, value, this->text);
             }
         );
-        this->declareProperty("position", this->position);
         this->declareProperty("justification", this->justification);
     }
 
@@ -156,7 +155,6 @@ class Label : public Engine::Nodes::Base {
     int size = 0;
     std::string text;
     SDL_Color colour{255, 255, 255, 255};
-    SDL_Point position{0, 0};
     Justification justification = Justification::Left;
 };
 

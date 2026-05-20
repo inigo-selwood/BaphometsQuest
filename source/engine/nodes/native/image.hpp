@@ -2,7 +2,7 @@
 
 #include "../../resources/types/image_texture.hpp"
 #include "../../runtime/game.hpp"
-#include "../base.hpp"
+#include "object.hpp"
 
 #include <SDL.h>
 
@@ -12,7 +12,7 @@
 namespace Engine::Nodes {
 
 /** Render an image texture resource into the node tree */
-class Image : public Engine::Nodes::Base {
+class Image : public Engine::Nodes::Object {
   public:
     Image() {
         this->declareHook(Engine::Nodes::Hook::Render);
@@ -21,7 +21,6 @@ class Image : public Engine::Nodes::Base {
             this->path,
             [this](const std::string &value) { this->update(value); }
         );
-        this->declareProperty("position", this->position);
         this->declareProperty("region", this->region);
     }
 
@@ -93,7 +92,6 @@ class Image : public Engine::Nodes::Base {
 
     Engine::Resource::ID textureResourceID = 0;
     std::string path;
-    SDL_Point position{0, 0};
     SDL_Rect region{0, 0, 0, 0};
 };
 

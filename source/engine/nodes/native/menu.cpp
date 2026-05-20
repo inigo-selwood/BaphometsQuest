@@ -36,7 +36,6 @@ Menu::Menu() {
             this->rebuild();
         }
     );
-    this->declareProperty("position", this->position);
     this->declareProperty("line-height", this->lineHeight);
     this->declareProperty("cursor-offset", this->cursorOffset);
     this->declareProperty(

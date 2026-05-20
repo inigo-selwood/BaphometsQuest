@@ -3,7 +3,7 @@
 #include "../../resources/types/image_texture.hpp"
 #include "../../resources/types/map_data.hpp"
 #include "../../resources/types/tileset.hpp"
-#include "../base.hpp"
+#include "object.hpp"
 
 #include <SDL.h>
 
@@ -12,7 +12,7 @@
 namespace Engine::Nodes {
 
 /** Render map data using a tileset and texture atlas */
-class Tilemap : public Engine::Nodes::Base {
+class Tilemap : public Engine::Nodes::Object {
   public:
     Tilemap();
 
@@ -40,7 +40,6 @@ class Tilemap : public Engine::Nodes::Base {
     Engine::Resource::ID textureResourceID = 0;
     Engine::Resource::ID tilesetResourceID = 0;
     Engine::Resource::ID mapResourceID = 0;
-    SDL_Point position{0, 0};
     std::string texture;
     std::string tileset;
     std::string map;

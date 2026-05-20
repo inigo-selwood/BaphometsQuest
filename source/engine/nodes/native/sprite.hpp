@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../resources/base.hpp"
-#include "../base.hpp"
+#include "object.hpp"
 
 #include <SDL.h>
 
@@ -16,7 +16,7 @@ class XMLElement;
 namespace Engine::Nodes {
 
 /** Render a named animation frame from a texture atlas */
-class Sprite : public Engine::Nodes::Base {
+class Sprite : public Engine::Nodes::Object {
   public:
     /** Single animation frame drawn from an atlas region */
     struct Frame {
@@ -57,7 +57,6 @@ class Sprite : public Engine::Nodes::Base {
 
     Engine::Resource::ID textureResourceID = 0;
     std::string path;
-    SDL_Point position{0, 0};
     std::vector<Animation> animations;
     std::string animation;
     std::size_t frameIndex = 0;
