@@ -9,9 +9,14 @@ Tile rendering is split across three concepts:
 Tilesets
 --------
 
-A tileset parses fixed-size tile records into a lookup table keyed by tile ID.
+A tileset loads a Tiled `.tsx` file into a lookup table keyed by engine tile
+ID. Tiled local tile IDs are shifted by one so engine tile ID `0` remains the
+empty tile value used by map data.
+
 The tileset is the source of truth for tile size, so tilemaps and map lookups
-use that size when converting between pixels and cells.
+use that size when converting between pixels and cells. Tile-level
+`walk-mask` or `walk_mask` properties are read as movement bitmasks and default
+to `0` when omitted.
 
 Map Data
 --------
