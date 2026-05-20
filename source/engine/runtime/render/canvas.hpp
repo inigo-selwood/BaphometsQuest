@@ -80,15 +80,10 @@ class Canvas {
     ) const {
         const SDL_Rect screenDestination = this->toScreen(destination);
 
-        if(SDL_RenderCopy(
-               &this->renderer,
-               texture,
-               source,
-               &screenDestination
-           ) != 0) {
+        if(SDL_RenderCopy(&this->renderer, texture, source, &screenDestination)
+            != 0) {
             throw std::runtime_error(
-                std::string("Failed to copy canvas texture: ")
-                + SDL_GetError()
+                std::string("Failed to copy canvas texture: ") + SDL_GetError()
             );
         }
     }

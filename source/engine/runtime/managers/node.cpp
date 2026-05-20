@@ -1,8 +1,8 @@
 #include "node.hpp"
 
+#include "../../nodes/native/camera.hpp"
 #include "../game.hpp"
 #include "../render/canvas.hpp"
-#include "../../nodes/native/camera.hpp"
 
 #include <memory>
 #include <optional>
@@ -111,11 +111,7 @@ void Manager::findActiveCamera(
     }
 
     for(std::size_t index = 0; index < node->children.size(); index++) {
-        this->findActiveCamera(
-            node->children[index],
-            context,
-            cameraFocus
-        );
+        this->findActiveCamera(node->children[index], context, cameraFocus);
     }
 }
 

@@ -53,7 +53,9 @@ std::uint16_t parseTileID(std::string_view text, const std::string &path) {
     text = Engine::Parse::trim(text);
 
     if(text.empty()) {
-        throw std::runtime_error("Map data '" + path + "' has an empty tile ID");
+        throw std::runtime_error(
+            "Map data '" + path + "' has an empty tile ID"
+        );
     }
 
     std::uint32_t gid = 0;
@@ -84,8 +86,11 @@ std::uint16_t parseTileID(std::string_view text, const std::string &path) {
 }
 
 /** Parse a CSV tile payload and hard-fail if its shape is unexpected */
-std::vector<std::uint16_t>
-parseCSV(const char *text, std::size_t expectedTiles, const std::string &path) {
+std::vector<std::uint16_t> parseCSV(
+    const char *text,
+    std::size_t expectedTiles,
+    const std::string &path
+) {
     if(text == nullptr) {
         throw std::runtime_error("Map data '" + path + "' has no CSV content");
     }
@@ -133,7 +138,9 @@ getDataElement(const tinyxml2::XMLElement &root, const std::string &path) {
     const tinyxml2::XMLElement *data = layer->FirstChildElement("data");
 
     if(data == nullptr) {
-        throw std::runtime_error("Map data '" + path + "' requires layer data");
+        throw std::runtime_error(
+            "Map data '" + path + "' requires layer data"
+        );
     }
 
     const char *encoding = data->Attribute("encoding");
@@ -155,10 +162,8 @@ getDataElement(const tinyxml2::XMLElement &root, const std::string &path) {
 }
 
 /** Flatten Tiled infinite-map chunks into one bounded tile array */
-LoadedData loadChunkedData(
-    const tinyxml2::XMLElement &data,
-    const std::string &path
-) {
+LoadedData
+loadChunkedData(const tinyxml2::XMLElement &data, const std::string &path) {
     const tinyxml2::XMLElement *firstChunk = data.FirstChildElement("chunk");
 
     if(firstChunk == nullptr) {
@@ -253,7 +258,11 @@ LoadedData loadFiniteData(
 
     return LoadedData{
         SDL_Rect{0, 0, width, height},
-        parseCSV(data.GetText(), static_cast<std::size_t>(width * height), path),
+        parseCSV(
+            data.GetText(),
+            static_cast<std::size_t>(width * height),
+            path
+        ),
     };
 }
 
