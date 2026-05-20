@@ -4,14 +4,27 @@ tasks:
   format:
     dir: ../..
     cmds:
-      - find source -name '*.cpp' -o -name '*.hpp' | xargs clang-format -i --style=file:configuration/formatting/.clang-format
+      - >-
+        find source
+        \( -name '*.cpp' -o -name '*.hpp' \)
+        -type f
+        | xargs clang-format
+        -i
+        --style=file:configuration/formatting/.clang-format
       - npm --prefix configuration/formatting install
       - task: format-xml
 
   format-xml:
     dir: ../formatting
     cmds:
-      - find ../../source ../../resources \( -name '*.xml' -o -name '*.tsx' -o -name '*.tmx' \) -type f -exec npm exec prettier -- --config .prettierrc --parser xml --write {} +
+      - >-
+        find ../../source ../../resources
+        \( -name '*.xml' -o -name '*.tsx' -o -name '*.tmx' \)
+        -type f
+        -exec npm exec prettier --
+        --config .prettierrc
+        --parser xml
+        --write {} +
 
   clean:
     dir: ../..
