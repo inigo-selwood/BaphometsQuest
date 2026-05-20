@@ -32,7 +32,8 @@ other attribute is applied as a property.
 
 Nested XML normally becomes child nodes. Some nodes override that behaviour and
 parse their child XML as internal data instead. `Menu` owns `<option>` elements,
-and `Sprite` owns `<animation>` and `<frame>` elements.
+`Sprite` owns `<animation>` and `<frame>` elements, and `Map` owns `<chunk>`
+elements.
 
 Canvas Layers
 -------------
@@ -43,12 +44,16 @@ camera-derived viewport origin.
 
 ```xml
 <canvas-layer mode="world">
-  <tilemap
-    map="resources/maps/chunks/overworld.tmx"
-    position="[16, 16]"
+  <map
+    name="world"
     texture="resources/textures/tileset.png"
     tileset="resources/maps/tileset.tsx"
-  />
+  >
+    <chunk
+      data="resources/maps/chunks/overworld.tmx"
+      position="[16, 16]"
+    />
+  </map>
 
   <player
     path="resources/textures/tileset.png"

@@ -87,7 +87,7 @@ box->setProperty("size", SDL_Rect{0, 0, 16, 16});
 Native Nodes
 ------------
 
-Current native nodes cover simple drawing, text, images, music, tilemaps, a
+Current native nodes cover simple drawing, text, images, music, maps, a
 self-rendering menu, and animated sprites. `Menu` and `Sprite` are examples of
 nodes that own structured internal data instead of representing every part as a
 child node.
