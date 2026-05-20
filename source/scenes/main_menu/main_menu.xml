@@ -19,7 +19,7 @@
   <menu
     colour="#ffffffff"
     cursor-path="resources/textures/tileset.png"
-    cursor-region="[232, 16, 8, 8]"
+    cursor-region="[104, 16, 8, 8]"
     font="resources/fonts/04B_03.TTF"
     name="main-menu"
     position="[64, 76]"
@@ -45,15 +45,15 @@
     <animation name="idle">
       <frame
         duration="0.5"
-        region="[232, 16, 8, 8]"
+        region="[96, 88, 8, 8]"
       />
       <frame
         duration="0.5"
-        region="[240, 16, 8, 8]"
+        region="[104, 88, 8, 8]"
       />
       <frame
         duration="0.5"
-        region="[248, 16, 8, 8]"
+        region="[112, 88, 8, 8]"
       />
     </animation>
   </sprite>
