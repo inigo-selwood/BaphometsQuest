@@ -72,8 +72,7 @@ inline std::string path(std::string_view value) {
         return std::string{value};
     }
 
-    const std::size_t first =
-        tokens.size() > 3 ? tokens.size() - 3 : 0;
+    const std::size_t first = tokens.size() > 3 ? tokens.size() - 3 : 0;
     std::ostringstream stream;
 
     for(std::size_t index = first; index < tokens.size(); index++) {

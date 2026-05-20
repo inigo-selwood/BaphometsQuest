@@ -28,10 +28,8 @@ inline std::string_view trim(std::string_view text) {
     return text.substr(start, end - start + 1);
 }
 
-inline std::string_view arrayBody(
-    std::string_view text,
-    const std::string &typeName
-) {
+inline std::string_view
+arrayBody(std::string_view text, const std::string &typeName) {
     text = trim(text);
 
     if(text.empty()) {

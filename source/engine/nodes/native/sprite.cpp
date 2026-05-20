@@ -68,7 +68,8 @@ void Sprite::process(float deltaSeconds) {
 
     while(this->frameElapsed
         >= activeAnimation.frames[this->frameIndex].duration) {
-        const float duration = activeAnimation.frames[this->frameIndex].duration;
+        const float duration =
+            activeAnimation.frames[this->frameIndex].duration;
 
         if(duration <= 0.0F) {
             this->frameElapsed = 0.0F;
@@ -76,8 +77,8 @@ void Sprite::process(float deltaSeconds) {
         }
 
         this->frameElapsed -= duration;
-        this->frameIndex = (this->frameIndex + 1)
-            % activeAnimation.frames.size();
+        this->frameIndex =
+            (this->frameIndex + 1) % activeAnimation.frames.size();
     }
 }
 
@@ -106,12 +107,8 @@ void Sprite::render(SDL_Renderer &renderer) {
             this->textureResourceID
         );
 
-    if(SDL_RenderCopy(
-           &renderer,
-           image.handle.get(),
-           &region,
-           &destination
-       ) != 0) {
+    if(SDL_RenderCopy(&renderer, image.handle.get(), &region, &destination)
+        != 0) {
         throw std::runtime_error(
             std::string("Failed to render sprite node: ") + SDL_GetError()
         );

@@ -60,7 +60,8 @@ Menu::Menu() {
 bool Menu::loadXmlChildren(const tinyxml2::XMLElement &element) {
     std::vector<Option> parsedOptions;
 
-    for(const tinyxml2::XMLElement *optionElement = element.FirstChildElement();
+    for(const tinyxml2::XMLElement *optionElement =
+            element.FirstChildElement();
         optionElement != nullptr;
         optionElement = optionElement->NextSiblingElement()) {
         parsedOptions.push_back(parseOption(*optionElement));
@@ -192,8 +193,10 @@ void Menu::rebuild() {
             );
         }
 
-        this->fontResourceID =
-            game.resources.load<Engine::Resource::Font>(this->font, this->size);
+        this->fontResourceID = game.resources.load<Engine::Resource::Font>(
+            this->font,
+            this->size
+        );
 
         for(Option &option : this->options) {
             option.textResourceID =
