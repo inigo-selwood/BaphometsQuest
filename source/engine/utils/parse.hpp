@@ -14,8 +14,7 @@
 
 namespace Engine::Parse {
 
-namespace Detail {
-
+/** Remove whitespace around text tokens without allocating */
 inline std::string_view trim(std::string_view text) {
     const std::size_t start = text.find_first_not_of(" \t\n\r");
 
@@ -27,6 +26,8 @@ inline std::string_view trim(std::string_view text) {
 
     return text.substr(start, end - start + 1);
 }
+
+namespace Detail {
 
 inline std::string_view
 arrayBody(std::string_view text, const std::string &typeName) {

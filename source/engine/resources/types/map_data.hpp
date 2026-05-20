@@ -12,7 +12,7 @@
 
 namespace Engine::Resource {
 
-/** Binary tile ID grid loaded from a map data file */
+/** Tiled tile ID grid loaded from a map file */
 class MapData : public Engine::Resource::Base {
   public:
     explicit MapData(const std::string &path);
@@ -29,9 +29,6 @@ class MapData : public Engine::Resource::Base {
     /** Return the stable cache ID for a map data path */
     static Engine::Resource::ID key(const std::string &path);
 
-    /** Save the current map data back to its source path */
-    void save() const;
-
     /** Return a tile ID by row-major map index */
     std::uint16_t getTileID(int index) const;
 
@@ -44,19 +41,19 @@ class MapData : public Engine::Resource::Base {
     /** Return YAML-formatted resource details for logging */
     std::string describe() const override;
 
-    /** Source path used for loading and saving */
+    /** Source path used for loading */
     const std::string path;
 
     /** Map dimensions in tile cells */
     const SDL_Rect size{0, 0, 0, 0};
 
-    /** Raw little-endian uint16 tile ID payload */
-    const std::vector<std::uint8_t> bytes;
+    /** Row-major tile IDs */
+    const std::vector<std::uint16_t> tiles;
 
   private:
     struct Data {
         SDL_Rect size{0, 0, 0, 0};
-        std::vector<std::uint8_t> bytes;
+        std::vector<std::uint16_t> tiles;
     };
 
     MapData(const std::string &path, Data data);

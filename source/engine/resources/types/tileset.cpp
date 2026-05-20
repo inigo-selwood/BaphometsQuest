@@ -86,8 +86,8 @@ Tileset::Data Tileset::load(const std::string &path) {
 
     if(error != tinyxml2::XML_SUCCESS) {
         throw std::runtime_error(
-            "Failed to load Tiled tileset '" + path + "': "
-            + document.ErrorStr()
+            "Failed to load Tiled tileset '" + path
+            + "': " + document.ErrorStr()
         );
     }
 

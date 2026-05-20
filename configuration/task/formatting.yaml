@@ -11,7 +11,7 @@ tasks:
   format-xml:
     dir: ../formatting
     cmds:
-      - find ../../source ../../resources \( -name '*.xml' -o -name '*.tsx' \) -type f -exec npm exec prettier -- --config .prettierrc --parser xml --write {} +
+      - find ../../source ../../resources \( -name '*.xml' -o -name '*.tsx' -o -name '*.tmx' \) -type f -exec npm exec prettier -- --config .prettierrc --parser xml --write {} +
 
   clean:
     dir: ../..

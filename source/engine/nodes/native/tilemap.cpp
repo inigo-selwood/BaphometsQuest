@@ -52,6 +52,8 @@ void Tilemap::render(SDL_Renderer &renderer) {
 
         const int column = index % mapData.size.w;
         const int row = index / mapData.size.w;
+        const int mapX = mapData.size.x + column;
+        const int mapY = mapData.size.y + row;
         const SDL_Rect source{
             tile->second.origin.x,
             tile->second.origin.y,
@@ -59,8 +61,8 @@ void Tilemap::render(SDL_Renderer &renderer) {
             tileset.tileSize.h,
         };
         const SDL_Rect destination{
-            this->position.x + (column * tileset.tileSize.w),
-            this->position.y + (row * tileset.tileSize.h),
+            this->position.x + (mapX * tileset.tileSize.w),
+            this->position.y + (mapY * tileset.tileSize.h),
             tileset.tileSize.w,
             tileset.tileSize.h,
         };
