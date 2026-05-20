@@ -34,6 +34,37 @@ Nested XML normally becomes child nodes. Some nodes override that behaviour and
 parse their child XML as internal data instead. `Menu` owns `<option>` elements,
 and `Sprite` owns `<animation>` and `<frame>` elements.
 
+Canvas Layers
+-------------
+
+`canvas-layer` elements define coordinate space for their children. A screen
+layer draws directly to the logical screen; a world layer applies the active
+camera-derived viewport origin.
+
+```xml
+<canvas-layer mode="world">
+  <tilemap
+    map="resources/maps/chunks/overworld.tmx"
+    position="[16, 16]"
+    texture="resources/textures/tileset.png"
+    tileset="resources/maps/tileset.tsx"
+  />
+
+  <player
+    path="resources/textures/tileset.png"
+    position="[80, 72]"
+    region="[80, 40, 8, 8]"
+    step="8"
+  >
+    <camera position="[4, 4]" />
+  </player>
+</canvas-layer>
+```
+
+Scenes that do not use a canvas layer render as screen space by default. World
+layers without an active camera still render using `[0, 0]` as the viewport
+origin, which keeps simple map scenes usable while camera behaviour evolves.
+
 Imports
 -------
 

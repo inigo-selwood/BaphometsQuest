@@ -1,9 +1,35 @@
 <scene>
-  <tilemap
-    map="resources/maps/chunks/overworld.tmx"
-    name="overworld"
-    position="[16, 16]"
-    texture="resources/textures/tileset.png"
-    tileset="resources/maps/tileset.tsx"
-  />
+  <canvas-layer mode="world">
+    <tilemap
+      map="resources/maps/chunks/overworld.tmx"
+      name="overworld"
+      position="[16, 16]"
+      texture="resources/textures/tileset.png"
+      tileset="resources/maps/tileset.tsx"
+    />
+
+    <player
+      name="player"
+      path="resources/textures/tileset.png"
+      position="[80, 72]"
+      region="[80, 40, 8, 8]"
+      step="8"
+    >
+      <camera
+        name="camera"
+        position="[4, 4]"
+      />
+    </player>
+  </canvas-layer>
+
+  <canvas-layer mode="screen">
+    <label
+      colour="#ffffffff"
+      font="resources/fonts/Early GameBoy.ttf"
+      name="health-label"
+      position="[8, 8]"
+      size="8"
+      text="Health"
+    />
+  </canvas-layer>
 </scene>
