@@ -36,25 +36,5 @@
     />
   </menu>
 
-  <sprite
-    animation="idle"
-    name="example-sprite"
-    path="resources/textures/tileset.png"
-    position="[124, 76]"
-  >
-    <animation name="idle">
-      <frame
-        duration="0.5"
-        region="[96, 88, 8, 8]"
-      />
-      <frame
-        duration="0.5"
-        region="[104, 88, 8, 8]"
-      />
-      <frame
-        duration="0.5"
-        region="[112, 88, 8, 8]"
-      />
-    </animation>
-  </sprite>
+  <import path="example_sprite.xml" />
 </scene>

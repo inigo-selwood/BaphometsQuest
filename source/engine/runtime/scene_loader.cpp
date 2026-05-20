@@ -6,7 +6,9 @@
 #include <tinyxml2.h>
 
 #include <exception>
+#include <filesystem>
 #include <string>
+#include <vector>
 
 namespace Engine {
 
@@ -15,7 +17,26 @@ SceneLoader::SceneLoader(Engine::Nodes::Base &parent)
 
 void SceneLoader::load(const std::string &path) {
     std::shared_ptr<Engine::Nodes::Base> parent = this->getParent();
-    Engine::Game &game = parent->getGame();
+    std::vector<std::string> importStack;
+
+    this->loadScene(*parent, path, importStack);
+}
+
+void SceneLoader::loadScene(
+    Engine::Nodes::Base &parent,
+    const std::string &path,
+    std::vector<std::string> &importStack
+) const {
+    for(const std::string &importedPath : importStack) {
+        if(importedPath == path) {
+            throw std::runtime_error(
+                "Scene XML import cycle detected for '" + path + "'"
+            );
+        }
+    }
+
+    importStack.push_back(path);
+    Engine::Game &game = parent.getGame();
     const Engine::Resource::ID xmlID =
         game.resources.load<Engine::Resource::XML>(path);
     const Engine::Resource::XML &xml =
@@ -32,7 +53,8 @@ void SceneLoader::load(const std::string &path) {
         );
     }
 
-    this->loadChildren(*parent, *root);
+    this->loadChildren(parent, *root, path, importStack);
+    importStack.pop_back();
 }
 
 std::shared_ptr<Engine::Nodes::Base> SceneLoader::getParent() const {
@@ -47,20 +69,30 @@ std::shared_ptr<Engine::Nodes::Base> SceneLoader::getParent() const {
 
 void SceneLoader::loadChildren(
     Engine::Nodes::Base &parent,
-    const tinyxml2::XMLElement &element
+    const tinyxml2::XMLElement &element,
+    const std::string &path,
+    std::vector<std::string> &importStack
 ) const {
     for(const tinyxml2::XMLElement *child = element.FirstChildElement();
         child != nullptr;
         child = child->NextSiblingElement()) {
-        this->loadNode(parent, *child);
+        this->loadNode(parent, *child, path, importStack);
     }
 }
 
 void SceneLoader::loadNode(
     Engine::Nodes::Base &parent,
-    const tinyxml2::XMLElement &element
+    const tinyxml2::XMLElement &element,
+    const std::string &path,
+    std::vector<std::string> &importStack
 ) const {
     const std::string elementName = element.Name();
+
+    if(elementName == "import") {
+        this->loadImport(parent, element, path, importStack);
+        return;
+    }
+
     const auto nodeCreator = this->nodeCreators.find(elementName);
 
     if(nodeCreator == this->nodeCreators.end()) {
@@ -103,8 +135,42 @@ void SceneLoader::loadNode(
     }
 
     if(!node->loadXmlChildren(element)) {
-        this->loadChildren(*node, element);
+        this->loadChildren(*node, element, path, importStack);
     }
+}
+
+void SceneLoader::loadImport(
+    Engine::Nodes::Base &parent,
+    const tinyxml2::XMLElement &element,
+    const std::string &path,
+    std::vector<std::string> &importStack
+) const {
+    const char *pathAttribute = element.Attribute("path");
+
+    if(pathAttribute == nullptr || std::string{pathAttribute}.empty()) {
+        throw std::runtime_error(
+            "Scene XML import in '" + path + "' requires a path attribute"
+        );
+    }
+
+    this->loadScene(parent, resolvePath(path, pathAttribute), importStack);
+}
+
+std::string SceneLoader::resolvePath(
+    const std::string &path,
+    const std::string &importPath
+) {
+    const std::filesystem::path requestedPath{importPath};
+
+    if(requestedPath.is_absolute() || std::filesystem::exists(requestedPath)) {
+        return requestedPath.lexically_normal().generic_string();
+    }
+
+    const std::filesystem::path importingPath{path};
+    const std::filesystem::path relativePath =
+        importingPath.parent_path() / requestedPath;
+
+    return relativePath.lexically_normal().generic_string();
 }
 
 } // namespace Engine

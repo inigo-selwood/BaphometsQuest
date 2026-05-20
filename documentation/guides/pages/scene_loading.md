@@ -34,6 +34,27 @@ Nested XML normally becomes child nodes. Some nodes override that behaviour and
 parse their child XML as internal data instead. `Menu` owns `<option>` elements,
 and `Sprite` owns `<animation>` and `<frame>` elements.
 
+Imports
+-------
+
+Use `<import path="..."/>` to include another scene XML file. The imported
+file must also have a `<scene>` root, and its children are inserted where the
+import appears.
+
+```xml
+<scene>
+  <import path="shared/background.xml" />
+
+  <label
+    name="title"
+    text="baphomet's quest"
+  />
+</scene>
+```
+
+Relative import paths resolve from the XML file that declares the import.
+Import cycles throw at load time.
+
 Registration
 ------------
 

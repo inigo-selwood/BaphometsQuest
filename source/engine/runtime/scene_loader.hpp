@@ -8,6 +8,7 @@
 #include <string>
 #include <type_traits>
 #include <unordered_map>
+#include <vector>
 
 namespace tinyxml2 {
 class XMLElement;
@@ -52,15 +53,35 @@ class SceneLoader {
   private:
     using NodeCreator = std::function<std::shared_ptr<Engine::Nodes::Base>()>;
 
+    void loadScene(
+        Engine::Nodes::Base &parent,
+        const std::string &path,
+        std::vector<std::string> &importStack
+    ) const;
+
     void loadChildren(
         Engine::Nodes::Base &parent,
-        const tinyxml2::XMLElement &element
+        const tinyxml2::XMLElement &element,
+        const std::string &path,
+        std::vector<std::string> &importStack
     ) const;
 
     void loadNode(
         Engine::Nodes::Base &parent,
-        const tinyxml2::XMLElement &element
+        const tinyxml2::XMLElement &element,
+        const std::string &path,
+        std::vector<std::string> &importStack
     ) const;
+
+    void loadImport(
+        Engine::Nodes::Base &parent,
+        const tinyxml2::XMLElement &element,
+        const std::string &path,
+        std::vector<std::string> &importStack
+    ) const;
+
+    static std::string
+    resolvePath(const std::string &path, const std::string &importPath);
 
     std::shared_ptr<Engine::Nodes::Base> getParent() const;
 
