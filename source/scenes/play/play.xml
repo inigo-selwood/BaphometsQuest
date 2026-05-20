@@ -1,0 +1,9 @@
+<scene>
+  <tilemap
+    map="resources/maps/chunks/overworld.tmx"
+    name="overworld"
+    position="[16, 16]"
+    texture="resources/textures/tileset.png"
+    tileset="resources/maps/tileset.tsx"
+  />
+</scene>

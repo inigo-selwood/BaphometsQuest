@@ -28,7 +28,9 @@ class Scene : public Engine::Nodes::Base {
             menu,
             "selected",
             [this](const std::string &tag) {
-                if(tag == "quit") {
+                if(tag == "play") {
+                    this->getGame().queueScene("play");
+                } else if(tag == "quit") {
                     this->getGame().queueQuit();
                 }
             }
