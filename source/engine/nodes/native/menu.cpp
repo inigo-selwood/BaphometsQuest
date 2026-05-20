@@ -37,6 +37,8 @@ Menu::Menu() {
         }
     );
     this->declareProperty("position", this->position);
+    this->declareProperty("line-height", this->lineHeight);
+    this->declareProperty("cursor-offset", this->cursorOffset);
     this->declareProperty(
         "cursor-path",
         this->cursorPath,
@@ -111,8 +113,10 @@ void Menu::input(const SDL_Event &event) {
 
 void Menu::render(SDL_Renderer &renderer) {
     Engine::Game &game = this->getGame();
-    const int rowHeight = this->size * 2;
-    const int cursorOffset = this->size * 2;
+    const int rowHeight =
+        this->lineHeight > 0 ? this->lineHeight : this->size * 2;
+    const int cursorOffset =
+        this->cursorOffset > 0 ? this->cursorOffset : this->size * 2;
 
     for(std::size_t index = 0; index < this->options.size(); index++) {
         const Option &option = this->options[index];

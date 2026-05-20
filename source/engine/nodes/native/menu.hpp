@@ -44,6 +44,8 @@ class Menu : public Engine::Nodes::Base {
     int size = 0;
     SDL_Color colour{255, 255, 255, 255};
     SDL_Point position{0, 0};
+    int lineHeight = 0;
+    int cursorOffset = 0;
     std::string cursorPath;
     SDL_Rect cursorRegion{0, 0, 0, 0};
     Engine::Resource::ID fontResourceID = 0;

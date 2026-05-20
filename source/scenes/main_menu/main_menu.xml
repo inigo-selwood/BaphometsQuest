@@ -1,6 +1,6 @@
 <scene>
   <music
-    autoplay="true"
+    autoplay="false"
     loop="true"
     name="background-music"
     path="resources/music/Koyaanisqatsi.wav"
@@ -18,11 +18,13 @@
 
   <menu
     colour="#ffffffff"
+    cursor-offset="12"
     cursor-path="resources/textures/tileset.png"
     cursor-region="[104, 16, 8, 8]"
-    font="resources/fonts/04B_03.TTF"
+    font="resources/fonts/Early GameBoy.ttf"
+    line-height="12"
     name="main-menu"
-    position="[64, 76]"
+    position="[64, 64]"
     size="8"
   >
     <option
@@ -35,6 +37,4 @@
       text="Quit"
     />
   </menu>
-
-  <import path="example_sprite.xml" />
 </scene>
