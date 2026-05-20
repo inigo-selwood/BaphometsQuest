@@ -2,123 +2,146 @@
 
 #include "../../utils/format.hpp"
 
-#include <fstream>
+#include <tinyxml2.h>
+
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 namespace Engine::Resource {
+
+namespace {
+
+int requireIntAttribute(
+    const tinyxml2::XMLElement &element,
+    const std::string &name,
+    const std::string &path
+) {
+    int value = 0;
+
+    if(element.QueryIntAttribute(name.c_str(), &value)
+        != tinyxml2::XML_SUCCESS) {
+        throw std::runtime_error(
+            "Tileset '" + path + "' requires integer attribute '" + name + "'"
+        );
+    }
+
+    return value;
+}
+
+int getWalkMask(const tinyxml2::XMLElement &tileElement) {
+    const tinyxml2::XMLElement *properties =
+        tileElement.FirstChildElement("properties");
+
+    if(properties == nullptr) {
+        return 0;
+    }
+
+    for(const tinyxml2::XMLElement *property =
+            properties->FirstChildElement("property");
+        property != nullptr;
+        property = property->NextSiblingElement("property")) {
+        const char *name = property->Attribute("name");
+
+        if(name == nullptr) {
+            continue;
+        }
+
+        const std::string propertyName{name};
+
+        if(propertyName != "walk-mask" && propertyName != "walk_mask") {
+            continue;
+        }
+
+        int value = 0;
+
+        if(property->QueryIntAttribute("value", &value)
+            != tinyxml2::XML_SUCCESS) {
+            throw std::runtime_error(
+                "Tileset walk-mask property must be an integer"
+            );
+        }
+
+        return value;
+    }
+
+    return 0;
+}
+
+} // namespace
 
 Tileset::Tileset(const std::string &path) : Tileset(path, load(path)) {}
 
 Tileset::Tileset(const std::string &path, Data data)
     : Base("tileset"), path(path), tileSize(data.tileSize),
-      bytes(std::move(data.bytes)),
-      tiles(parseTiles(this->bytes, this->tileSize)) {}
+      tiles(std::move(data.tiles)) {}
 
 Engine::Resource::ID Tileset::key(const std::string &path) {
     return hashKey("Tileset:" + path);
 }
 
 Tileset::Data Tileset::load(const std::string &path) {
-    std::ifstream file(path, std::ios::binary);
+    tinyxml2::XMLDocument document;
+    const tinyxml2::XMLError error = document.LoadFile(path.c_str());
 
-    if(!file) {
-        throw std::runtime_error("Failed to load tileset '" + path + "'");
-    }
-
-    SDL_Rect tileSize{0, 0, 0, 0};
-    std::uint64_t byteCount = 0;
-
-    file.read(reinterpret_cast<char *>(&tileSize), sizeof(tileSize));
-    file.read(reinterpret_cast<char *>(&byteCount), sizeof(byteCount));
-
-    if(!file) {
+    if(error != tinyxml2::XML_SUCCESS) {
         throw std::runtime_error(
-            "Failed to read tileset metadata '" + path + "'"
+            "Failed to load Tiled tileset '" + path + "': "
+            + document.ErrorStr()
         );
     }
 
-    std::vector<std::uint8_t> bytes(byteCount);
+    const tinyxml2::XMLElement *root = document.RootElement();
 
-    if(!bytes.empty()) {
-        file.read(
-            reinterpret_cast<char *>(bytes.data()),
-            static_cast<std::streamsize>(bytes.size())
+    if(root == nullptr || std::string(root->Name()) != "tileset") {
+        throw std::runtime_error(
+            "Tiled tileset '" + path + "' root element must be <tileset>"
         );
     }
 
-    if(!file) {
-        throw std::runtime_error("Failed to read tileset data '" + path + "'");
-    }
+    const int tileWidth = requireIntAttribute(*root, "tilewidth", path);
+    const int tileHeight = requireIntAttribute(*root, "tileheight", path);
+    const int tileCount = requireIntAttribute(*root, "tilecount", path);
+    const int columns = requireIntAttribute(*root, "columns", path);
 
-    // Tileset files are strict: metadata byte count must consume the stream
-    if(file.peek() != std::char_traits<char>::eof()) {
+    if(tileWidth <= 0 || tileHeight <= 0 || tileCount < 0 || columns <= 0) {
         throw std::runtime_error(
-            "Tileset '" + path + "' has a stream length mismatch"
-        );
-    }
-
-    return Data{tileSize, bytes};
-}
-
-std::unordered_map<std::uint16_t, Tile> Tileset::parseTiles(
-    const std::vector<std::uint8_t> &bytes,
-    SDL_Rect tileSize
-) {
-    if(bytes.size() % TILE_BYTES != 0) {
-        throw std::runtime_error(
-            "Tileset byte count does not match tile record size"
+            "Tiled tileset '" + path + "' has invalid tile dimensions"
         );
     }
 
     std::unordered_map<std::uint16_t, Tile> tiles;
 
-    // Records are id low, id high, origin tile x, origin tile y, walk mask
-    for(std::size_t offset = 0; offset < bytes.size(); offset += TILE_BYTES) {
+    for(int localID = 0; localID < tileCount; localID++) {
         Tile tile;
-        tile.id = static_cast<std::uint16_t>(
-            bytes[offset] | (bytes[offset + 1] << 8)
-        );
+        tile.id = static_cast<std::uint16_t>(localID + 1);
         tile.origin = SDL_Point{
-            bytes[offset + 2] * tileSize.w,
-            bytes[offset + 3] * tileSize.h,
+            (localID % columns) * tileWidth,
+            (localID / columns) * tileHeight,
         };
-        tile.walkMask = static_cast<char>(bytes[offset + 4]);
         tiles.emplace(tile.id, tile);
     }
 
-    return tiles;
-}
+    for(const tinyxml2::XMLElement *tileElement =
+            root->FirstChildElement("tile");
+        tileElement != nullptr;
+        tileElement = tileElement->NextSiblingElement("tile")) {
+        const int localID = requireIntAttribute(*tileElement, "id", path);
 
-void Tileset::save() const {
-    std::ofstream file(this->path, std::ios::binary);
+        if(localID < 0 || localID >= tileCount) {
+            throw std::runtime_error(
+                "Tiled tileset '" + path + "' tile id is out of range"
+            );
+        }
 
-    if(!file) {
-        throw std::runtime_error(
-            "Failed to save tileset '" + this->path + "'"
-        );
+        tiles.at(static_cast<std::uint16_t>(localID + 1)).walkMask =
+            static_cast<char>(getWalkMask(*tileElement));
     }
 
-    const std::uint64_t byteCount = this->bytes.size();
-
-    file.write(
-        reinterpret_cast<const char *>(&this->tileSize),
-        sizeof(this->tileSize)
-    );
-    file.write(reinterpret_cast<const char *>(&byteCount), sizeof(byteCount));
-
-    if(!this->bytes.empty()) {
-        file.write(
-            reinterpret_cast<const char *>(this->bytes.data()),
-            static_cast<std::streamsize>(this->bytes.size())
-        );
-    }
-
-    if(!file) {
-        throw std::runtime_error(
-            "Failed to write tileset '" + this->path + "'"
-        );
-    }
+    return Data{
+        SDL_Rect{0, 0, tileWidth, tileHeight},
+        tiles,
+    };
 }
 
 std::string Tileset::describe() const {
@@ -127,7 +150,7 @@ std::string Tileset::describe() const {
     name["path"] = Engine::Format::path(this->path);
     name["tile-width"] = this->tileSize.w;
     name["tile-height"] = this->tileSize.h;
-    name["bytes"] = this->bytes.size();
+    name["tiles"] = this->tiles.size();
 
     return this->formatDescription(name);
 }
