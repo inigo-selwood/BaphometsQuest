@@ -1,12 +1,15 @@
 <scene>
   <canvas-layer mode="world">
-    <tilemap
-      map="resources/maps/chunks/overworld.tmx"
-      name="overworld"
-      position="[16, 16]"
+    <map
+      name="world"
       texture="resources/textures/tileset.png"
       tileset="resources/maps/tileset.tsx"
-    />
+    >
+      <chunk
+        data="resources/maps/chunks/overworld.tmx"
+        position="[16, 16]"
+      />
+    </map>
 
     <player
       name="player"

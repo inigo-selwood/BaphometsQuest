@@ -1,12 +1,15 @@
 #pragma once
 
 #include "../../../engine/nodes/native/image.hpp"
+#include "../../../engine/nodes/native/map.hpp"
 
 #include <SDL.h>
 
+#include <memory>
+
 namespace Scenes::Play::Components {
 
-/** Temporary controllable player image for camera traversal */
+/** Controllable player image for map traversal */
 class Player : public Engine::Nodes::Image {
   public:
     Player() {
@@ -19,21 +22,44 @@ class Player : public Engine::Nodes::Image {
             return;
         }
 
+        SDL_Point movement{0, 0};
+
         switch(event.key.keysym.sym) {
         case SDLK_UP:
-            this->position.y -= this->step;
+            movement.y = -this->step;
             break;
         case SDLK_DOWN:
-            this->position.y += this->step;
+            movement.y = this->step;
             break;
         case SDLK_LEFT:
-            this->position.x -= this->step;
+            movement.x = -this->step;
             break;
         case SDLK_RIGHT:
-            this->position.x += this->step;
+            movement.x = this->step;
             break;
         default:
-            break;
+            return;
+        }
+
+        const std::shared_ptr<Engine::Nodes::Map> map =
+            this->getTreeNode<Engine::Nodes::Map>();
+        const SDL_Point mapPosition = map->getProperty<SDL_Point>("position");
+        const SDL_Point target{
+            this->position.x + movement.x,
+            this->position.y + movement.y,
+        };
+
+        if(map->canMove(
+               SDL_Point{
+                   this->position.x - mapPosition.x,
+                   this->position.y - mapPosition.y,
+               },
+               SDL_Point{
+                   target.x - mapPosition.x,
+                   target.y - mapPosition.y,
+               }
+           )) {
+            this->position = target;
         }
     }
 

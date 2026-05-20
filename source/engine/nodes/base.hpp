@@ -86,6 +86,53 @@ class Base : public std::enable_shared_from_this<Base> {
         return child;
     }
 
+    /** Return the nearest ancestor with a checked node type */
+    template <typename NodeType>
+    std::shared_ptr<NodeType> getAncestor() const {
+        static_assert(
+            std::is_base_of_v<Base, NodeType>,
+            "NodeType must inherit from Engine::Nodes::Base"
+        );
+
+        std::shared_ptr<Base> ancestor = this->parent.lock();
+
+        while(ancestor != nullptr) {
+            std::shared_ptr<NodeType> typedAncestor =
+                std::dynamic_pointer_cast<NodeType>(ancestor);
+
+            if(typedAncestor != nullptr) {
+                return typedAncestor;
+            }
+
+            ancestor = ancestor->parent.lock();
+        }
+
+        throw std::runtime_error("Node ancestor type was not found");
+    }
+
+    /** Return a node found by searching this node then ancestor subtrees */
+    template <typename NodeType> std::shared_ptr<NodeType> getTreeNode() {
+        static_assert(
+            std::is_base_of_v<Base, NodeType>,
+            "NodeType must inherit from Engine::Nodes::Base"
+        );
+
+        std::shared_ptr<Base> scope = this->shared_from_this();
+
+        while(scope != nullptr) {
+            std::shared_ptr<NodeType> match =
+                scope->findDescendantOrSelf<NodeType>();
+
+            if(match != nullptr) {
+                return match;
+            }
+
+            scope = scope->parent.lock();
+        }
+
+        throw std::runtime_error("Node tree type was not found");
+    }
+
     /** Return true when this node has declared a property */
     bool hasProperty(const std::string &name) const;
 
@@ -234,6 +281,28 @@ class Base : public std::enable_shared_from_this<Base> {
 
     /** Attach this node and its descendants to a game context */
     void attach(const std::weak_ptr<Game> &game);
+
+    /** Return the first matching node in this subtree */
+    template <typename NodeType>
+    std::shared_ptr<NodeType> findDescendantOrSelf() {
+        std::shared_ptr<NodeType> self =
+            std::dynamic_pointer_cast<NodeType>(this->shared_from_this());
+
+        if(self != nullptr) {
+            return self;
+        }
+
+        for(const std::shared_ptr<Base> &child : this->children) {
+            std::shared_ptr<NodeType> match =
+                child->findDescendantOrSelf<NodeType>();
+
+            if(match != nullptr) {
+                return match;
+            }
+        }
+
+        return nullptr;
+    }
 
     /** Return the compact node label used in trace logs */
     std::string describe() const {
