@@ -22,6 +22,13 @@ Run Loop
 events, dispatches node hooks, clears and presents the renderer, purges expired
 resources, and asks `Engine::Timer` how long to delay before the next frame.
 
+Rendering is dispatched through `Engine::Nodes::Manager`. The render pass first
+discovers the active world camera, then walks the tree in order with an
+`Engine::Render::Canvas` that applies parent offsets, canvas-layer mode, and
+viewport origin. When a scene has no canvas layer, rendering defaults to screen
+space. When a world layer has no active camera, rendering defaults to viewport
+origin `[0, 0]`.
+
 Shutdown
 --------
 

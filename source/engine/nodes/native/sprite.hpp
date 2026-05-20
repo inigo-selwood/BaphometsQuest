@@ -36,7 +36,7 @@ class Sprite : public Engine::Nodes::Object {
 
     void process(float deltaSeconds) override;
 
-    void render(SDL_Renderer &renderer) override;
+    void render(Engine::Render::Canvas &canvas) override;
 
   private:
     /** Update the cached texture ID when the sprite path changes */

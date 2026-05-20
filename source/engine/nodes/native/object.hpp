@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../runtime/render/context.hpp"
 #include "../base.hpp"
 
 #include <SDL.h>
@@ -11,6 +12,10 @@ class Object : public Engine::Nodes::Base {
   public:
     Object() {
         this->declareProperty("position", this->position);
+    }
+
+    void applyRenderContext(Engine::Render::Context &context) const override {
+        context.addOrigin(this->position);
     }
 
   protected:

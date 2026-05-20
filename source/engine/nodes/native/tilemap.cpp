@@ -1,6 +1,7 @@
 #include "tilemap.hpp"
 
 #include "../../runtime/game.hpp"
+#include "../../runtime/render/canvas.hpp"
 
 #include <stdexcept>
 
@@ -23,7 +24,7 @@ Tilemap::Tilemap() {
     });
 }
 
-void Tilemap::render(SDL_Renderer &renderer) {
+void Tilemap::render(Engine::Render::Canvas &canvas) {
     if(this->textureResourceID == 0 || this->tilesetResourceID == 0
         || this->mapResourceID == 0) {
         return;
@@ -38,7 +39,6 @@ void Tilemap::render(SDL_Renderer &renderer) {
         game.resources.get<Engine::Resource::Tileset>(this->tilesetResourceID);
     const Engine::Resource::MapData &mapData =
         game.resources.get<Engine::Resource::MapData>(this->mapResourceID);
-    const SDL_Rect screenSize = game.getScreenSize();
 
     const int tileCount = static_cast<int>(mapData.getTileCount());
     for(int index = 0; index < tileCount; ++index) {
@@ -60,31 +60,22 @@ void Tilemap::render(SDL_Renderer &renderer) {
             tileset.tileSize.h,
         };
         const SDL_Rect destination{
-            this->position.x + (mapX * tileset.tileSize.w),
-            this->position.y + (mapY * tileset.tileSize.h),
+            mapX * tileset.tileSize.w,
+            mapY * tileset.tileSize.h,
             tileset.tileSize.w,
             tileset.tileSize.h,
         };
 
-        if(SDL_HasIntersection(&destination, &screenSize) == SDL_FALSE) {
+        if(!canvas.isVisible(destination)) {
             continue;
         }
 
-        if(SDL_RenderCopy(
-               &renderer,
-               texture.handle.get(),
-               &source,
-               &destination
-           ) != 0) {
-            throw std::runtime_error(
-                std::string("Failed to render tilemap node: ") + SDL_GetError()
-            );
-        }
+        canvas.copy(texture.handle.get(), &source, destination);
     }
 }
 
-Engine::Resource::Tile Tilemap::getTileAt(SDL_Point screenPixel) const {
-    const SDL_Point cell = this->getCellAt(screenPixel);
+Engine::Resource::Tile Tilemap::getTileAt(SDL_Point localPixel) const {
+    const SDL_Point cell = this->getCellAt(localPixel);
 
     const Engine::Resource::Tileset &tileset =
         this->getGame().resources.get<Engine::Resource::Tileset>(
@@ -105,7 +96,7 @@ Engine::Resource::Tile Tilemap::getTileAt(SDL_Point screenPixel) const {
     return tile->second;
 }
 
-SDL_Point Tilemap::getCellAt(SDL_Point screenPixel) const {
+SDL_Point Tilemap::getCellAt(SDL_Point localPixel) const {
     if(this->tilesetResourceID == 0) {
         throw std::runtime_error(
             "Tilemap requires a tileset before converting pixels"
@@ -123,12 +114,9 @@ SDL_Point Tilemap::getCellAt(SDL_Point screenPixel) const {
         );
     }
 
-    const int localX = screenPixel.x - this->position.x;
-    const int localY = screenPixel.y - this->position.y;
-
     return SDL_Point{
-        divideFloor(localX, tileset.tileSize.w),
-        divideFloor(localY, tileset.tileSize.h),
+        divideFloor(localPixel.x, tileset.tileSize.w),
+        divideFloor(localPixel.y, tileset.tileSize.h),
     };
 }
 

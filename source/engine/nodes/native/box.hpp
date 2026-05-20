@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../runtime/render/canvas.hpp"
 #include "object.hpp"
 
 #include <SDL.h>
@@ -15,20 +16,10 @@ class Box : public Engine::Nodes::Object {
         this->declareProperty("size", this->size);
     }
 
-    void render(SDL_Renderer &renderer) override {
-        SDL_SetRenderDrawBlendMode(&renderer, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderDrawColor(
-            &renderer,
-            this->colour.r,
-            this->colour.g,
-            this->colour.b,
-            this->colour.a
-        );
-        const SDL_Rect drawArea{this->position.x,
-            this->position.y,
-            this->size.w,
-            this->size.h};
-        SDL_RenderFillRect(&renderer, &drawArea);
+    void render(Engine::Render::Canvas &canvas) override {
+        canvas.setBlendMode(SDL_BLENDMODE_BLEND);
+        canvas.setDrawColour(this->colour);
+        canvas.fillRect(SDL_Rect{0, 0, this->size.w, this->size.h});
     }
 
   private:

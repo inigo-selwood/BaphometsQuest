@@ -4,6 +4,7 @@
 #include "../../resources/types/image_texture.hpp"
 #include "../../resources/types/text_texture.hpp"
 #include "../../runtime/game.hpp"
+#include "../../runtime/render/canvas.hpp"
 
 #include <tinyxml2.h>
 
@@ -111,7 +112,7 @@ void Menu::input(const SDL_Event &event) {
     }
 }
 
-void Menu::render(SDL_Renderer &renderer) {
+void Menu::render(Engine::Render::Canvas &canvas) {
     Engine::Game &game = this->getGame();
     const int rowHeight =
         this->lineHeight > 0 ? this->lineHeight : this->size * 2;
@@ -130,22 +131,13 @@ void Menu::render(SDL_Renderer &renderer) {
                 option.textResourceID
             );
         const SDL_Rect destination{
-            this->position.x,
-            this->position.y + static_cast<int>(index) * rowHeight,
+            0,
+            static_cast<int>(index) * rowHeight,
             texture.size.w,
             texture.size.h,
         };
 
-        if(SDL_RenderCopy(
-               &renderer,
-               texture.handle.get(),
-               nullptr,
-               &destination
-           ) != 0) {
-            throw std::runtime_error(
-                std::string("Failed to render menu option: ") + SDL_GetError()
-            );
-        }
+        canvas.copy(texture.handle.get(), nullptr, destination);
     }
 
     if(this->cursorResourceID == 0 || this->options.empty()) {
@@ -163,18 +155,13 @@ void Menu::render(SDL_Renderer &renderer) {
     }
 
     const SDL_Rect destination{
-        this->position.x - cursorOffset,
-        this->position.y + static_cast<int>(this->selectedOption) * rowHeight,
+        -cursorOffset,
+        static_cast<int>(this->selectedOption) * rowHeight,
         source.w,
         source.h,
     };
 
-    if(SDL_RenderCopy(&renderer, cursor.handle.get(), &source, &destination)
-        != 0) {
-        throw std::runtime_error(
-            std::string("Failed to render menu cursor: ") + SDL_GetError()
-        );
-    }
+    canvas.copy(cursor.handle.get(), &source, destination);
 }
 
 void Menu::rebuild() {

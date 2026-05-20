@@ -16,14 +16,14 @@ class Tilemap : public Engine::Nodes::Object {
   public:
     Tilemap();
 
-    void render(SDL_Renderer &renderer) override;
+    void render(Engine::Render::Canvas &canvas) override;
 
-    /** Return the tileset tile at a screen-space pixel position */
-    Engine::Resource::Tile getTileAt(SDL_Point screenPixel) const;
+    /** Return the tileset tile at a tilemap-local pixel position */
+    Engine::Resource::Tile getTileAt(SDL_Point localPixel) const;
 
   private:
-    /** Convert screen pixels to map cell coordinates */
-    SDL_Point getCellAt(SDL_Point screenPixel) const;
+    /** Convert tilemap-local pixels to map cell coordinates */
+    SDL_Point getCellAt(SDL_Point localPixel) const;
 
     /** Divide while rounding toward negative infinity for off-map pixels */
     static int divideFloor(int value, int divisor);

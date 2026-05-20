@@ -2,6 +2,7 @@
 
 #include "../../resources/types/image_texture.hpp"
 #include "../../runtime/game.hpp"
+#include "../../runtime/render/canvas.hpp"
 #include "object.hpp"
 
 #include <SDL.h>
@@ -24,7 +25,7 @@ class Image : public Engine::Nodes::Object {
         this->declareProperty("region", this->region);
     }
 
-    void render(SDL_Renderer &renderer) override {
+    void render(Engine::Render::Canvas &canvas) override {
         Engine::Game &game = this->getGame();
 
         if(this->textureResourceID == 0) {
@@ -42,22 +43,13 @@ class Image : public Engine::Nodes::Object {
         }
 
         const SDL_Rect destination{
-            this->position.x,
-            this->position.y,
+            0,
+            0,
             textureRegion.w,
             textureRegion.h,
         };
 
-        if(SDL_RenderCopy(
-               &renderer,
-               image.handle.get(),
-               &textureRegion,
-               &destination
-           ) != 0) {
-            throw std::runtime_error(
-                std::string("Failed to render image node: ") + SDL_GetError()
-            );
-        }
+        canvas.copy(image.handle.get(), &textureRegion, destination);
     }
 
   private:

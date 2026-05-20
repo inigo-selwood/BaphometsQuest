@@ -31,7 +31,7 @@ class Menu : public Engine::Nodes::Object {
 
     void input(const SDL_Event &event) override;
 
-    void render(SDL_Renderer &renderer) override;
+    void render(Engine::Render::Canvas &canvas) override;
 
   private:
     void rebuild();

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../../nodes/base.hpp"
+#include "../render/context.hpp"
 
 #include <memory>
+#include <optional>
 
 #include <SDL.h>
 
@@ -53,6 +55,20 @@ class Manager {
             this->walk(node->children[index], callback);
         }
     }
+
+    /** Find the active world camera before rendering */
+    void findActiveCamera(
+        const std::shared_ptr<Base> &node,
+        Engine::Render::Context context,
+        std::optional<SDL_Point> &cameraFocus
+    ) const;
+
+    /** Render the active tree with inherited canvas context */
+    void renderNode(
+        const std::shared_ptr<Base> &node,
+        Engine::Render::Context context,
+        SDL_Renderer &renderer
+    ) const;
 
     Game &game;
     std::shared_ptr<Base> root;

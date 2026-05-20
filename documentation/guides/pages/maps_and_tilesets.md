@@ -41,9 +41,9 @@ A tilemap owns resource IDs for its atlas texture, tileset, and map data. During
 rendering, it skips tiles outside the logical screen area and draws only tile
 IDs that exist in the tileset.
 
-`getTileAt(SDL_Point screenPixel)` converts a screen-space pixel into a map cell
-using the tilemap position and tileset tile size, then returns the matching tile
-definition.
+`getTileAt(SDL_Point localPixel)` converts a tilemap-local pixel into a map
+cell using the tileset tile size, then returns the matching tile definition.
+Screen input should be translated by the runtime context before tile lookup.
 
 Scene XML can create a tilemap with paths to the atlas texture, Tiled tileset,
 and Tiled map:

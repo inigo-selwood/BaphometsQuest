@@ -2,6 +2,7 @@
 
 #include "../../resources/types/image_texture.hpp"
 #include "../../runtime/game.hpp"
+#include "../../runtime/render/canvas.hpp"
 #include "../../utils/parse.hpp"
 
 #include <tinyxml2.h>
@@ -81,7 +82,7 @@ void Sprite::process(float deltaSeconds) {
     }
 }
 
-void Sprite::render(SDL_Renderer &renderer) {
+void Sprite::render(Engine::Render::Canvas &canvas) {
     Engine::Game &game = this->getGame();
 
     if(this->textureResourceID == 0 || this->animation.empty()) {
@@ -96,8 +97,8 @@ void Sprite::render(SDL_Renderer &renderer) {
 
     const SDL_Rect region = activeAnimation.frames[this->frameIndex].region;
     const SDL_Rect destination{
-        this->position.x,
-        this->position.y,
+        0,
+        0,
         region.w,
         region.h,
     };
@@ -106,12 +107,7 @@ void Sprite::render(SDL_Renderer &renderer) {
             this->textureResourceID
         );
 
-    if(SDL_RenderCopy(&renderer, image.handle.get(), &region, &destination)
-        != 0) {
-        throw std::runtime_error(
-            std::string("Failed to render sprite node: ") + SDL_GetError()
-        );
-    }
+    canvas.copy(image.handle.get(), &region, destination);
 }
 
 void Sprite::update(const std::string &path) {

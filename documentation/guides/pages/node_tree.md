@@ -34,7 +34,35 @@ class Example : public Engine::Nodes::Object {
 
 Native nodes that need a `position` property can inherit from
 `Engine::Nodes::Object`, which declares the property and stores the shared
-`SDL_Point` member.
+`SDL_Point` member. The position is local to the node's parent, not a manually
+managed world coordinate.
+
+Rendering
+---------
+
+Render hooks receive an `Engine::Render::Canvas`, not the raw SDL renderer.
+Nodes draw in local coordinates and let the runtime apply parent offsets,
+canvas-layer mode, and viewport origin.
+
+```cpp
+void Sprite::render(Engine::Render::Canvas &canvas) {
+    canvas.copy(
+        image.handle.get(),
+        &frame.region,
+        SDL_Rect{0, 0, frame.region.w, frame.region.h}
+    );
+}
+```
+
+`CanvasLayer` nodes define whether their subtree renders in screen space or
+world space. Screen space ignores the active camera, while world space subtracts
+the runtime viewport origin during canvas drawing.
+
+`Camera` nodes inherit from `Object`. The node manager uses the accumulated
+local positions of parent objects to find the active camera focus before
+rendering, then centres the viewport on that focus. Missing canvas layers fall
+back to screen space, and world layers without an active camera render with the
+viewport origin at `[0, 0]`.
 
 Hooks
 -----

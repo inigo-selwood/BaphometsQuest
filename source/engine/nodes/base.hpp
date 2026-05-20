@@ -25,6 +25,11 @@ namespace Engine {
 
 class Game;
 
+namespace Render {
+class Canvas;
+struct Context;
+} // namespace Render
+
 namespace Nodes {
 
 class Manager;
@@ -155,7 +160,10 @@ class Base : public std::enable_shared_from_this<Base> {
     virtual void exit();
     virtual void input(const SDL_Event &event);
     virtual void process(float deltaSeconds);
-    virtual void render(SDL_Renderer &renderer);
+    virtual void render(Engine::Render::Canvas &canvas);
+
+    /** Apply this node's transform to the inherited render context */
+    virtual void applyRenderContext(Engine::Render::Context &context) const;
 
     /** Return true when this node consumed its own XML child elements */
     virtual bool loadXmlChildren(const tinyxml2::XMLElement &element);

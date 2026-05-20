@@ -1,8 +1,11 @@
 #include "node.hpp"
 
 #include "../game.hpp"
+#include "../render/canvas.hpp"
+#include "../../nodes/native/camera.hpp"
 
 #include <memory>
+#include <optional>
 #include <stdexcept>
 
 namespace Engine::Nodes {
@@ -62,11 +65,83 @@ void Manager::process(float deltaSeconds) {
 }
 
 void Manager::render(SDL_Renderer &renderer) {
-    this->walk(this->root, [&renderer](Base &node) {
-        if(node.hasHook(Hook::Render)) {
-            node.render(renderer);
+    Engine::Render::Context context;
+    context.screenBounds = this->game.getScreenSize();
+
+    // Missing canvas layers intentionally use the screen-space context default
+    // Missing cameras intentionally leave world layers at origin viewport
+    std::optional<SDL_Point> activeCameraFocus;
+    this->findActiveCamera(this->root, context, activeCameraFocus);
+
+    if(activeCameraFocus.has_value()) {
+        context.viewportOrigin = Engine::Render::Context::centreViewportOn(
+            *activeCameraFocus,
+            context.screenBounds
+        );
+    }
+
+    this->renderNode(this->root, context, renderer);
+}
+
+void Manager::findActiveCamera(
+    const std::shared_ptr<Base> &node,
+    Engine::Render::Context context,
+    std::optional<SDL_Point> &cameraFocus
+) const {
+    if(node == nullptr) {
+        return;
+    }
+
+    if(!node->visible) {
+        return;
+    }
+
+    node->applyRenderContext(context);
+
+    const std::shared_ptr<Camera> camera =
+        std::dynamic_pointer_cast<Camera>(node);
+
+    if(camera != nullptr && camera->isActive()
+        && context.mode == Engine::Render::CanvasMode::World) {
+        if(cameraFocus.has_value()) {
+            throw std::runtime_error("Multiple active world cameras found");
         }
-    });
+
+        cameraFocus = context.origin;
+    }
+
+    for(std::size_t index = 0; index < node->children.size(); index++) {
+        this->findActiveCamera(
+            node->children[index],
+            context,
+            cameraFocus
+        );
+    }
+}
+
+void Manager::renderNode(
+    const std::shared_ptr<Base> &node,
+    Engine::Render::Context context,
+    SDL_Renderer &renderer
+) const {
+    if(node == nullptr) {
+        return;
+    }
+
+    if(!node->visible) {
+        return;
+    }
+
+    node->applyRenderContext(context);
+
+    if(node->hasHook(Hook::Render)) {
+        Engine::Render::Canvas canvas{renderer, context};
+        node->render(canvas);
+    }
+
+    for(std::size_t index = 0; index < node->children.size(); index++) {
+        this->renderNode(node->children[index], context, renderer);
+    }
 }
 
 } // namespace Engine::Nodes

@@ -3,6 +3,7 @@
 #include "../../resources/types/font.hpp"
 #include "../../resources/types/text_texture.hpp"
 #include "../../runtime/game.hpp"
+#include "../../runtime/render/canvas.hpp"
 #include "object.hpp"
 
 #include <SDL.h>
@@ -51,7 +52,7 @@ class Label : public Engine::Nodes::Object {
         this->declareProperty("justification", this->justification);
     }
 
-    void render(SDL_Renderer &renderer) override {
+    void render(Engine::Render::Canvas &canvas) override {
         Engine::Game &game = this->getGame();
 
         if(this->textResourceID == 0) {
@@ -64,33 +65,24 @@ class Label : public Engine::Nodes::Object {
             );
         SDL_Rect destination{
             0,
-            this->position.y,
+            0,
             texture.size.w,
             texture.size.h,
         };
 
         switch(this->justification) {
         case Justification::Left:
-            destination.x = this->position.x;
+            destination.x = 0;
             break;
         case Justification::Centre:
-            destination.x = this->position.x - (texture.size.w / 2);
+            destination.x = -(texture.size.w / 2);
             break;
         case Justification::Right:
-            destination.x = this->position.x - texture.size.w;
+            destination.x = -texture.size.w;
             break;
         }
 
-        if(SDL_RenderCopy(
-               &renderer,
-               texture.handle.get(),
-               nullptr,
-               &destination
-           ) != 0) {
-            throw std::runtime_error(
-                std::string("Failed to render label node: ") + SDL_GetError()
-            );
-        }
+        canvas.copy(texture.handle.get(), nullptr, destination);
     }
 
   private:

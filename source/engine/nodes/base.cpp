@@ -139,7 +139,9 @@ void Base::input(const SDL_Event &) {}
 
 void Base::process(float) {}
 
-void Base::render(SDL_Renderer &) {}
+void Base::render(Engine::Render::Canvas &) {}
+
+void Base::applyRenderContext(Engine::Render::Context &) const {}
 
 bool Base::loadXmlChildren(const tinyxml2::XMLElement &) {
     return false;
