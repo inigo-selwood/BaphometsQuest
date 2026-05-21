@@ -1,11 +1,9 @@
 #pragma once
 
 #include "../../../engine/nodes/native/image.hpp"
-#include "../../../engine/nodes/native/map.hpp"
+#include "world.hpp"
 
 #include <SDL.h>
-
-#include <memory>
 
 namespace Scenes::Play::Components {
 
@@ -13,57 +11,86 @@ namespace Scenes::Play::Components {
 class Player : public Engine::Nodes::Image {
   public:
     Player() {
-        this->declareHook(Engine::Nodes::Hook::Input);
+        this->declareHook(Engine::Nodes::Hook::Process);
+        this->declareProperty("speed", this->speed);
         this->declareProperty("step", this->step);
     }
 
-    void input(const SDL_Event &event) override {
-        if(event.type != SDL_KEYDOWN) {
+    void process(float deltaSeconds) override {
+        const Uint8 *keys = SDL_GetKeyboardState(nullptr);
+        const SDL_Point movement = this->getMovement(keys);
+
+        if(movement.x == 0 && movement.y == 0) {
+            this->elapsedMovementTime = 0.0F;
+            this->lastMovement = movement;
             return;
         }
 
-        SDL_Point movement{0, 0};
+        const float interval = this->getMovementInterval();
 
-        switch(event.key.keysym.sym) {
-        case SDLK_UP:
-            movement.y = -this->step;
-            break;
-        case SDLK_DOWN:
-            movement.y = this->step;
-            break;
-        case SDLK_LEFT:
-            movement.x = -this->step;
-            break;
-        case SDLK_RIGHT:
-            movement.x = this->step;
-            break;
-        default:
+        if(interval <= 0.0F) {
             return;
         }
 
-        const std::shared_ptr<Engine::Nodes::Map> map =
-            this->getTreeNode<Engine::Nodes::Map>();
-        const SDL_Point mapPosition = map->getProperty<SDL_Point>("position");
-        const SDL_Point target{
-            this->position.x + movement.x,
-            this->position.y + movement.y,
-        };
+        if(movement.x != this->lastMovement.x
+            || movement.y != this->lastMovement.y) {
+            this->elapsedMovementTime = interval;
+            this->lastMovement = movement;
+        }
 
-        if(map->canMove(
-               SDL_Point{
-                   this->position.x - mapPosition.x,
-                   this->position.y - mapPosition.y,
-               },
-               SDL_Point{
-                   target.x - mapPosition.x,
-                   target.y - mapPosition.y,
-               }
-           )) {
+        this->elapsedMovementTime += deltaSeconds;
+
+        while(this->elapsedMovementTime >= interval) {
+            this->elapsedMovementTime -= interval;
+
+            const SDL_Point target{
+                this->position.x + movement.x,
+                this->position.y + movement.y,
+            };
+
+            if(!this->getAncestor<World>()->canMove(this->position, target)) {
+                return;
+            }
+
             this->position = target;
         }
     }
 
   private:
+    /** Return a cardinal grid movement from the currently held keys */
+    SDL_Point getMovement(const Uint8 *keys) const {
+        if(keys[SDL_SCANCODE_UP] && !keys[SDL_SCANCODE_DOWN]) {
+            return SDL_Point{0, -this->step};
+        }
+
+        if(keys[SDL_SCANCODE_DOWN] && !keys[SDL_SCANCODE_UP]) {
+            return SDL_Point{0, this->step};
+        }
+
+        if(keys[SDL_SCANCODE_LEFT] && !keys[SDL_SCANCODE_RIGHT]) {
+            return SDL_Point{-this->step, 0};
+        }
+
+        if(keys[SDL_SCANCODE_RIGHT] && !keys[SDL_SCANCODE_LEFT]) {
+            return SDL_Point{this->step, 0};
+        }
+
+        return SDL_Point{0, 0};
+    }
+
+    /** Return seconds between grid steps at the configured speed */
+    float getMovementInterval() const {
+        if(this->step <= 0 || this->speed <= 0) {
+            return 0.0F;
+        }
+
+        return static_cast<float>(this->step)
+            / static_cast<float>(this->speed);
+    }
+
+    float elapsedMovementTime = 0.0F;
+    SDL_Point lastMovement{0, 0};
+    int speed = 48;
     int step = 8;
 };
 

@@ -1,28 +1,31 @@
 <scene>
   <canvas-layer mode="world">
-    <map
-      name="world"
-      texture="resources/textures/tileset.png"
-      tileset="resources/maps/tileset.tsx"
-    >
-      <chunk
-        data="resources/maps/chunks/overworld.tmx"
-        position="[16, 16]"
-      />
-    </map>
+    <world name="world">
+      <map
+        name="map"
+        texture="resources/textures/tileset.png"
+        tileset="resources/maps/tileset.tsx"
+      >
+        <chunk
+          data="resources/maps/chunks/overworld.tmx"
+          position="[16, 16]"
+        />
+      </map>
 
-    <player
-      name="player"
-      path="resources/textures/tileset.png"
-      position="[80, 72]"
-      region="[96, 88, 8, 8]"
-      step="8"
-    >
-      <camera
-        name="camera"
-        position="[4, 4]"
-      />
-    </player>
+      <player
+        name="player"
+        path="resources/textures/tileset.png"
+        position="[80, 72]"
+        region="[96, 88, 8, 8]"
+        speed="48"
+        step="8"
+      >
+        <camera
+          name="camera"
+          position="[4, 4]"
+        />
+      </player>
+    </world>
   </canvas-layer>
 
   <canvas-layer mode="screen">
