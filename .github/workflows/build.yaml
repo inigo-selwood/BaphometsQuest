@@ -1,7 +1,12 @@
 name: Build
 
 on:
+  # Manual runs always perform a full build, even if the scheduled cache says
+  # nothing changed
   workflow_dispatch:
+
+  # Scheduled builds are intentionally weekly rather than push-triggered so we
+  # keep confidence in platform builds without spending minutes on every commit
   schedule:
     - cron: '0 6 * * 1'
 
@@ -13,6 +18,8 @@ jobs:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.runner }}
 
+    # Each platform uses its native runner so package discovery, icons, bundles,
+    # and platform-specific CMake branches are tested where they actually run
     strategy:
       fail-fast: false
       matrix:
@@ -28,11 +35,45 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      # GitHub still starts scheduled workflows even when nothing changed. This
+      # cache key gives us a cheap early exit per platform after checkout
+      - name: Check scheduled build cache
+        id: build-cache
+        if: github.event_name == 'schedule'
+        uses: actions/cache/restore@v4
+        with:
+          path: .github/build-cache/${{ runner.os }}
+
+          # Only files that can affect compilation, packaging, or bundled
+          # runtime data should be included here. Docs and unrelated project
+          # notes should not wake the expensive build path
+          key: >-
+            platform-build-${{ runner.os }}-${{ hashFiles(
+              '.github/workflows/build.yaml',
+              'CMakeLists.txt',
+              'Taskfile.yaml',
+              'configuration/cmake/**',
+              'configuration/distribution/**',
+              'configuration/task/build.yaml',
+              'resources/**',
+              'source/**'
+            ) }}
+
+      # go-task keeps CI aligned with local commands. Scheduled cache hits skip
+      # this and all following build setup to avoid burning platform minutes
       - name: Set up Task
+        if: >-
+          github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true'
         uses: arduino/setup-task@v2
 
+      # Linux uses distro packages so the build resembles a normal developer or
+      # CI machine rather than a bespoke vendored dependency layout
       - name: Install Linux dependencies
-        if: runner.os == 'Linux'
+        if: >-
+          runner.os == 'Linux' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
         run: |
           sudo apt-get update
           sudo apt-get install --yes \
@@ -51,8 +92,13 @@ jobs:
             ninja-build \
             pkg-config
 
+      # macOS packages exercise the same toolchain family as local development,
+      # including sips-generated app icons and .app bundle layout
       - name: Install macOS dependencies
-        if: runner.os == 'macOS'
+        if: >-
+          runner.os == 'macOS' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
         run: |
           brew update
           brew install \
@@ -68,8 +114,13 @@ jobs:
             tinyxml2 \
             yaml-cpp
 
+      # Windows uses MSYS2/UCRT64 so CMake can find MinGW packages consistently
+      # and compile the generated resource script for the executable icon
       - name: Set up MSYS2
-        if: runner.os == 'Windows'
+        if: >-
+          runner.os == 'Windows' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
         uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
@@ -89,11 +140,51 @@ jobs:
             mingw-w64-ucrt-x86_64-tinyxml2
             mingw-w64-ucrt-x86_64-yaml-cpp
 
+      # Non-Windows runners can call the same task from their default shell
       - name: Build
-        if: runner.os != 'Windows'
+        if: >-
+          runner.os != 'Windows' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
         run: task build
 
+      # Windows keeps the build inside the MSYS2 shell so packages, cmake, ninja,
+      # and ImageMagick all resolve from the same environment
       - name: Build Windows
-        if: runner.os == 'Windows'
+        if: >-
+          runner.os == 'Windows' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
         shell: msys2 {0}
         run: task build
+
+      # The marker file is intentionally tiny. The cache key carries the real
+      # state; the file only gives actions/cache something concrete to store
+      - name: Mark scheduled build complete
+        if: >-
+          github.event_name == 'schedule' &&
+          steps.build-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ".github/build-cache/${{ runner.os }}"
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > ".github/build-cache/${{ runner.os }}/built-at.txt"
+
+      # Only successful scheduled builds reach this step, so a failing build
+      # never records a false "already checked" cache entry
+      - name: Save scheduled build cache
+        if: >-
+          github.event_name == 'schedule' &&
+          steps.build-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .github/build-cache/${{ runner.os }}
+          key: >-
+            platform-build-${{ runner.os }}-${{ hashFiles(
+              '.github/workflows/build.yaml',
+              'CMakeLists.txt',
+              'Taskfile.yaml',
+              'configuration/cmake/**',
+              'configuration/distribution/**',
+              'configuration/task/build.yaml',
+              'resources/**',
+              'source/**'
+            ) }}
