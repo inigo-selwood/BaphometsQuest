@@ -1,0 +1,99 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            runner: ubuntu-latest
+          - name: macOS
+            runner: macos-latest
+          - name: Windows
+            runner: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Task
+        uses: arduino/setup-task@v2
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            build-essential \
+            cmake \
+            imagemagick \
+            libcli11-dev \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            libspdlog-dev \
+            libtinyxml2-dev \
+            libx11-dev \
+            libyaml-cpp-dev \
+            ninja-build \
+            pkg-config
+
+      - name: Install macOS dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install \
+            cli11 \
+            cmake \
+            imagemagick \
+            ninja \
+            sdl2 \
+            sdl2_image \
+            sdl2_mixer \
+            sdl2_ttf \
+            spdlog \
+            tinyxml2 \
+            yaml-cpp
+
+      - name: Set up MSYS2
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          path-type: inherit
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-cli11
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-imagemagick
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-SDL2
+            mingw-w64-ucrt-x86_64-SDL2_image
+            mingw-w64-ucrt-x86_64-SDL2_mixer
+            mingw-w64-ucrt-x86_64-SDL2_ttf
+            mingw-w64-ucrt-x86_64-spdlog
+            mingw-w64-ucrt-x86_64-tinyxml2
+            mingw-w64-ucrt-x86_64-yaml-cpp
+
+      - name: Build
+        if: runner.os != 'Windows'
+        run: task build
+
+      - name: Build Windows
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
+        run: task build

@@ -7,7 +7,6 @@ tasks:
       - >-
         cmake -S . -B build/debug
         -G Ninja
-        -DCMAKE_MAKE_PROGRAM=/opt/homebrew/bin/ninja
       - cmake --build build/debug --parallel
 
   release:
@@ -16,7 +15,6 @@ tasks:
       - >-
         cmake -S . -B build/release
         -G Ninja
-        -DCMAKE_MAKE_PROGRAM=/opt/homebrew/bin/ninja
         -DCMAKE_BUILD_TYPE=Release
         -DBAPHOMETS_QUEST_RELEASE_OPTIMISATION=ON
       - >-

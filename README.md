@@ -1,5 +1,7 @@
 # Baphomet's Quest
 
+[![Build](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml/badge.svg)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml)
+
 Install the project tools and native libraries using the
 [installation guide](wiki/installation.md).
 
