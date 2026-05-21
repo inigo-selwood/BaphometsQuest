@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Baphomet's Quest
+Exec=AppRun
+Icon=baphomets_quest
+Categories=Game;
+Terminal=false
