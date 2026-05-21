@@ -4,6 +4,7 @@
 #include "../utils/format.hpp"
 #include "resize/handler.hpp"
 
+#include <filesystem>
 #include <stdexcept>
 #include <string>
 
@@ -31,6 +32,17 @@ void Game::start(
     const std::string &consoleLogLevel
 ) {
     Logger::start(executablePath, consoleLogLevel);
+
+    const std::filesystem::path executableDirectory =
+        std::filesystem::weakly_canonical(
+            std::filesystem::absolute(executablePath)
+        )
+            .parent_path();
+
+    // Bundled app launches use resources beside the executable
+    if(std::filesystem::exists(executableDirectory / "resources")) {
+        std::filesystem::current_path(executableDirectory);
+    }
 
     const Engine::Resource::ID settingsId =
         this->resources.load<Engine::Resource::YAML>(SETTINGS_PATH);
