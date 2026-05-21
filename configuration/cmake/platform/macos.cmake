@@ -4,6 +4,8 @@ function(configure_macos_distribution
     appBundleCommandsOutput
     appBundleDependenciesOutput
 )
+    # macOS Finder/Dock icons live on application bundles
+    # Keeps executable and bundle names shell-friendly; Info.plist shows the name
     set(appBundleName BaphometsQuest.app)
     set(appBundleDirectory
         $<TARGET_FILE_DIR:${targetName}>/${appBundleName}
@@ -18,6 +20,8 @@ function(configure_macos_distribution
         ${CMAKE_BINARY_DIR}/generated/Info.plist
     )
 
+    # Info.plist.in is committed source with build-time placeholders
+    # configure_file writes the generated bundle metadata
     set(BAPHOMETS_QUEST_BUNDLE_EXECUTABLE ${targetName})
     set(BAPHOMETS_QUEST_BUNDLE_ICON baphomets_quest.icns)
     set(BAPHOMETS_QUEST_BUNDLE_IDENTIFIER
@@ -30,6 +34,8 @@ function(configure_macos_distribution
         @ONLY
     )
 
+    # The app bundle needs an .icns file
+    # Generates it from the same favicon PNG used by SDL at runtime
     add_custom_command(
         OUTPUT ${appIconFile}
         COMMAND /usr/bin/sips -s format icns ${appIconSource} --out
@@ -38,6 +44,8 @@ function(configure_macos_distribution
         COMMENT "Generating macOS app icon"
     )
 
+    # Resources live beside the executable in Contents/MacOS
+    # Game::start switches there so relative resource paths work from Finder
     list(APPEND appBundleDependencies ${appIconFile} ${appInfoPlist})
     list(APPEND appBundleCommands
         COMMAND ${CMAKE_COMMAND} -E rm -rf ${appBundleDirectory}
@@ -59,6 +67,8 @@ function(configure_macos_distribution
             ${appBundleDirectory}/Contents/MacOS/resources
     )
 
+    # Scene XML mirrors the source/scenes shape inside Contents/MacOS
+    # SceneLoader paths stay identical between local and bundled runs
     foreach(sceneResourceFile ${${sceneResourceFilesVariable}})
         file(RELATIVE_PATH
             sceneResourcePath

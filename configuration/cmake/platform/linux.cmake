@@ -4,6 +4,8 @@ function(configure_linux_distribution
     appBundleCommandsOutput
     appBundleDependenciesOutput
 )
+    # AppDir is the portable Linux application shape
+    # Runs directly now; can feed AppImage tooling later
     set(linuxAppDirectory
         $<TARGET_FILE_DIR:${targetName}>/BaphometsQuest.AppDir
     )
@@ -14,6 +16,8 @@ function(configure_linux_distribution
         ${CMAKE_BINARY_DIR}/generated/baphomets_quest.desktop
     )
 
+    # AppRun is the portable launch shim
+    # Starts the real executable from usr/bin; resources stay beside the binary
     set(BAPHOMETS_QUEST_LINUX_EXECUTABLE ${targetName})
     configure_file(
         ${CMAKE_SOURCE_DIR}/configuration/distribution/linux/AppRun.in
@@ -25,6 +29,8 @@ function(configure_linux_distribution
         ${linuxDesktopFile}
         @ONLY
     )
+    # AppRun must be executable inside the AppDir
+    # CMake writes configured files with regular permissions by default
     file(CHMOD ${linuxAppRun}
         PERMISSIONS
             OWNER_READ OWNER_WRITE OWNER_EXECUTE
@@ -32,6 +38,8 @@ function(configure_linux_distribution
             WORLD_READ WORLD_EXECUTE
     )
 
+    # AppDir keeps top-level and freedesktop launcher metadata
+    # Runs directly and stays friendly to tools expecting usr/share layout
     list(APPEND appBundleDependencies ${linuxAppRun} ${linuxDesktopFile})
     list(APPEND appBundleCommands
         COMMAND ${CMAKE_COMMAND} -E rm -rf ${linuxAppDirectory}
@@ -64,6 +72,8 @@ function(configure_linux_distribution
             ${linuxAppDirectory}/usr/bin/resources
     )
 
+    # Scene XML mirrors source/scenes under usr/bin
+    # Runtime paths stay identical between local and AppDir runs
     foreach(sceneResourceFile ${${sceneResourceFilesVariable}})
         file(RELATIVE_PATH
             sceneResourcePath
