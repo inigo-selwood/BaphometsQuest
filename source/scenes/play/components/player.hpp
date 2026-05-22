@@ -99,7 +99,7 @@ class Player : public Engine::Nodes::Image {
     }
 
     float elapsedMovementTime = 1.0F;
-    int speed = 48;
+    int speed = 56;
     int step = 8;
 };
 
