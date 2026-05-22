@@ -1,19 +1,12 @@
 <scene>
-  <music
-    autoplay="false"
-    loop="true"
-    name="background-music"
-    path="resources/music/Koyaanisqatsi.wav"
-  />
-
   <label
     colour="#ffffffff"
     font="resources/fonts/Early GameBoy.ttf"
     justification="centre"
     name="title"
-    position="[80, 24]"
+    position="[80, 48]"
     size="8"
-    text="baphomet's quest"
+    text="are you sure?"
   />
 
   <menu
@@ -23,8 +16,8 @@
     cursor-region="[104, 16, 8, 8]"
     font="resources/fonts/Early GameBoy.ttf"
     line-height="12"
-    name="main-menu"
-    position="[64, 64]"
+    name="new-game-menu"
+    position="[64, 76]"
     size="8"
   >
     <option
@@ -33,13 +26,8 @@
     />
 
     <option
-      tag="new-game"
-      text="New Game"
-    />
-
-    <option
-      tag="quit"
-      text="Quit"
+      tag="back"
+      text="Back"
     />
   </menu>
 </scene>

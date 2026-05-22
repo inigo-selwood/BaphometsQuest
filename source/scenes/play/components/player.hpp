@@ -11,9 +11,22 @@ namespace Scenes::Play::Components {
 class Player : public Engine::Nodes::Image {
   public:
     Player() {
+        this->declareHook(Engine::Nodes::Hook::Enter);
+        this->declareHook(Engine::Nodes::Hook::Exit);
         this->declareHook(Engine::Nodes::Hook::Process);
         this->declareProperty("speed", this->speed);
         this->declareProperty("step", this->step);
+    }
+
+    void enter() override {
+        this->position = this->getGame().state.ensure(
+            "player-position",
+            SDL_Point{80, 72}
+        );
+    }
+
+    void exit() override {
+        this->getGame().state.set("player-position", this->position);
     }
 
     void process(float deltaSeconds) override {

@@ -24,12 +24,18 @@ class Scene : public Engine::Nodes::Base {
 
         const auto menu = this->getChild<Engine::Nodes::Menu>("main-menu");
 
+        if(!this->getGame().state.has("player-position")) {
+            menu->removeOption("continue");
+        }
+
         this->getGame().signals.connect<std::string>(
             menu,
             "selected",
             [this](const std::string &tag) {
-                if(tag == "play") {
+                if(tag == "continue") {
                     this->getGame().queueScene("play");
+                } else if(tag == "new-game") {
+                    this->getGame().queueScene("new-game");
                 } else if(tag == "quit") {
                     this->getGame().queueQuit();
                 }
