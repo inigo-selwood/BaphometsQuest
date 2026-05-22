@@ -8,6 +8,7 @@
 
 #include <tinyxml2.h>
 
+#include <algorithm>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -84,6 +85,26 @@ bool Menu::loadXmlChildren(const tinyxml2::XMLElement &element) {
     this->rebuild();
 
     return true;
+}
+
+void Menu::removeOption(const std::string &tag) {
+    const auto option = std::remove_if(
+        this->options.begin(),
+        this->options.end(),
+        [&tag](const Option &option) { return option.tag == tag; }
+    );
+
+    if(option == this->options.end()) {
+        return;
+    }
+
+    this->options.erase(option, this->options.end());
+
+    if(this->selectedOption >= this->options.size()) {
+        this->selectedOption = 0;
+    }
+
+    this->rebuild();
 }
 
 void Menu::input(const SDL_Event &event) {

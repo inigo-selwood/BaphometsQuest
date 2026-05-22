@@ -29,6 +29,9 @@ class Menu : public Engine::Nodes::Object {
 
     bool loadXmlChildren(const tinyxml2::XMLElement &element) override;
 
+    /** Remove a selectable option by tag */
+    void removeOption(const std::string &tag);
+
     void input(const SDL_Event &event) override;
 
     void render(Engine::Render::Canvas &canvas) override;
