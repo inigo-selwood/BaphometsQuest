@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <optional>
+#include <vector>
 
 #include <SDL.h>
 
@@ -38,7 +39,7 @@ class Manager {
     void render(SDL_Renderer &renderer);
 
   private:
-    /** Depth-first walk used by all hook dispatch methods */
+    /** Depth-first walk used by hook dispatch methods */
     template <typename Callback>
     void walk(const std::shared_ptr<Base> &node, Callback &&callback) {
         if(node == nullptr) {
@@ -55,6 +56,12 @@ class Manager {
             this->walk(node->children[index], callback);
         }
     }
+
+    /** Snapshot active input nodes before dispatching an event */
+    void collectInputNodes(
+        const std::shared_ptr<Base> &node,
+        std::vector<std::shared_ptr<Base>> &nodes
+    ) const;
 
     /** Find the active world camera before rendering */
     void findActiveCamera(

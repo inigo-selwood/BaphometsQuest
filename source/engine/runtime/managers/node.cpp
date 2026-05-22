@@ -49,11 +49,12 @@ void Manager::exit() {
 }
 
 void Manager::input(const SDL_Event &event) {
-    this->walk(this->root, [&event](Base &node) {
-        if(node.hasHook(Hook::Input)) {
-            node.input(event);
-        }
-    });
+    std::vector<std::shared_ptr<Base>> inputNodes;
+    this->collectInputNodes(this->root, inputNodes);
+
+    for(const std::shared_ptr<Base> &node : inputNodes) {
+        node->input(event);
+    }
 }
 
 void Manager::process(float deltaSeconds) {
@@ -81,6 +82,27 @@ void Manager::render(SDL_Renderer &renderer) {
     }
 
     this->renderNode(this->root, context, renderer);
+}
+
+void Manager::collectInputNodes(
+    const std::shared_ptr<Base> &node,
+    std::vector<std::shared_ptr<Base>> &nodes
+) const {
+    if(node == nullptr) {
+        return;
+    }
+
+    if(!node->active) {
+        return;
+    }
+
+    if(node->hasHook(Hook::Input)) {
+        nodes.push_back(node);
+    }
+
+    for(std::size_t index = 0; index < node->children.size(); index++) {
+        this->collectInputNodes(node->children[index], nodes);
+    }
 }
 
 void Manager::findActiveCamera(

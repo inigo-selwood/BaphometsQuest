@@ -60,15 +60,8 @@ class Scene : public Engine::Nodes::Base {
         const std::shared_ptr<Engine::Nodes::Menu> &menu,
         const std::shared_ptr<Engine::Nodes::Base> &confirmation
     ) {
-        Engine::Game &game = this->getGame();
-
-        if(game.state.has("player-position")) {
-            menu->setProperty("active", false);
-            confirmation->setProperty("active", true);
-            return;
-        }
-
-        this->startNewGame();
+        menu->setProperty("active", false);
+        confirmation->setProperty("active", true);
     }
 
     void startNewGame() {
