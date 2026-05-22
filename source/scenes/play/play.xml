@@ -70,7 +70,13 @@
 
     <textbox
       awaiting-input="true"
+      colour="#20283dff"
+      cursor-path="resources/textures/tileset.png"
+      cursor-region="[96, 16, 8, 8]"
+      font="resources/fonts/04B_03.TTF"
+      font-size="8"
       name="textbox"
+      size="[0, 0, 160, 40]"
       text="I should find the temple before night falls."
     />
   </canvas-layer>

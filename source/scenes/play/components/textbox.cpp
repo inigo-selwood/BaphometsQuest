@@ -8,6 +8,7 @@
 
 #include <SDL_ttf.h>
 
+#include <algorithm>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -17,26 +18,12 @@ namespace Scenes::Play::Components {
 
 namespace {
 
-constexpr SDL_Color BACKGROUND_COLOUR{32, 40, 61, 255};
 constexpr SDL_Color TEXT_COLOUR{255, 255, 255, 255};
-constexpr SDL_Rect BOX_SIZE{0, 0, 144, 40};
-constexpr SDL_Rect CURSOR_REGION{8, 8, 8, 8};
-constexpr SDL_Rect CURSOR_DESTINATION{
-    BOX_SIZE.w - CURSOR_REGION.w,
-    BOX_SIZE.h - CURSOR_REGION.h,
-    CURSOR_REGION.w,
-    CURSOR_REGION.h,
-};
 constexpr SDL_Point TEXT_ORIGIN{2, 2};
-constexpr int FONT_SIZE = 8;
 constexpr int LINE_HEIGHT = 8;
 constexpr int MAX_LINES = 4;
 constexpr int TEXT_CURSOR_GAP = 2;
-constexpr int TEXT_WIDTH =
-    BOX_SIZE.w - TEXT_ORIGIN.x - CURSOR_DESTINATION.w - TEXT_CURSOR_GAP;
 constexpr float CARET_OSCILLATION_INTERVAL = 0.5F;
-const std::string CURSOR_PATH = "resources/textures/tileset.png";
-const std::string FONT_PATH = "resources/fonts/04B_03.TTF";
 
 } // namespace
 
@@ -52,10 +39,41 @@ Textbox::Textbox() {
         }
     );
     this->declareProperty("awaiting-input", this->awaitingInput);
-    this->position = SDL_Point{8, 112};
+    this->declareProperty("colour", this->colour);
+    this->declareProperty(
+        "size",
+        this->size,
+        [this](const SDL_Rect &value) {
+            this->size = value;
+            this->rebuild();
+        }
+    );
+    this->declareProperty(
+        "font",
+        this->font,
+        [this](const std::string &value) {
+            this->font = value;
+            this->rebuild();
+        }
+    );
+    this->declareProperty("font-size", this->fontSize, [this](int value) {
+        this->fontSize = value;
+        this->rebuild();
+    });
+    this->declareProperty(
+        "cursor-path",
+        this->cursorPath,
+        [this](const std::string &value) {
+            this->cursorPath = value;
+            this->rebuildCursor();
+        }
+    );
+    this->declareProperty("cursor-region", this->cursorRegion);
 }
 
 void Textbox::setup() {
+    const SDL_Rect screen = this->getGame().getScreenSize();
+    this->position = SDL_Point{0, screen.h - this->size.h};
     this->rebuildCursor();
 }
 
@@ -78,8 +96,8 @@ void Textbox::render(Engine::Render::Canvas &canvas) {
     Engine::Game &game = this->getGame();
 
     canvas.setBlendMode(SDL_BLENDMODE_BLEND);
-    canvas.setDrawColour(BACKGROUND_COLOUR);
-    canvas.fillRect(BOX_SIZE);
+    canvas.setDrawColour(this->colour);
+    canvas.fillRect(this->size);
 
     for(std::size_t index = 0; index < this->lines.size(); index++) {
         const Line &line = this->lines[index];
@@ -111,16 +129,21 @@ void Textbox::render(Engine::Render::Canvas &canvas) {
             this->cursorResourceID
         );
 
-    SDL_Rect destination = CURSOR_DESTINATION;
+    SDL_Rect destination = this->getCursorDestination();
     destination.y += this->caretShift;
 
-    canvas.copy(cursor.handle.get(), &CURSOR_REGION, destination);
+    canvas.copy(cursor.handle.get(), &this->cursorRegion, destination);
 }
 
 void Textbox::rebuild() {
     this->lines.clear();
 
     if(this->text.empty()) {
+        this->fontResourceID = 0;
+        return;
+    }
+
+    if(this->font.empty() || this->fontSize <= 0) {
         this->fontResourceID = 0;
         return;
     }
@@ -134,14 +157,14 @@ void Textbox::rebuild() {
     }
 
     this->fontResourceID = game.resources.load<Engine::Resource::Font>(
-        FONT_PATH,
-        FONT_SIZE
+        this->font,
+        this->fontSize
     );
 
     const Engine::Resource::Font &fontResource =
         game.resources.get<Engine::Resource::Font>(this->fontResourceID);
     const std::vector<std::string> wrappedLines =
-        this->wrapText(fontResource, TEXT_WIDTH);
+        this->wrapText(fontResource, this->getTextWidth());
     const std::size_t visibleLines = std::min(
         wrappedLines.size(),
         static_cast<std::size_t>(MAX_LINES)
@@ -163,6 +186,11 @@ void Textbox::rebuild() {
 void Textbox::rebuildCursor() {
     Engine::Game &game = this->getGame();
 
+    if(this->cursorPath.empty()) {
+        this->cursorResourceID = 0;
+        return;
+    }
+
     if(game.renderer == nullptr) {
         throw std::runtime_error(
             "Textbox requires a renderer before rebuilding cursor"
@@ -172,8 +200,24 @@ void Textbox::rebuildCursor() {
     this->cursorResourceID =
         game.resources.load<Engine::Resource::ImageTexture>(
             game.renderer.get(),
-            CURSOR_PATH
+            this->cursorPath
         );
+}
+
+SDL_Rect Textbox::getCursorDestination() const {
+    return SDL_Rect{
+        this->size.w - this->cursorRegion.w - 2,
+        this->size.h - this->cursorRegion.h - 2,
+        this->cursorRegion.w,
+        this->cursorRegion.h,
+    };
+}
+
+int Textbox::getTextWidth() const {
+    return std::max(
+        0,
+        this->size.w - TEXT_ORIGIN.x - this->cursorRegion.w - TEXT_CURSOR_GAP
+    );
 }
 
 std::vector<std::string>

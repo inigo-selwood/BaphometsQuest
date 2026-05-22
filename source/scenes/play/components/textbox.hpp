@@ -35,6 +35,10 @@ class Textbox : public Engine::Nodes::Object {
 
     void rebuildCursor();
 
+    SDL_Rect getCursorDestination() const;
+
+    int getTextWidth() const;
+
     std::vector<std::string>
     wrapText(const Engine::Resource::Font &font, int width) const;
 
@@ -52,6 +56,12 @@ class Textbox : public Engine::Nodes::Object {
 
     std::string text;
     bool awaitingInput = false;
+    SDL_Color colour{32, 40, 61, 255};
+    SDL_Rect size{0, 0, 144, 40};
+    std::string font = "resources/fonts/04B_03.TTF";
+    int fontSize = 8;
+    std::string cursorPath = "resources/textures/tileset.png";
+    SDL_Rect cursorRegion{8, 8, 8, 8};
     Engine::Resource::ID fontResourceID = 0;
     Engine::Resource::ID cursorResourceID = 0;
     std::vector<Line> lines;
