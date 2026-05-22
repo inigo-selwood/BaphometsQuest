@@ -101,6 +101,11 @@ class Store {
         return this->values.contains(name);
     }
 
+    /** Return true when no state keys exist */
+    bool empty() const {
+        return this->values.empty();
+    }
+
     /** Remove a state key */
     void erase(const std::string &name) {
         this->values.erase(name);
@@ -119,6 +124,11 @@ class Store {
             throw std::runtime_error(
                 "Failed to open state file '" + path.string() + "'"
             );
+        }
+
+        if(this->empty()) {
+            stream << "values: {}\n";
+            return;
         }
 
         stream << this->toYAML();
@@ -151,7 +161,7 @@ class Store {
 
     ::YAML::Node toYAML() const {
         ::YAML::Node root;
-        ::YAML::Node valuesNode;
+        ::YAML::Node valuesNode{::YAML::NodeType::Map};
         std::vector<std::string> keys;
 
         for(const auto &[name, value] : this->values) {
@@ -171,7 +181,18 @@ class Store {
 
     void fromYAML(const ::YAML::Node &node) {
         std::unordered_map<std::string, Value> parsedValues;
+
+        if(!node || node.IsNull()) {
+            this->values.clear();
+            return;
+        }
+
         const ::YAML::Node valuesNode = node["values"];
+
+        if(valuesNode && valuesNode.IsNull()) {
+            this->values.clear();
+            return;
+        }
 
         if(!valuesNode || !valuesNode.IsMap()) {
             throw std::runtime_error("State YAML requires a values map");

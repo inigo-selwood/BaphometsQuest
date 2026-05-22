@@ -29,7 +29,7 @@ getStatePath(const std::filesystem::path &executableDirectory) {
 Game::Game() : nodeManager(*this) {}
 
 Game::~Game() {
-    if(this->statePath.has_value()) {
+    if(this->statePath.has_value() && !this->state.empty()) {
         try {
             this->saveState();
         } catch(const std::exception &exception) {
