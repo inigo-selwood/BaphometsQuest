@@ -63,11 +63,14 @@ void Game::start(
 
     if(std::filesystem::exists(*this->statePath)) {
         this->state.load(*this->statePath);
-        spdlog::info("Loaded game state from '{}'", this->statePath->string());
+        spdlog::info(
+            "Loaded game state from '{}'",
+            Engine::Format::path(this->statePath->string())
+        );
     } else {
         spdlog::debug(
             "No game state found at '{}'",
-            this->statePath->string()
+            Engine::Format::path(this->statePath->string())
         );
     }
 
@@ -206,7 +209,10 @@ void Game::saveState() const {
 
     std::filesystem::create_directories(this->statePath->parent_path());
     this->state.save(*this->statePath);
-    spdlog::info("Saved game state to '{}'", this->statePath->string());
+    spdlog::info(
+        "Saved game state to '{}'",
+        Engine::Format::path(this->statePath->string())
+    );
 }
 
 SDL_Rect Game::getScreenSize() const {
