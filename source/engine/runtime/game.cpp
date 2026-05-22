@@ -15,12 +15,28 @@ namespace Engine {
 namespace {
 
 constexpr char SETTINGS_PATH[] = "resources/configuration/settings.yaml";
+constexpr char STATE_DIRECTORY[] = ".saves";
+constexpr char STATE_FILENAME[] = "state.yaml";
+
+/** Return the development save path outside shipped resources */
+std::filesystem::path
+getStatePath(const std::filesystem::path &executableDirectory) {
+    return executableDirectory / STATE_DIRECTORY / STATE_FILENAME;
+}
 
 } // namespace
 
 Game::Game() : nodeManager(*this) {}
 
 Game::~Game() {
+    if(this->statePath.has_value()) {
+        try {
+            this->saveState();
+        } catch(const std::exception &exception) {
+            spdlog::error("Failed to save game state: {}", exception.what());
+        }
+    }
+
     spdlog::info("Unloading game resources");
     this->resources.clear();
 
@@ -38,10 +54,21 @@ void Game::start(
             std::filesystem::absolute(executablePath)
         )
             .parent_path();
+    this->statePath = getStatePath(executableDirectory);
 
     // Bundled app launches use resources beside the executable
     if(std::filesystem::exists(executableDirectory / "resources")) {
         std::filesystem::current_path(executableDirectory);
+    }
+
+    if(std::filesystem::exists(*this->statePath)) {
+        this->state.load(*this->statePath);
+        spdlog::info("Loaded game state from '{}'", this->statePath->string());
+    } else {
+        spdlog::debug(
+            "No game state found at '{}'",
+            this->statePath->string()
+        );
     }
 
     const Engine::Resource::ID settingsId =
@@ -170,6 +197,16 @@ void Game::run() {
 
 void Game::queueQuit() {
     this->running = false;
+}
+
+void Game::saveState() const {
+    if(!this->statePath.has_value()) {
+        throw std::runtime_error("Game must be started before saving state");
+    }
+
+    std::filesystem::create_directories(this->statePath->parent_path());
+    this->state.save(*this->statePath);
+    spdlog::info("Saved game state to '{}'", this->statePath->string());
 }
 
 SDL_Rect Game::getScreenSize() const {

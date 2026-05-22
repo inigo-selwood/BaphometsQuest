@@ -6,6 +6,7 @@
 #include "managers/node.hpp"
 #include "managers/resource.hpp"
 #include "managers/signal.hpp"
+#include "state.hpp"
 #include "timer.hpp"
 
 #include <filesystem>
@@ -52,6 +53,9 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Queue the active game loop to stop */
     void queueQuit();
 
+    /** Save persistent game state to the configured save file */
+    void saveState() const;
+
     /** Return the logical screen area currently used for rendering */
     SDL_Rect getScreenSize() const;
 
@@ -82,6 +86,9 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Shared signal manager */
     Engine::Signal::Manager signals;
 
+    /** Shared state store */
+    Engine::State::Store state;
+
     /** Active node tree manager */
     Engine::Nodes::Manager nodeManager;
 
@@ -103,6 +110,9 @@ class Game : public std::enable_shared_from_this<Game> {
 
     /** Renderer clear colour */
     SDL_Color renderClearColour{0, 0, 0, 255};
+
+    /** Persistent state save path */
+    std::optional<std::filesystem::path> statePath;
 
     /** Registered scene factories keyed by the names used with queueScene() */
     std::unordered_map<
