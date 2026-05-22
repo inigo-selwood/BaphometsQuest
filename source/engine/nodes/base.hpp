@@ -139,6 +139,11 @@ class Base : public std::enable_shared_from_this<Base> {
     /** Return true when this node has declared a hook */
     bool hasHook(Hook hook) const;
 
+    /** Return true when this node and its subtree can receive dispatch */
+    bool isActive() const {
+        return this->active;
+    }
+
     /** Return a read-only reference to a typed property */
     template <typename Value>
     const Value &getProperty(const std::string &name) const {
@@ -329,7 +334,7 @@ class Base : public std::enable_shared_from_this<Base> {
     std::vector<std::shared_ptr<Base>> children;
     std::weak_ptr<Base> parent;
     std::weak_ptr<Game> game;
-    bool visible = true;
+    bool active = true;
     bool setupComplete = false;
     std::unordered_map<std::string, Property> properties;
     std::set<Hook> hooks;

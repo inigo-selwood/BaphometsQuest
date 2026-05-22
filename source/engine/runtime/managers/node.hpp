@@ -45,7 +45,7 @@ class Manager {
             return;
         }
 
-        if(!node->visible) {
+        if(!node->active) {
             return;
         }
 

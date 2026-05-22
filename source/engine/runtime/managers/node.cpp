@@ -92,7 +92,7 @@ void Manager::findActiveCamera(
         return;
     }
 
-    if(!node->visible) {
+    if(!node->active) {
         return;
     }
 
@@ -124,7 +124,7 @@ void Manager::renderNode(
         return;
     }
 
-    if(!node->visible) {
+    if(!node->active) {
         return;
     }
 

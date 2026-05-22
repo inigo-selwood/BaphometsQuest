@@ -38,7 +38,7 @@ Engine::Nodes::Label::Justification parseJustification(
 } // namespace
 
 Base::Base() : id(generateID()) {
-    this->declareProperty("visible", this->visible);
+    this->declareProperty("active", this->active);
 }
 
 Game &Base::getGame() {

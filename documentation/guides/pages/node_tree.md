@@ -74,7 +74,7 @@ calls the matching virtual method only when the hook is declared.
 `setup()` runs once before a node enters normal hook dispatch. Use it for
 one-time composition such as loading declarative scene XML.
 
-The base `visible` property suppresses hook dispatch for a node and its
+The base `active` property suppresses all hook dispatch for a node and its
 children when set to `false`.
 
 ```cpp
