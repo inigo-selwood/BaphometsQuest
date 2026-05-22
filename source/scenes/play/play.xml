@@ -67,5 +67,11 @@
         text="0000"
       />
     </box>
+
+    <textbox
+      awaiting-input="true"
+      name="textbox"
+      text="I should find the temple before night falls."
+    />
   </canvas-layer>
 </scene>

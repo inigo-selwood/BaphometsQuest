@@ -1,6 +1,7 @@
 #pragma once
 
 #include "components/player.hpp"
+#include "components/textbox.hpp"
 #include "components/world.hpp"
 
 #include "../../engine/nodes/base.hpp"
@@ -26,6 +27,7 @@ class Scene : public Engine::Nodes::Base {
         loader.registerNode<Engine::Nodes::Label>("label");
         loader.registerNode<Engine::Nodes::Map>("map");
         loader.registerNode<Scenes::Play::Components::Player>("player");
+        loader.registerNode<Scenes::Play::Components::Textbox>("textbox");
         loader.registerNode<Scenes::Play::Components::World>("world");
         loader.load("source/scenes/play/play.xml");
     }
