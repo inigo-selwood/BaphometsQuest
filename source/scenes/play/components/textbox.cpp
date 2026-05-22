@@ -34,12 +34,14 @@ constexpr int MAX_LINES = 4;
 constexpr int TEXT_CURSOR_GAP = 2;
 constexpr int TEXT_WIDTH =
     BOX_SIZE.w - TEXT_ORIGIN.x - CURSOR_DESTINATION.w - TEXT_CURSOR_GAP;
+constexpr float CARET_OSCILLATION_INTERVAL = 0.5F;
 const std::string CURSOR_PATH = "resources/textures/tileset.png";
 const std::string FONT_PATH = "resources/fonts/04B_03.TTF";
 
 } // namespace
 
 Textbox::Textbox() {
+    this->declareHook(Engine::Nodes::Hook::Process);
     this->declareHook(Engine::Nodes::Hook::Render);
     this->declareProperty(
         "text",
@@ -55,6 +57,21 @@ Textbox::Textbox() {
 
 void Textbox::setup() {
     this->rebuildCursor();
+}
+
+void Textbox::process(float deltaSeconds) {
+    if(!this->awaitingInput) {
+        this->caretElapsed = 0.0F;
+        this->caretShift = 0;
+        return;
+    }
+
+    this->caretElapsed += deltaSeconds;
+
+    while(this->caretElapsed >= CARET_OSCILLATION_INTERVAL) {
+        this->caretElapsed -= CARET_OSCILLATION_INTERVAL;
+        this->caretShift = this->caretShift == 0 ? 1 : 0;
+    }
 }
 
 void Textbox::render(Engine::Render::Canvas &canvas) {
@@ -94,7 +111,10 @@ void Textbox::render(Engine::Render::Canvas &canvas) {
             this->cursorResourceID
         );
 
-    canvas.copy(cursor.handle.get(), &CURSOR_REGION, CURSOR_DESTINATION);
+    SDL_Rect destination = CURSOR_DESTINATION;
+    destination.y += this->caretShift;
+
+    canvas.copy(cursor.handle.get(), &CURSOR_REGION, destination);
 }
 
 void Textbox::rebuild() {

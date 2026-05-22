@@ -34,6 +34,8 @@ class Menu : public Engine::Nodes::Object {
 
     void input(const SDL_Event &event) override;
 
+    void process(float deltaSeconds) override;
+
     void render(Engine::Render::Canvas &canvas) override;
 
   private:
@@ -54,6 +56,8 @@ class Menu : public Engine::Nodes::Object {
     Engine::Resource::ID cursorResourceID = 0;
     std::vector<Option> options;
     std::size_t selectedOption = 0;
+    float cursorElapsed = 0.0F;
+    int cursorShift = 0;
 };
 
 } // namespace Engine::Nodes

@@ -15,8 +15,15 @@
 
 namespace Engine::Nodes {
 
+namespace {
+
+constexpr float CURSOR_OSCILLATION_INTERVAL = 0.5F;
+
+} // namespace
+
 Menu::Menu() {
     this->declareHook(Engine::Nodes::Hook::Input);
+    this->declareHook(Engine::Nodes::Hook::Process);
     this->declareHook(Engine::Nodes::Hook::Render);
     this->declareProperty(
         "font",
@@ -133,6 +140,15 @@ void Menu::input(const SDL_Event &event) {
     }
 }
 
+void Menu::process(float deltaSeconds) {
+    this->cursorElapsed += deltaSeconds;
+
+    while(this->cursorElapsed >= CURSOR_OSCILLATION_INTERVAL) {
+        this->cursorElapsed -= CURSOR_OSCILLATION_INTERVAL;
+        this->cursorShift = this->cursorShift == 0 ? 1 : 0;
+    }
+}
+
 void Menu::render(Engine::Render::Canvas &canvas) {
     Engine::Game &game = this->getGame();
     const int rowHeight =
@@ -176,7 +192,7 @@ void Menu::render(Engine::Render::Canvas &canvas) {
     }
 
     const SDL_Rect destination{
-        -cursorOffset,
+        -cursorOffset + this->cursorShift,
         static_cast<int>(this->selectedOption) * rowHeight,
         source.w,
         source.h,

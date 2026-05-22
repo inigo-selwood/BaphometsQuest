@@ -21,6 +21,8 @@ class Textbox : public Engine::Nodes::Object {
 
     void setup() override;
 
+    void process(float deltaSeconds) override;
+
     void render(Engine::Render::Canvas &canvas) override;
 
   private:
@@ -53,6 +55,8 @@ class Textbox : public Engine::Nodes::Object {
     Engine::Resource::ID fontResourceID = 0;
     Engine::Resource::ID cursorResourceID = 0;
     std::vector<Line> lines;
+    float caretElapsed = 0.0F;
+    int caretShift = 0;
 };
 
 } // namespace Scenes::Play::Components
