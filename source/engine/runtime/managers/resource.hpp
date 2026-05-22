@@ -43,6 +43,59 @@ class Manager {
     /** Return a cached resource, reconstructing it first if it expired */
     const Base &get(ID id) const;
 
+    /** Destroy one live cached resource while keeping its stable ID */
+    void unload(ID id);
+
+    /** Destroy live cached resources of one type while keeping stable IDs */
+    template <typename ResourceType> void unloadAll() {
+        static_assert(
+            std::is_base_of_v<Base, ResourceType>,
+            "ResourceType must inherit from Engine::Resource::Base."
+        );
+
+        for(auto &[id, resource] : this->resources) {
+            if(resource.resource == nullptr) {
+                continue;
+            }
+
+            if(dynamic_cast<ResourceType *>(resource.resource.get())
+                == nullptr) {
+                continue;
+            }
+
+            spdlog::debug("Freed {:016x} ({})", id, resource.resource->name);
+            resource.resource.reset();
+        }
+    }
+
+    /** Destroy live cached resources except the listed types */
+    template <typename... ResourceTypes> void unloadAllExcept() {
+        static_assert(
+            (std::is_base_of_v<Base, ResourceTypes> && ...),
+            "ResourceTypes must inherit from Engine::Resource::Base."
+        );
+
+        for(auto &[id, resource] : this->resources) {
+            if(resource.resource == nullptr) {
+                continue;
+            }
+
+            const bool shouldKeep =
+                (
+                    ...
+                    || (dynamic_cast<ResourceTypes *>(resource.resource.get())
+                        != nullptr)
+                );
+
+            if(shouldKeep) {
+                continue;
+            }
+
+            spdlog::debug("Freed {:016x} ({})", id, resource.resource->name);
+            resource.resource.reset();
+        }
+    }
+
     /** Unload live resources that have exceeded their type-specific TTL */
     void purgeExpired();
 

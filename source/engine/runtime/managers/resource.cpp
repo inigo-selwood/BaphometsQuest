@@ -50,6 +50,23 @@ const Base &Manager::get(ID id) const {
     return const_cast<Manager *>(this)->get(id);
 }
 
+void Manager::unload(ID id) {
+    const auto resource = this->resources.find(id);
+
+    if(resource == this->resources.end()) {
+        throw std::runtime_error(
+            "Resource " + std::to_string(id) + " does not exist."
+        );
+    }
+
+    if(resource->second.resource == nullptr) {
+        return;
+    }
+
+    spdlog::debug("Freed {:016x} ({})", id, resource->second.resource->name);
+    resource->second.resource.reset();
+}
+
 void Manager::purgeExpired() {
     const Clock::time_point now = Clock::now();
 

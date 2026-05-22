@@ -1,6 +1,8 @@
 #include "game.hpp"
 
 #include "../../core/logger.hpp"
+#include "../resources/types/font.hpp"
+#include "../resources/types/image_texture.hpp"
 #include "../utils/format.hpp"
 #include "resize/handler.hpp"
 
@@ -100,6 +102,7 @@ void Game::start(
     spdlog::info("Starting game services");
 
     Engine::Lifecycle::start(this->window, this->renderer, settingsResource);
+    this->resources.unload(settingsId);
 }
 
 void Game::run() {
@@ -129,6 +132,10 @@ void Game::run() {
 
             if(sceneEntered) {
                 this->nodeManager.exit();
+                this->resources
+                    .unloadAllExcept<
+                        Engine::Resource::ImageTexture,
+                        Engine::Resource::Font>();
             }
 
             this->currentScene = this->sceneFactories.at(sceneName)();
