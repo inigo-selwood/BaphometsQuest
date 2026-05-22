@@ -14,6 +14,27 @@ namespace {
 
 std::atomic<std::uint32_t> nextID = 1;
 
+Engine::Nodes::Label::Justification parseJustification(
+    std::string_view text
+) {
+    if(text == "left") {
+        return Engine::Nodes::Label::Justification::Left;
+    }
+
+    if(text == "centre") {
+        return Engine::Nodes::Label::Justification::Centre;
+    }
+
+    if(text == "right") {
+        return Engine::Nodes::Label::Justification::Right;
+    }
+
+    throw std::runtime_error(
+        "Justification value must be left, centre, or right: '"
+        + std::string(text) + "'"
+    );
+}
+
 } // namespace
 
 Base::Base() : id(generateID()) {
@@ -112,7 +133,7 @@ void Base::setPropertyFromText(
         this->setProperty(name, Engine::Parse::colour(value));
     } else if(type
         == std::type_index(typeid(Engine::Nodes::Label::Justification))) {
-        this->setProperty(name, Engine::Parse::justification(value));
+        this->setProperty(name, parseJustification(value));
     } else {
         throw std::runtime_error(
             "Node property '" + name + "' cannot be set from text"

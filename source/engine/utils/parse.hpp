@@ -2,8 +2,6 @@
 
 #include "format.hpp"
 
-#include "../nodes/native/label.hpp"
-
 #include <SDL.h>
 
 #include <array>
@@ -11,6 +9,8 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+
+#include <yaml-cpp/yaml.h>
 
 namespace Engine::Parse {
 
@@ -120,9 +120,24 @@ inline bool boolean(std::string_view text) {
     );
 }
 
+/** Parse YAML boolean nodes */
+inline bool boolean(const ::YAML::Node &node) {
+    return node.as<bool>();
+}
+
 /** Parse integer text */
 inline int integer(std::string_view text) {
     return Detail::integer(text, "Integer");
+}
+
+/** Parse YAML integer nodes */
+inline int integer(const ::YAML::Node &node) {
+    return node.as<int>();
+}
+
+/** Parse YAML string nodes */
+inline std::string string(const ::YAML::Node &node) {
+    return node.as<std::string>();
 }
 
 /** Parse x,y text into an SDL point */
@@ -130,6 +145,15 @@ inline SDL_Point point(std::string_view text) {
     const auto values = Detail::integerList(text, 2, "Point");
 
     return SDL_Point{values[0], values[1]};
+}
+
+/** Parse YAML sequence nodes into an SDL point */
+inline SDL_Point point(const ::YAML::Node &node) {
+    if(!node.IsSequence() || node.size() != 2) {
+        throw std::runtime_error("Point value must be a two-item sequence");
+    }
+
+    return SDL_Point{node[0].as<int>(), node[1].as<int>()};
 }
 
 /** Parse x,y,w,h text into an SDL rectangle */
@@ -142,27 +166,6 @@ inline SDL_Rect rect(std::string_view text) {
 /** Parse #rrggbbaa text into an SDL colour */
 inline SDL_Color colour(std::string_view text) {
     return Engine::Format::colour(text);
-}
-
-/** Parse label justification text */
-inline Engine::Nodes::Label::Justification
-justification(std::string_view text) {
-    if(text == "left") {
-        return Engine::Nodes::Label::Justification::Left;
-    }
-
-    if(text == "centre") {
-        return Engine::Nodes::Label::Justification::Centre;
-    }
-
-    if(text == "right") {
-        return Engine::Nodes::Label::Justification::Right;
-    }
-
-    throw std::runtime_error(
-        "Justification value must be left, centre, or right: '"
-        + std::string(text) + "'"
-    );
 }
 
 } // namespace Engine::Parse
