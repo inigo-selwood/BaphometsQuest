@@ -18,8 +18,14 @@ namespace Engine {
 
 /** Populate a scene node tree from declarative XML */
 class SceneLoader {
+  private:
+    using NodeCreator = std::function<std::shared_ptr<Engine::Nodes::Base>()>;
+
   public:
     explicit SceneLoader(Engine::Nodes::Base &parent);
+
+    /** Register engine-native XML node types */
+    static void registerNativeNodes();
 
     /** Register a default-constructible node for an XML element name */
     template <typename NodeType>
@@ -32,6 +38,13 @@ class SceneLoader {
         if(elementName.empty()) {
             throw std::runtime_error(
                 "Scene loader element name must not be empty"
+            );
+        }
+
+        if(getGlobalNodeCreators().contains(elementName)) {
+            throw std::runtime_error(
+                "Scene loader element '" + elementName
+                + "' is already globally registered"
             );
         }
 
@@ -51,12 +64,43 @@ class SceneLoader {
     void load(const std::string &path);
 
   private:
-    using NodeCreator = std::function<std::shared_ptr<Engine::Nodes::Base>()>;
+    template <typename NodeType>
+    static void registerGlobalNode(const std::string &elementName) {
+        static_assert(
+            std::is_base_of_v<Engine::Nodes::Base, NodeType>,
+            "NodeType must inherit from Engine::Nodes::Base."
+        );
+
+        if(elementName.empty()) {
+            throw std::runtime_error(
+                "Scene loader element name must not be empty"
+            );
+        }
+
+        auto &nodeCreators = getGlobalNodeCreators();
+
+        if(nodeCreators.contains(elementName)) {
+            return;
+        }
+
+        nodeCreators.emplace(elementName, []() {
+            return std::make_shared<NodeType>();
+        });
+    }
+
+    static const NodeCreator *getNodeCreator(
+        const std::unordered_map<std::string, NodeCreator> &localNodeCreators,
+        const std::string &elementName
+    );
+
+    static std::unordered_map<std::string, NodeCreator> &
+    getGlobalNodeCreators();
 
     void loadScene(
         Engine::Nodes::Base &parent,
         const std::string &path,
-        std::vector<std::string> &importStack
+        std::vector<std::string> &importStack,
+        bool assignRootName
     ) const;
 
     void loadChildren(

@@ -11,13 +11,14 @@ stable.
 XML Shape
 ---------
 
-The root element must be `<scene>`. Each child element is a node unless the
-parent node consumes its own child XML. The element name selects the registered
-node class, the optional `name` attribute becomes the child node name, and every
-other attribute is applied as a property.
+The root element must be `<scene>` and must include a `name` attribute. That
+name is assigned to the scene root node. Each child element is a node unless
+the parent node consumes its own child XML. The element name selects the
+registered node class, the optional `name` attribute becomes the child node
+name, and every other attribute is applied as a property.
 
 ```xml
-<scene>
+<scene name="main-menu">
   <label
     name="title"
     font="resources/fonts/Early GameBoy.ttf"
@@ -74,11 +75,11 @@ Imports
 -------
 
 Use `<import path="..."/>` to include another scene XML file. The imported
-file must also have a `<scene>` root, and its children are inserted where the
-import appears.
+file must also have a named `<scene>` root, and its children are inserted where
+the import appears.
 
 ```xml
-<scene>
+<scene name="main-menu">
   <import path="shared/background.xml" />
 
   <label
@@ -94,12 +95,12 @@ Import cycles throw at load time.
 Registration
 ------------
 
-Scenes register default-constructible node classes before loading XML.
+Engine-native node classes are registered during `Game::start()`. Scenes only
+register custom components before loading XML.
 
 ```cpp
 Engine::SceneLoader loader{*this};
-loader.registerNode<Engine::Nodes::Label>("label");
-loader.registerNode<Engine::Nodes::Music>("music");
+loader.registerNode<Scenes::Play::Components::Player>("player");
 loader.load("source/scenes/main_menu/main_menu.xml");
 ```
 

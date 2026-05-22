@@ -24,6 +24,7 @@ class XMLElement;
 namespace Engine {
 
 class Game;
+class SceneLoader;
 
 namespace Render {
 class Canvas;
@@ -276,7 +277,7 @@ class Base : public std::enable_shared_from_this<Base> {
     void declareHook(Hook hook);
 
   private:
-    friend class Engine::Game;
+    friend class Engine::SceneLoader;
     friend class Manager;
 
     struct Property {

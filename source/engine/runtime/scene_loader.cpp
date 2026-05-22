@@ -1,5 +1,14 @@
 #include "scene_loader.hpp"
 
+#include "../nodes/native/box.hpp"
+#include "../nodes/native/camera.hpp"
+#include "../nodes/native/canvas_layer.hpp"
+#include "../nodes/native/image.hpp"
+#include "../nodes/native/label.hpp"
+#include "../nodes/native/map.hpp"
+#include "../nodes/native/menu.hpp"
+#include "../nodes/native/music.hpp"
+#include "../nodes/native/sprite.hpp"
 #include "../resources/types/xml.hpp"
 #include "game.hpp"
 
@@ -15,17 +24,30 @@ namespace Engine {
 SceneLoader::SceneLoader(Engine::Nodes::Base &parent)
     : parent(parent.shared_from_this()) {}
 
+void SceneLoader::registerNativeNodes() {
+    registerGlobalNode<Engine::Nodes::Box>("box");
+    registerGlobalNode<Engine::Nodes::Camera>("camera");
+    registerGlobalNode<Engine::Nodes::CanvasLayer>("canvas-layer");
+    registerGlobalNode<Engine::Nodes::Image>("image");
+    registerGlobalNode<Engine::Nodes::Label>("label");
+    registerGlobalNode<Engine::Nodes::Map>("map");
+    registerGlobalNode<Engine::Nodes::Menu>("menu");
+    registerGlobalNode<Engine::Nodes::Music>("music");
+    registerGlobalNode<Engine::Nodes::Sprite>("sprite");
+}
+
 void SceneLoader::load(const std::string &path) {
     std::shared_ptr<Engine::Nodes::Base> parent = this->getParent();
     std::vector<std::string> importStack;
 
-    this->loadScene(*parent, path, importStack);
+    this->loadScene(*parent, path, importStack, true);
 }
 
 void SceneLoader::loadScene(
     Engine::Nodes::Base &parent,
     const std::string &path,
-    std::vector<std::string> &importStack
+    std::vector<std::string> &importStack,
+    bool assignRootName
 ) const {
     for(const std::string &importedPath : importStack) {
         if(importedPath == path) {
@@ -53,6 +75,18 @@ void SceneLoader::loadScene(
         );
     }
 
+    const char *nameAttribute = root->Attribute("name");
+
+    if(nameAttribute == nullptr || std::string{nameAttribute}.empty()) {
+        throw std::runtime_error(
+            "Scene XML '" + path + "' root element requires a name attribute"
+        );
+    }
+
+    if(assignRootName) {
+        parent.name = nameAttribute;
+    }
+
     this->loadChildren(parent, *root, path, importStack);
     importStack.pop_back();
 }
@@ -65,6 +99,33 @@ std::shared_ptr<Engine::Nodes::Base> SceneLoader::getParent() const {
     }
 
     return parent;
+}
+
+const SceneLoader::NodeCreator *SceneLoader::getNodeCreator(
+    const std::unordered_map<std::string, NodeCreator> &localNodeCreators,
+    const std::string &elementName
+) {
+    const auto localNodeCreator = localNodeCreators.find(elementName);
+
+    if(localNodeCreator != localNodeCreators.end()) {
+        return &localNodeCreator->second;
+    }
+
+    const auto &globalNodeCreators = getGlobalNodeCreators();
+    const auto globalNodeCreator = globalNodeCreators.find(elementName);
+
+    if(globalNodeCreator != globalNodeCreators.end()) {
+        return &globalNodeCreator->second;
+    }
+
+    return nullptr;
+}
+
+std::unordered_map<std::string, SceneLoader::NodeCreator> &
+SceneLoader::getGlobalNodeCreators() {
+    static std::unordered_map<std::string, NodeCreator> nodeCreators;
+
+    return nodeCreators;
 }
 
 void SceneLoader::loadChildren(
@@ -93,9 +154,12 @@ void SceneLoader::loadNode(
         return;
     }
 
-    const auto nodeCreator = this->nodeCreators.find(elementName);
+    const NodeCreator *nodeCreator = getNodeCreator(
+        this->nodeCreators,
+        elementName
+    );
 
-    if(nodeCreator == this->nodeCreators.end()) {
+    if(nodeCreator == nullptr) {
         throw std::runtime_error(
             "Scene XML element '" + elementName + "' is not registered"
         );
@@ -104,7 +168,7 @@ void SceneLoader::loadNode(
     const char *nameAttribute = element.Attribute("name");
     const std::string nodeName =
         nameAttribute == nullptr ? std::string{} : nameAttribute;
-    std::shared_ptr<Engine::Nodes::Base> node = nodeCreator->second();
+    std::shared_ptr<Engine::Nodes::Base> node = (*nodeCreator)();
 
     if(node == nullptr) {
         throw std::runtime_error(
@@ -153,7 +217,12 @@ void SceneLoader::loadImport(
         );
     }
 
-    this->loadScene(parent, resolvePath(path, pathAttribute), importStack);
+    this->loadScene(
+        parent,
+        resolvePath(path, pathAttribute),
+        importStack,
+        false
+    );
 }
 
 std::string SceneLoader::resolvePath(
