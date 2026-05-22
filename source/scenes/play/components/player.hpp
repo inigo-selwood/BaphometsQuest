@@ -32,41 +32,38 @@ class Player : public Engine::Nodes::Image {
     void process(float deltaSeconds) override {
         const Uint8 *keys = SDL_GetKeyboardState(nullptr);
         const SDL_Point movement = this->getMovement(keys);
-
-        if(movement.x == 0 && movement.y == 0) {
-            this->elapsedMovementTime = 0.0F;
-            this->lastMovement = movement;
-            return;
-        }
-
         const float interval = this->getMovementInterval();
 
         if(interval <= 0.0F) {
             return;
         }
 
-        if(movement.x != this->lastMovement.x
-            || movement.y != this->lastMovement.y) {
-            this->elapsedMovementTime = interval;
-            this->lastMovement = movement;
-        }
-
         this->elapsedMovementTime += deltaSeconds;
 
-        while(this->elapsedMovementTime >= interval) {
-            this->elapsedMovementTime -= interval;
-
-            const SDL_Point target{
-                this->position.x + movement.x,
-                this->position.y + movement.y,
-            };
-
-            if(!this->getAncestor<World>()->canMove(this->position, target)) {
-                return;
-            }
-
-            this->position = target;
+        if(this->elapsedMovementTime > interval) {
+            this->elapsedMovementTime = interval;
         }
+
+        if(movement.x == 0 && movement.y == 0) {
+            return;
+        }
+
+        if(this->elapsedMovementTime < interval) {
+            return;
+        }
+
+        this->elapsedMovementTime -= interval;
+
+        const SDL_Point target{
+            this->position.x + movement.x,
+            this->position.y + movement.y,
+        };
+
+        if(!this->getAncestor<World>()->canMove(this->position, target)) {
+            return;
+        }
+
+        this->position = target;
     }
 
   private:
@@ -101,8 +98,7 @@ class Player : public Engine::Nodes::Image {
             / static_cast<float>(this->speed);
     }
 
-    float elapsedMovementTime = 0.0F;
-    SDL_Point lastMovement{0, 0};
+    float elapsedMovementTime = 1.0F;
     int speed = 48;
     int step = 8;
 };
