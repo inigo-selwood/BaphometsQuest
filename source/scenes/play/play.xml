@@ -1,5 +1,8 @@
-<scene>
-  <canvas-layer mode="world">
+<scene name="play">
+  <canvas-layer
+    mode="world"
+    name="world-layer"
+  >
     <world name="world">
       <map
         name="map"
@@ -28,7 +31,10 @@
     </world>
   </canvas-layer>
 
-  <canvas-layer mode="screen">
+  <canvas-layer
+    mode="screen"
+    name="screen-layer"
+  >
     <box
       colour="#20283dff"
       name="hud"

@@ -1,7 +1,6 @@
 #include "core/arguments.hpp"
 #include "engine/runtime/game.hpp"
 #include "scenes/main_menu/scene.hpp"
-#include "scenes/new_game/scene.hpp"
 #include "scenes/play/scene.hpp"
 
 #include <CLI/CLI.hpp>
@@ -25,7 +24,6 @@ int main(int argumentCount, const char *arguments[]) {
         auto game = std::make_shared<Engine::Game>();
         game->start(parsedArguments.executablePath, parsedArguments.logLevel);
         game->registerScene<Scenes::MainMenu::Scene>("main");
-        game->registerScene<Scenes::NewGame::Scene>("new-game");
         game->registerScene<Scenes::Play::Scene>("play");
         game->queueScene("main");
         game->run();

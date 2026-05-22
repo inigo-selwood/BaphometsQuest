@@ -1,4 +1,4 @@
-<scene>
+<scene name="main-menu">
   <music
     autoplay="false"
     loop="true"
@@ -42,4 +42,44 @@
       text="Quit"
     />
   </menu>
+
+  <box
+    active="false"
+    colour="#20283dff"
+    name="new-game-confirmation"
+    position="[0, 0]"
+    size="[0, 0, 160, 120]"
+  >
+    <label
+      colour="#ffffffff"
+      font="resources/fonts/Early GameBoy.ttf"
+      font-size="8"
+      justification="centre"
+      name="new-game-title"
+      position="[80, 48]"
+      text="are you sure?"
+    />
+
+    <menu
+      colour="#ffffffff"
+      cursor-offset="12"
+      cursor-path="resources/textures/tileset.png"
+      cursor-region="[104, 16, 8, 8]"
+      font="resources/fonts/Early GameBoy.ttf"
+      font-size="8"
+      line-height="12"
+      name="new-game-menu"
+      position="[48, 76]"
+    >
+      <option
+        tag="continue"
+        text="Continue"
+      />
+
+      <option
+        tag="back"
+        text="Back"
+      />
+    </menu>
+  </box>
 </scene>
