@@ -24,7 +24,7 @@
     font="resources/fonts/Early GameBoy.ttf"
     line-height="12"
     name="main-menu"
-    position="[64, 64]"
+    position="[48, 64]"
     size="8"
   >
     <option
