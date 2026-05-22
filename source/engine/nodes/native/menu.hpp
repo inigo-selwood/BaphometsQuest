@@ -46,7 +46,7 @@ class Menu : public Engine::Nodes::Object {
     static Option parseOption(const tinyxml2::XMLElement &optionElement);
 
     std::string font;
-    int size = 0;
+    int fontSize = 0;
     SDL_Color colour{255, 255, 255, 255};
     int lineHeight = 0;
     int cursorOffset = 0;

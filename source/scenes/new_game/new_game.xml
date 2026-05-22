@@ -5,7 +5,7 @@
     justification="centre"
     name="title"
     position="[80, 48]"
-    size="8"
+    font-size="8"
     text="are you sure?"
   />
 
@@ -18,7 +18,7 @@
     line-height="12"
     name="new-game-menu"
     position="[48, 76]"
-    size="8"
+    font-size="8"
   >
     <option
       tag="continue"

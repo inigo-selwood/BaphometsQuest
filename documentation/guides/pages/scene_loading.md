@@ -21,7 +21,7 @@ other attribute is applied as a property.
   <label
     name="title"
     font="resources/fonts/Early GameBoy.ttf"
-    size="8"
+    font-size="8"
     text="baphomet's quest"
     colour="#ffffffff"
     position="[80, 24]"
@@ -128,7 +128,7 @@ nodes.
   font="resources/fonts/04B_03.TTF"
   name="main-menu"
   position="[64, 76]"
-  size="8"
+  font-size="8"
 >
   <option
     tag="play"

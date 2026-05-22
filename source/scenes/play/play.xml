@@ -47,7 +47,7 @@
         font="resources/fonts/04B_03.TTF"
         name="health-value"
         position="[18, 1]"
-        size="8"
+        font-size="8"
         text="000"
       />
 
@@ -63,7 +63,7 @@
         font="resources/fonts/04B_03.TTF"
         name="money-value"
         position="[48, 1]"
-        size="8"
+        font-size="8"
         text="0000"
       />
     </box>

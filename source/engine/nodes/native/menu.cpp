@@ -33,10 +33,14 @@ Menu::Menu() {
             this->rebuild();
         }
     );
-    this->declareProperty("size", this->size, [this](const int &value) {
-        this->size = value;
-        this->rebuild();
-    });
+    this->declareProperty(
+        "font-size",
+        this->fontSize,
+        [this](const int &value) {
+            this->fontSize = value;
+            this->rebuild();
+        }
+    );
     this->declareProperty(
         "colour",
         this->colour,
@@ -152,9 +156,9 @@ void Menu::process(float deltaSeconds) {
 void Menu::render(Engine::Render::Canvas &canvas) {
     Engine::Game &game = this->getGame();
     const int rowHeight =
-        this->lineHeight > 0 ? this->lineHeight : this->size * 2;
+        this->lineHeight > 0 ? this->lineHeight : this->fontSize * 2;
     const int cursorOffset =
-        this->cursorOffset > 0 ? this->cursorOffset : this->size * 2;
+        this->cursorOffset > 0 ? this->cursorOffset : this->fontSize * 2;
 
     for(std::size_t index = 0; index < this->options.size(); index++) {
         const Option &option = this->options[index];
@@ -202,7 +206,7 @@ void Menu::render(Engine::Render::Canvas &canvas) {
 }
 
 void Menu::rebuild() {
-    if(this->font.empty() || this->size <= 0 || this->options.empty()) {
+    if(this->font.empty() || this->fontSize <= 0 || this->options.empty()) {
         this->fontResourceID = 0;
         for(Option &option : this->options) {
             option.textResourceID = 0;
@@ -218,7 +222,7 @@ void Menu::rebuild() {
 
         this->fontResourceID = game.resources.load<Engine::Resource::Font>(
             this->font,
-            this->size
+            this->fontSize
         );
 
         for(Option &option : this->options) {

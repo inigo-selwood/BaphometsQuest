@@ -29,24 +29,28 @@ class Label : public Engine::Nodes::Object {
             "font",
             this->font,
             [this](const std::string &value) {
-                this->update(value, this->size, this->colour, this->text);
+                this->update(value, this->fontSize, this->colour, this->text);
             }
         );
-        this->declareProperty("size", this->size, [this](const int &value) {
-            this->update(this->font, value, this->colour, this->text);
-        });
+        this->declareProperty(
+            "font-size",
+            this->fontSize,
+            [this](const int &value) {
+                this->update(this->font, value, this->colour, this->text);
+            }
+        );
         this->declareProperty(
             "text",
             this->text,
             [this](const std::string &value) {
-                this->update(this->font, this->size, this->colour, value);
+                this->update(this->font, this->fontSize, this->colour, value);
             }
         );
         this->declareProperty(
             "colour",
             this->colour,
             [this](const SDL_Color &value) {
-                this->update(this->font, this->size, value, this->text);
+                this->update(this->font, this->fontSize, value, this->text);
             }
         );
         this->declareProperty("justification", this->justification);
@@ -94,13 +98,14 @@ class Label : public Engine::Nodes::Object {
         const std::string &text
     ) {
         Engine::Game &game = this->getGame();
-        const bool fontChanged = font != this->font || size != this->size;
+        const bool fontChanged =
+            font != this->font || size != this->fontSize;
         const bool textureChanged = fontChanged || text != this->text
             || colour.r != this->colour.r || colour.g != this->colour.g
             || colour.b != this->colour.b || colour.a != this->colour.a;
 
         this->font = font;
-        this->size = size;
+        this->fontSize = size;
         this->colour = colour;
         this->text = text;
 
@@ -110,7 +115,7 @@ class Label : public Engine::Nodes::Object {
 
         this->textResourceID = 0;
 
-        if(this->font.empty() || this->size <= 0) {
+        if(this->font.empty() || this->fontSize <= 0) {
             this->fontResourceID = 0;
             return;
         }
@@ -128,7 +133,7 @@ class Label : public Engine::Nodes::Object {
         if(fontChanged || this->fontResourceID == 0) {
             this->fontResourceID = game.resources.load<Engine::Resource::Font>(
                 this->font,
-                this->size
+                this->fontSize
             );
         }
 
@@ -144,7 +149,7 @@ class Label : public Engine::Nodes::Object {
     Engine::Resource::ID fontResourceID = 0;
     Engine::Resource::ID textResourceID = 0;
     std::string font;
-    int size = 0;
+    int fontSize = 0;
     std::string text;
     SDL_Color colour{255, 255, 255, 255};
     Justification justification = Justification::Left;
