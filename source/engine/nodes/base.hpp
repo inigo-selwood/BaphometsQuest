@@ -271,6 +271,7 @@ class Base : public std::enable_shared_from_this<Base> {
     void declareHook(Hook hook);
 
   private:
+    friend class Engine::Game;
     friend class Manager;
 
     struct Property {

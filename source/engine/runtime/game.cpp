@@ -139,12 +139,14 @@ void Game::run() {
             }
 
             this->currentScene = this->sceneFactories.at(sceneName)();
+            this->currentScene->name = "scene";
             this->queuedScene.reset();
             this->nodeManager.setRoot(this->currentScene);
             spdlog::debug("Entering scene '{}'", sceneName);
             this->nodeManager.enter();
             sceneEntered = true;
         } else if(!sceneEntered) {
+            this->currentScene->name = "scene";
             this->nodeManager.setRoot(this->currentScene);
             spdlog::debug("Entering current scene");
             this->nodeManager.enter();
