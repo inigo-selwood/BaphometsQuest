@@ -124,6 +124,11 @@ class Store {
         return this->values.empty() && this->rawValues.empty();
     }
 
+    /** Return true when state has been loaded from or saved to storage */
+    bool hasSaveFile() const {
+        return this->saveFileExists;
+    }
+
     /** Remove a state key */
     void erase(const std::string &name) {
         this->values.erase(name);
@@ -148,15 +153,18 @@ class Store {
 
         if(this->empty()) {
             stream << "{}\n";
+            this->saveFileExists = true;
             return;
         }
 
         stream << this->toYAML();
+        this->saveFileExists = true;
     }
 
     /** Load state from storage */
     void load(const std::filesystem::path &path) {
         this->fromYAML(::YAML::LoadFile(path.string()));
+        this->saveFileExists = true;
     }
 
   private:
@@ -269,6 +277,7 @@ class Store {
 
     mutable std::unordered_map<std::string, Value> values;
     mutable std::unordered_map<std::string, ::YAML::Node> rawValues;
+    mutable bool saveFileExists = false;
 };
 
 } // namespace Engine::State

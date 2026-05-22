@@ -23,7 +23,7 @@ class Scene : public Engine::Nodes::Base {
         const auto confirmationMenu =
             confirmation->getChild<Engine::Nodes::Menu>("new-game-menu");
 
-        if(!this->getGame().state.has("player-position")) {
+        if(!this->getGame().state.hasSaveFile()) {
             menu->removeOption("continue");
         }
 
