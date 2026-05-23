@@ -51,9 +51,9 @@
       <label
         colour="#ffffffff"
         font="resources/fonts/04B_03.TTF"
+        font-size="8"
         name="health-value"
         position="[18, 1]"
-        font-size="8"
         text="000"
       />
 
@@ -67,9 +67,9 @@
       <label
         colour="#ffffffff"
         font="resources/fonts/04B_03.TTF"
+        font-size="8"
         name="money-value"
         position="[48, 1]"
-        font-size="8"
         text="0000"
       />
     </box>
@@ -85,5 +85,95 @@
       size="[0, 0, 160, 40]"
       text="I should find the temple before night falls."
     />
+
+    <box
+      active="false"
+      colour="#20283dff"
+      name="pause-overlay"
+      position="[0, 0]"
+      size="[0, 0, 160, 120]"
+    >
+      <label
+        colour="#ffffffff"
+        font="resources/fonts/Early GameBoy.ttf"
+        font-size="8"
+        justification="centre"
+        name="pause-title"
+        position="[80, 28]"
+        text="paused"
+      />
+
+      <menu
+        colour="#ffffffff"
+        cursor-offset="12"
+        cursor-path="resources/textures/tileset.png"
+        cursor-region="[104, 16, 8, 8]"
+        font="resources/fonts/Early GameBoy.ttf"
+        font-size="8"
+        line-height="12"
+        name="pause-menu"
+        position="[56, 52]"
+      >
+        <option
+          tag="inventory"
+          text="Inventory"
+        />
+
+        <option
+          tag="stats"
+          text="Stats"
+        />
+
+        <option
+          tag="save"
+          text="Save"
+        />
+
+        <option
+          tag="quit"
+          text="Quit"
+        />
+      </menu>
+    </box>
+
+    <box
+      active="false"
+      colour="#20283dff"
+      name="save-confirmation"
+      position="[0, 0]"
+      size="[0, 0, 160, 120]"
+    >
+      <label
+        colour="#ffffffff"
+        font="resources/fonts/Early GameBoy.ttf"
+        font-size="8"
+        justification="centre"
+        name="save-title"
+        position="[80, 48]"
+        text="save game?"
+      />
+
+      <menu
+        colour="#ffffffff"
+        cursor-offset="12"
+        cursor-path="resources/textures/tileset.png"
+        cursor-region="[104, 16, 8, 8]"
+        font="resources/fonts/Early GameBoy.ttf"
+        font-size="8"
+        line-height="12"
+        name="save-menu"
+        position="[56, 76]"
+      >
+        <option
+          tag="yes"
+          text="Yes"
+        />
+
+        <option
+          tag="back"
+          text="Back"
+        />
+      </menu>
+    </box>
   </canvas-layer>
 </scene>
