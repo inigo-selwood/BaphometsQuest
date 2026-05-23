@@ -173,12 +173,13 @@ Map::Chunk Map::parseChunk(const tinyxml2::XMLElement &chunkElement) {
         );
     }
 
+    const std::string data{dataAttribute};
+    const std::string position{positionAttribute};
+
     return Chunk{
-        this->getGame().resources.load<Engine::Resource::MapData>(
-            dataAttribute
-        ),
-        dataAttribute,
-        Engine::Parse::point(positionAttribute),
+        this->getGame().resources.load<Engine::Resource::MapData>(data),
+        data,
+        Engine::Parse::point(position),
     };
 }
 
