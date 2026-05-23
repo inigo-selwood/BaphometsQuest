@@ -4,6 +4,7 @@
 #include "native/label.hpp"
 
 #include <atomic>
+#include <string_view>
 #include <typeindex>
 
 #include <spdlog/spdlog.h>
@@ -84,13 +85,50 @@ void Base::addChild(
 }
 
 std::shared_ptr<Base> Base::getChild(const std::string &name) const {
-    for(const auto &child : this->children) {
-        if(child->name == name) {
-            return child;
-        }
+    if(name.empty()) {
+        throw std::runtime_error("Child path must not be empty");
     }
 
-    throw std::runtime_error("Unknown child node '" + name + "'");
+    std::string_view path{name};
+    std::shared_ptr<Base> child;
+    const Base *parent = this;
+    std::size_t offset = 0;
+    const auto getDirectChild =
+        [](const Base &parent, std::string_view childName,
+            const std::string &path) {
+            if(childName.empty()) {
+                throw std::runtime_error(
+                    "Child path '" + path + "' has empty segment"
+                );
+            }
+
+            for(const auto &child : parent.children) {
+                if(child->name == childName) {
+                    return child;
+                }
+            }
+
+            throw std::runtime_error(
+                "Unknown child node '" + std::string(childName)
+                + "' in path '" + path + "'"
+            );
+        };
+
+    while(offset <= path.size()) {
+        const std::size_t separator = path.find('.', offset);
+        const std::size_t end =
+            separator == std::string_view::npos ? path.size() : separator;
+        child = getDirectChild(*parent, path.substr(offset, end - offset), name);
+
+        if(separator == std::string_view::npos) {
+            return child;
+        }
+
+        parent = child.get();
+        offset = separator + 1;
+    }
+
+    throw std::runtime_error("Child path '" + name + "' could not be resolved");
 }
 
 const std::vector<std::shared_ptr<Base>> &Base::getChildren() const {

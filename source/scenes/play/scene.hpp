@@ -31,12 +31,14 @@ class Scene : public Engine::Nodes::Base {
 
         const auto screenLayer = this->getChild("screen-layer");
         const auto pauseOverlay = screenLayer->getChild("pause-overlay");
-        const auto pauseMenu =
-            pauseOverlay->getChild<Engine::Nodes::Menu>("pause-menu");
+        const auto pauseMenu = this->getChild<Engine::Nodes::Menu>(
+            "screen-layer.pause-overlay.pause-menu"
+        );
         const auto saveConfirmation =
             screenLayer->getChild("save-confirmation");
-        const auto saveMenu =
-            saveConfirmation->getChild<Engine::Nodes::Menu>("save-menu");
+        const auto saveMenu = this->getChild<Engine::Nodes::Menu>(
+            "screen-layer.save-confirmation.save-menu"
+        );
 
         this->getGame().signals.connect<std::string>(
             pauseMenu,
@@ -82,10 +84,9 @@ class Scene : public Engine::Nodes::Base {
             return;
         }
 
-        const auto screenLayer = this->getChild("screen-layer");
-        const auto pauseOverlay = screenLayer->getChild("pause-overlay");
+        const auto pauseOverlay = this->getChild("screen-layer.pause-overlay");
         const auto saveConfirmation =
-            screenLayer->getChild("save-confirmation");
+            this->getChild("screen-layer.save-confirmation");
 
         if(saveConfirmation->isActive()) {
             pauseOverlay->setProperty("active", true);
@@ -99,24 +100,19 @@ class Scene : public Engine::Nodes::Base {
   private:
     void setPaused(bool paused) {
         this->getChild("world-layer")->setProperty("active", !paused);
-        const auto screenLayer = this->getChild("screen-layer");
-
-        screenLayer->getChild("pause-overlay")->setProperty("active", paused);
-        screenLayer->getChild("save-confirmation")
+        this->getChild("screen-layer.pause-overlay")
+            ->setProperty("active", paused);
+        this->getChild("screen-layer.save-confirmation")
             ->setProperty("active", false);
     }
 
     void setTextboxText(const std::string &text) {
-        this->getChild("screen-layer")
-            ->getChild("textbox")
-            ->setProperty("text", text);
+        this->getChild("screen-layer.textbox")->setProperty("text", text);
     }
 
     void persistPlayerState() {
         const SDL_Point playerPosition =
-            this->getChild("world-layer")
-                ->getChild("world")
-                ->getChild("player")
+            this->getChild("world-layer.world.player")
                 ->getProperty<SDL_Point>("position");
 
         this->getGame().state.set("player-position", playerPosition);
