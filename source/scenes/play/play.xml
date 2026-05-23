@@ -20,7 +20,7 @@
         path="resources/textures/tileset.png"
         position="[80, 72]"
         region="[96, 88, 8, 8]"
-        speed="48"
+        speed="64"
         step="8"
       >
         <camera
@@ -82,7 +82,7 @@
       font="resources/fonts/04B_03.TTF"
       font-size="8"
       name="textbox"
-      size="[0, 0, 160, 40]"
+      size="[0, 0, 160, 32]"
       text="I should find the temple before night falls."
     />
 
@@ -112,7 +112,7 @@
         font-size="8"
         line-height="12"
         name="pause-menu"
-        position="[56, 52]"
+        position="[48, 52]"
       >
         <option
           tag="inventory"
@@ -130,8 +130,8 @@
         />
 
         <option
-          tag="quit"
-          text="Quit"
+          tag="main-menu"
+          text="Main Menu"
         />
       </menu>
     </box>

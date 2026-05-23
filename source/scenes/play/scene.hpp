@@ -51,7 +51,7 @@ class Scene : public Engine::Nodes::Base {
                 } else if(tag == "save") {
                     pauseOverlay->setProperty("active", false);
                     saveConfirmation->setProperty("active", true);
-                } else if(tag == "quit") {
+                } else if(tag == "main-menu") {
                     this->getGame().queueScene("main");
                 }
             }
@@ -104,6 +104,7 @@ class Scene : public Engine::Nodes::Base {
             ->setProperty("active", paused);
         this->getChild("screen-layer.save-confirmation")
             ->setProperty("active", false);
+        this->getChild("screen-layer.textbox")->setProperty("active", !paused);
     }
 
     void setTextboxText(const std::string &text) {
