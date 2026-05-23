@@ -14,9 +14,7 @@ namespace {
 
 std::atomic<std::uint32_t> nextID = 1;
 
-Engine::Nodes::Label::Justification parseJustification(
-    std::string_view text
-) {
+Engine::Nodes::Label::Justification parseJustification(std::string_view text) {
     if(text == "left") {
         return Engine::Nodes::Label::Justification::Left;
     }

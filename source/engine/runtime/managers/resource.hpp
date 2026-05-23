@@ -81,11 +81,9 @@ class Manager {
             }
 
             const bool shouldKeep =
-                (
-                    ...
+                (...
                     || (dynamic_cast<ResourceTypes *>(resource.resource.get())
-                        != nullptr)
-                );
+                        != nullptr));
 
             if(shouldKeep) {
                 continue;

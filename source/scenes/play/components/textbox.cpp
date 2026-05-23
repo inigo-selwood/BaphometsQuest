@@ -40,14 +40,10 @@ Textbox::Textbox() {
     );
     this->declareProperty("awaiting-input", this->awaitingInput);
     this->declareProperty("colour", this->colour);
-    this->declareProperty(
-        "size",
-        this->size,
-        [this](const SDL_Rect &value) {
-            this->size = value;
-            this->rebuild();
-        }
-    );
+    this->declareProperty("size", this->size, [this](const SDL_Rect &value) {
+        this->size = value;
+        this->rebuild();
+    });
     this->declareProperty(
         "font",
         this->font,
@@ -109,7 +105,7 @@ void Textbox::render(Engine::Render::Canvas &canvas) {
         const Engine::Resource::TextTexture &texture =
             game.resources.get<Engine::Resource::TextTexture>(
                 line.textResourceID
-        );
+            );
         const SDL_Rect destination{
             TEXT_ORIGIN.x,
             TEXT_ORIGIN.y + (static_cast<int>(index) * LINE_HEIGHT),
@@ -165,21 +161,21 @@ void Textbox::rebuild() {
         game.resources.get<Engine::Resource::Font>(this->fontResourceID);
     const std::vector<std::string> wrappedLines =
         this->wrapText(fontResource, this->getTextWidth());
-    const std::size_t visibleLines = std::min(
-        wrappedLines.size(),
-        static_cast<std::size_t>(MAX_LINES)
-    );
+    const std::size_t visibleLines =
+        std::min(wrappedLines.size(), static_cast<std::size_t>(MAX_LINES));
 
     for(std::size_t index = 0; index < visibleLines; index++) {
-        this->lines.push_back(Line{
-            wrappedLines[index],
-            game.resources.load<Engine::Resource::TextTexture>(
-                game.renderer.get(),
-                this->fontResourceID,
-                TEXT_COLOUR,
-                wrappedLines[index]
-            ),
-        });
+        this->lines.push_back(
+            Line{
+                wrappedLines[index],
+                game.resources.load<Engine::Resource::TextTexture>(
+                    game.renderer.get(),
+                    this->fontResourceID,
+                    TEXT_COLOUR,
+                    wrappedLines[index]
+                ),
+            }
+        );
     }
 }
 

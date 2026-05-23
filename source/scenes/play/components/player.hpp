@@ -19,10 +19,8 @@ class Player : public Engine::Nodes::Image {
     }
 
     void enter() override {
-        this->position = this->getGame().state.ensure(
-            "player-position",
-            SDL_Point{80, 72}
-        );
+        this->position =
+            this->getGame().state.ensure("player-position", SDL_Point{80, 72});
     }
 
     void exit() override {

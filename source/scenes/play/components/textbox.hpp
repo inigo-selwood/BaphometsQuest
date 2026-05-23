@@ -42,13 +42,10 @@ class Textbox : public Engine::Nodes::Object {
     std::vector<std::string>
     wrapText(const Engine::Resource::Font &font, int width) const;
 
-    static int measureText(
-        const Engine::Resource::Font &font,
-        const std::string &text
-    );
+    static int
+    measureText(const Engine::Resource::Font &font, const std::string &text);
 
-    static std::vector<std::string>
-    wrapParagraph(
+    static std::vector<std::string> wrapParagraph(
         const Engine::Resource::Font &font,
         const std::string &paragraph,
         int width

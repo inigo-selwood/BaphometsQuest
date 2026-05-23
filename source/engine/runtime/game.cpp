@@ -134,10 +134,9 @@ void Game::run() {
 
             if(sceneEntered) {
                 this->nodeManager.exit();
-                this->resources
-                    .unloadAllExcept<
-                        Engine::Resource::ImageTexture,
-                        Engine::Resource::Font>();
+                this->resources.unloadAllExcept<
+                    Engine::Resource::ImageTexture,
+                    Engine::Resource::Font>();
             }
 
             this->currentScene = this->sceneFactories.at(sceneName)();

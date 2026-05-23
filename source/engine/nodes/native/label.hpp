@@ -98,8 +98,7 @@ class Label : public Engine::Nodes::Object {
         const std::string &text
     ) {
         Engine::Game &game = this->getGame();
-        const bool fontChanged =
-            font != this->font || size != this->fontSize;
+        const bool fontChanged = font != this->font || size != this->fontSize;
         const bool textureChanged = fontChanged || text != this->text
             || colour.r != this->colour.r || colour.g != this->colour.g
             || colour.b != this->colour.b || colour.a != this->colour.a;

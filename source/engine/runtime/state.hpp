@@ -25,9 +25,8 @@ class Store {
     using Value = std::variant<bool, int, std::string, SDL_Point>;
 
     template <typename Type>
-    static constexpr bool isSupportedValue =
-        std::is_same_v<Type, bool> || std::is_same_v<Type, int>
-        || std::is_same_v<Type, std::string>
+    static constexpr bool isSupportedValue = std::is_same_v<Type, bool>
+        || std::is_same_v<Type, int> || std::is_same_v<Type, std::string>
         || std::is_same_v<Type, SDL_Point>;
 
   public:
@@ -70,9 +69,8 @@ class Store {
         const auto value = this->values.find(name);
 
         if(value != this->values.end()) {
-            const StoredType *storedValue = std::get_if<StoredType>(
-                &value->second
-            );
+            const StoredType *storedValue =
+                std::get_if<StoredType>(&value->second);
 
             if(storedValue == nullptr) {
                 throw std::runtime_error(
@@ -91,10 +89,8 @@ class Store {
             );
         }
 
-        const Value parsedValue = valueFromYAML<StoredType>(
-            rawValue->second,
-            name
-        );
+        const Value parsedValue =
+            valueFromYAML<StoredType>(rawValue->second, name);
         const auto [storedValue, inserted] =
             this->values.emplace(name, parsedValue);
         this->rawValues.erase(rawValue);
@@ -251,10 +247,8 @@ class Store {
 
     template <typename Type>
         requires isSupportedValue<Type>
-    static Value valueFromYAML(
-        const ::YAML::Node &node,
-        const std::string &name
-    ) {
+    static Value
+    valueFromYAML(const ::YAML::Node &node, const std::string &name) {
         try {
             if constexpr(std::is_same_v<Type, SDL_Point>) {
                 return Engine::Parse::point(node);
@@ -269,8 +263,8 @@ class Store {
             }
         } catch(const std::exception &exception) {
             throw std::runtime_error(
-                "State key '" + name + "' type does not match: "
-                + exception.what()
+                "State key '" + name
+                + "' type does not match: " + exception.what()
             );
         }
     }

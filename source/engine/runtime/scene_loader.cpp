@@ -154,10 +154,8 @@ void SceneLoader::loadNode(
         return;
     }
 
-    const NodeCreator *nodeCreator = getNodeCreator(
-        this->nodeCreators,
-        elementName
-    );
+    const NodeCreator *nodeCreator =
+        getNodeCreator(this->nodeCreators, elementName);
 
     if(nodeCreator == nullptr) {
         throw std::runtime_error(

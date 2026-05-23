@@ -16,8 +16,7 @@ class World : public Engine::Nodes::Object {
     bool canMove(SDL_Point fromPixel, SDL_Point toPixel) const {
         const std::shared_ptr<Engine::Nodes::Map> map =
             this->getChild<Engine::Nodes::Map>("map");
-        const SDL_Point mapPosition =
-            map->getProperty<SDL_Point>("position");
+        const SDL_Point mapPosition = map->getProperty<SDL_Point>("position");
 
         return map->canMove(
             SDL_Point{

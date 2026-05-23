@@ -9,10 +9,10 @@
   <label
     colour="#ffffffff"
     font="resources/fonts/Early GameBoy.ttf"
+    font-size="8"
     justification="centre"
     name="title"
     position="[80, 24]"
-    font-size="8"
     text="baphomet's quest"
   />
 
@@ -22,10 +22,10 @@
     cursor-path="resources/textures/tileset.png"
     cursor-region="[104, 16, 8, 8]"
     font="resources/fonts/Early GameBoy.ttf"
+    font-size="8"
     line-height="12"
     name="main-menu"
     position="[48, 64]"
-    font-size="8"
   >
     <option
       tag="continue"
