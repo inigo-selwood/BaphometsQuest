@@ -12,7 +12,7 @@
 
 namespace Engine::Resource {
 
-/** Tiled tile ID grid loaded from a map file */
+/** Tiled tile-layer grid loaded from a map file */
 class MapData : public Engine::Resource::Base {
   public:
     explicit MapData(const std::string &path);

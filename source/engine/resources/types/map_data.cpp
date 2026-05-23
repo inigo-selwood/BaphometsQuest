@@ -126,7 +126,12 @@ std::vector<std::uint16_t> parseCSV(
     return tiles;
 }
 
-/** Return the supported layer data element from the first Tiled layer */
+/**
+ * Return the supported tile-layer data element
+ *
+ * Object layers are gameplay metadata and are intentionally left for a
+ * separate parser so tile grids stay small and predictable
+ */
 const tinyxml2::XMLElement *
 getDataElement(const tinyxml2::XMLElement &root, const std::string &path) {
     const tinyxml2::XMLElement *layer = root.FirstChildElement("layer");

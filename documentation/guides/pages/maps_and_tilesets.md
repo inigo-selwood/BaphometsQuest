@@ -8,6 +8,23 @@ Tile rendering is split across three concepts:
   queries
 - `<chunk>` elements provide positioned map data inside a map
 
+Tiled Authoring Contract
+-----------------------
+
+The engine currently treats Tiled files as authored source data rather than
+export targets. Keep the map format simple and explicit:
+
+- Tilesets use `.tsx`
+- Maps use `.tmx`
+- Tile layers use CSV encoding
+- Compressed layer data is unsupported
+- Flipped and rotated tile GIDs are rejected
+- Object layers are reserved for gameplay metadata and are not loaded yet
+
+That last point is intentional. Teleports, spawn points, interaction zones, and
+similar data should eventually come from Tiled object layers, but they belong to
+a gameplay/object parser rather than the tile-grid loader.
+
 Tilesets
 --------
 
@@ -26,6 +43,8 @@ Map Data
 Map data loads the first Tiled `.tmx` tile layer using CSV encoding. Finite
 maps use the map width and height directly; infinite maps flatten their chunks
 into one bounded grid while preserving the chunk origin in map coordinates.
+Other tile layers are ignored for now, and object layers are not interpreted by
+`MapData`.
 
 Lookups such as `getTileID(SDL_Point cell)` use map coordinates, not screen
 coordinates. Infinite maps can therefore contain negative cell coordinates when
