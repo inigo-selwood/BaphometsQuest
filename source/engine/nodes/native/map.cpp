@@ -26,7 +26,11 @@ Map::Map() {
         this->tileset,
         [this](const std::string &value) { this->updateTileset(value); }
     );
-    this->declareProperty("active-map", this->activeMap);
+    this->declareProperty(
+        "active-map",
+        this->activeMap,
+        [this](const std::string &value) { this->updateActiveMap(value); }
+    );
 }
 
 void Map::setup() {
@@ -40,6 +44,12 @@ void Map::setup() {
 
     if(this->chunks.empty()) {
         throw std::runtime_error("Map requires at least one chunk");
+    }
+
+    if(!this->hasActiveChunk()) {
+        throw std::runtime_error(
+            "Map active-map '" + this->activeMap + "' does not match a chunk"
+        );
     }
 }
 
@@ -81,7 +91,7 @@ void Map::render(Engine::Render::Canvas &canvas) {
 
         const Engine::Resource::MapData &mapData =
             game.resources.get<Engine::Resource::MapData>(
-                chunk.dataResourceID
+                this->ensureChunkData(chunk)
             );
 
         const int tileCount = static_cast<int>(mapData.getTileCount());
@@ -169,7 +179,7 @@ Map::findObjectsAt(SDL_Point localPixel) const {
 
         const Engine::Resource::MapData &mapData =
             this->getGame().resources.get<Engine::Resource::MapData>(
-                chunk.dataResourceID
+                this->ensureChunkData(chunk)
             );
         std::vector<Engine::Resource::MapObject> chunkObjects =
             mapData.getObjectsAt(
@@ -187,6 +197,33 @@ Map::findObjectsAt(SDL_Point localPixel) const {
     }
 
     return objects;
+}
+
+std::optional<Engine::Resource::MapObject>
+Map::findObject(const std::string &name) const {
+    for(const Chunk &chunk : this->chunks) {
+        if(!this->isChunkActive(chunk)) {
+            continue;
+        }
+
+        const Engine::Resource::MapData &mapData =
+            this->getGame().resources.get<Engine::Resource::MapData>(
+                this->ensureChunkData(chunk)
+            );
+
+        for(Engine::Resource::MapObject object : mapData.objects) {
+            if(object.name != name) {
+                continue;
+            }
+
+            object.bounds.x += chunk.position.x;
+            object.bounds.y += chunk.position.y;
+
+            return object;
+        }
+    }
+
+    return std::nullopt;
 }
 
 Map::Chunk Map::parseChunk(const tinyxml2::XMLElement &chunkElement) {
@@ -223,9 +260,9 @@ Map::Chunk Map::parseChunk(const tinyxml2::XMLElement &chunkElement) {
     const std::string position{positionAttribute};
 
     return Chunk{
-        this->getGame().resources.load<Engine::Resource::MapData>(data),
-        name,
+        0,
         data,
+        name,
         Engine::Parse::point(position),
     };
 }
@@ -234,19 +271,45 @@ bool Map::isChunkActive(const Chunk &chunk) const {
     return this->activeMap.empty() || chunk.name == this->activeMap;
 }
 
+bool Map::hasActiveChunk() const {
+    for(const Chunk &chunk : this->chunks) {
+        if(this->isChunkActive(chunk)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+Engine::Resource::ID Map::ensureChunkData(const Chunk &chunk) const {
+    if(chunk.dataResourceID == 0) {
+        Engine::Game &game = const_cast<Engine::Game &>(this->getGame());
+        chunk.dataResourceID =
+            game.resources.load<Engine::Resource::MapData>(chunk.data);
+    }
+
+    return chunk.dataResourceID;
+}
+
+void Map::unloadInactiveChunks() {
+    for(const Chunk &chunk : this->chunks) {
+        if(chunk.dataResourceID == 0 || this->isChunkActive(chunk)) {
+            continue;
+        }
+
+        this->getGame().resources.unload(chunk.dataResourceID);
+    }
+}
+
 std::optional<std::uint16_t> Map::findTileIDAt(
     const Chunk &chunk,
     SDL_Point localPixel,
     SDL_Rect tileSize
 ) const {
-    if(chunk.dataResourceID == 0) {
-        throw std::runtime_error("Map chunk requires map data before lookup");
-    }
-
     const SDL_Point cell = getCellAt(localPixel, tileSize);
     const Engine::Resource::MapData &mapData =
         this->getGame().resources.get<Engine::Resource::MapData>(
-            chunk.dataResourceID
+            this->ensureChunkData(chunk)
         );
 
     if(cell.x < mapData.size.x || cell.y < mapData.size.y
@@ -379,6 +442,18 @@ void Map::updateTileset(const std::string &tileset) {
         this->getGame().resources.load<Engine::Resource::Tileset>(
             this->tileset
         );
+}
+
+void Map::updateActiveMap(const std::string &activeMap) {
+    this->activeMap = activeMap;
+
+    if(!this->chunks.empty() && !this->hasActiveChunk()) {
+        throw std::runtime_error(
+            "Map active-map '" + this->activeMap + "' does not match a chunk"
+        );
+    }
+
+    this->unloadInactiveChunks();
 }
 
 } // namespace Engine::Nodes

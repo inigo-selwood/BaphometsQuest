@@ -78,6 +78,7 @@
     <object
       height="8"
       id="1"
+      name="teleport-player-home"
       width="8"
       x="40"
       y="64"
@@ -89,18 +90,18 @@
         />
         <property
           name="spawn"
-          type="list"
-        >
-          <item
-            type="int"
-            value="3"
-          />
-          <item
-            type="int"
-            value="7"
-          />
-        </property>
+          value="player-home"
+        />
       </properties>
     </object>
+    <object
+      height="8"
+      id="2"
+      name="home-town-door"
+      type="spawn"
+      width="8"
+      x="40"
+      y="64"
+    />
   </objectgroup>
 </map>

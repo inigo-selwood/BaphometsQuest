@@ -1,9 +1,11 @@
 #include "world.hpp"
 
 #include "../../../engine/runtime/game.hpp"
-#include "../../../engine/utils/parse.hpp"
 
 #include <spdlog/spdlog.h>
+
+#include <optional>
+#include <stdexcept>
 
 namespace Scenes::Play::Components {
 
@@ -143,14 +145,23 @@ void World::handleTeleport(
     }
 
     if(!spawn.empty()) {
-        const SDL_Point spawnCell = Engine::Parse::point(spawn);
-        const int step =
-            actor.hasProperty("step") ? actor.getProperty<int>("step") : 8;
-        const SDL_Point mapPosition =
-            this->getMap()->getProperty<SDL_Point>("position");
+        const std::shared_ptr<Engine::Nodes::Map> worldMap = this->getMap();
+        const std::optional<Engine::Resource::MapObject> spawnObject =
+            worldMap->findObject(spawn);
+
+        if(!spawnObject.has_value()) {
+            throw std::runtime_error(
+                "Teleport '" + object.name + "' target spawn '" + spawn
+                + "' does not exist"
+            );
+        }
+
+        const SDL_Point mapPosition = worldMap->getProperty<SDL_Point>(
+            "position"
+        );
         const SDL_Point spawnPosition{
-            mapPosition.x + (spawnCell.x * step),
-            mapPosition.y + (spawnCell.y * step),
+            mapPosition.x + spawnObject->bounds.x,
+            mapPosition.y + spawnObject->bounds.y,
         };
 
         actor.setProperty("position", spawnPosition);
