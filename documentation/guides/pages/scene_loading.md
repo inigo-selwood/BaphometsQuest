@@ -93,6 +93,14 @@ import appears.
 Relative import paths resolve from the XML file that declares the import.
 Import cycles throw at load time.
 
+Hot Reloading
+-------------
+
+During the run loop, loaded scene XML files and their imports are watched with a
+small polling file watcher. When one changes, the active scene is rebuilt from
+its registered factory at the next frame boundary. Persistent `Game::state`
+survives the reload, but transient node state belongs to the rebuilt scene.
+
 Registration
 ------------
 

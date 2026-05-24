@@ -2,6 +2,7 @@
 
 #include "../nodes/base.hpp"
 #include "../resources/types/yaml.hpp"
+#include "file_watcher.hpp"
 #include "lifecycle.hpp"
 #include "managers/node.hpp"
 #include "managers/resource.hpp"
@@ -17,6 +18,7 @@
 #include <string>
 #include <type_traits>
 #include <unordered_map>
+#include <vector>
 
 #include <SDL.h>
 
@@ -102,6 +104,11 @@ class Game : public std::enable_shared_from_this<Game> {
     std::unique_ptr<SDL_Window, WindowDeleter> window;
 
   private:
+    friend class SceneLoader;
+
+    /** Record an XML file used while loading the active scene */
+    void recordSceneFile(const std::string &path);
+
     /** Whether the game loop is currently running */
     bool running = false;
 
@@ -114,6 +121,12 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Persistent state save path */
     std::optional<std::filesystem::path> statePath;
 
+    /** Current scene XML files watched for development reloads */
+    FileWatcher sceneFileWatcher;
+
+    /** XML files used by the active scene and its imports */
+    std::vector<std::string> sceneFiles;
+
     /** Registered scene factories keyed by the names used with queueScene() */
     std::unordered_map<
         std::string,
@@ -122,6 +135,9 @@ class Game : public std::enable_shared_from_this<Game> {
 
     /** Scene name waiting to be applied at the next frame boundary */
     std::optional<std::string> queuedScene;
+
+    /** Scene name currently attached to the node manager */
+    std::optional<std::string> activeScene;
 };
 
 } // namespace Engine

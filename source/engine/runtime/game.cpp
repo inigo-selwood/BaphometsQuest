@@ -3,6 +3,7 @@
 #include "../../core/logger.hpp"
 #include "../resources/types/font.hpp"
 #include "../resources/types/image_texture.hpp"
+#include "../resources/types/xml.hpp"
 #include "../utils/format.hpp"
 #include "resize/handler.hpp"
 #include "scene_loader.hpp"
@@ -139,16 +140,21 @@ void Game::run() {
                     Engine::Resource::Font>();
             }
 
+            this->sceneFiles.clear();
             this->currentScene = this->sceneFactories.at(sceneName)();
             this->queuedScene.reset();
             this->nodeManager.setRoot(this->currentScene);
             spdlog::debug("Entering scene '{}'", sceneName);
             this->nodeManager.enter();
+            this->activeScene = sceneName;
+            this->sceneFileWatcher.watch(this->sceneFiles);
             sceneEntered = true;
         } else if(!sceneEntered) {
+            this->sceneFiles.clear();
             this->nodeManager.setRoot(this->currentScene);
             spdlog::debug("Entering current scene");
             this->nodeManager.enter();
+            this->sceneFileWatcher.watch(this->sceneFiles);
             sceneEntered = true;
         }
 
@@ -185,6 +191,17 @@ void Game::run() {
         this->nodeManager.render(*this->renderer);
         SDL_RenderPresent(this->renderer.get());
         this->resources.purgeExpired();
+
+        // Changed XML reloads by queuing the current scene for next frame
+        if(!this->queuedScene.has_value() && this->activeScene.has_value()
+            && this->sceneFileWatcher.hasChanged()) {
+            spdlog::debug(
+                "Reloading scene '{}' after XML change",
+                *this->activeScene
+            );
+            this->resources.unloadAll<Engine::Resource::XML>();
+            this->queuedScene = this->activeScene;
+        }
 
         // Delay only after render and cache maintenance so frame work is
         // counted
@@ -254,6 +271,16 @@ void Game::queueScene(const std::string &name) {
     }
 
     this->queuedScene = name;
+}
+
+void Game::recordSceneFile(const std::string &path) {
+    for(const std::string &sceneFile : this->sceneFiles) {
+        if(sceneFile == path) {
+            return;
+        }
+    }
+
+    this->sceneFiles.push_back(path);
 }
 
 } // namespace Engine

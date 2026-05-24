@@ -221,6 +221,9 @@ const tinyxml2::XMLElement &SceneLoader::loadRoot(
     const std::string &path
 ) const {
     Engine::Game &game = this->getParent()->getGame();
+
+    game.recordSceneFile(path);
+
     const Engine::Resource::ID xmlID =
         game.resources.load<Engine::Resource::XML>(path);
     const Engine::Resource::XML &xml =

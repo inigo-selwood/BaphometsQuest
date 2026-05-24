@@ -21,6 +21,9 @@ Run Loop
 `Game::run()` applies queued scene changes at frame boundaries, polls SDL
 events, dispatches node hooks, clears and presents the renderer, purges expired
 resources, and asks `Engine::Timer` how long to delay before the next frame.
+Scene XML changes are also checked near the end of the frame; changed XML
+reloads the active scene on the next frame boundary so exit and enter hooks
+remain paired.
 
 Rendering is dispatched through `Engine::Nodes::Manager`. The render pass first
 discovers the active world camera, then walks the tree in order with an
