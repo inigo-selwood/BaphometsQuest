@@ -52,8 +52,8 @@ camera-derived viewport origin.
     tileset="resources/maps/tileset.tsx"
   >
     <chunk
-      data="resources/maps/chunks/overworld.tmx"
-      position="[16, 16]"
+      data="resources/maps/chunks/home-town.tmx"
+      position="[0, 0]"
     />
   </map>
 

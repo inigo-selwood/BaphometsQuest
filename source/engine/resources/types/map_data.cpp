@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -29,6 +30,16 @@ struct LoadedData {
     SDL_Rect size{0, 0, 0, 0};
     std::vector<std::uint16_t> tiles;
 };
+
+/** Return a string attribute or an empty string when omitted */
+std::string getStringAttribute(
+    const tinyxml2::XMLElement &element,
+    const std::string &name
+) {
+    const char *value = element.Attribute(name.c_str());
+
+    return value == nullptr ? std::string{} : value;
+}
 
 /** Read a required integer attribute from a Tiled XML element */
 int requireIntAttribute(
@@ -129,8 +140,7 @@ std::vector<std::uint16_t> parseCSV(
 /**
  * Return the supported tile-layer data element
  *
- * Object layers are gameplay metadata and are intentionally left for a
- * separate parser so tile grids stay small and predictable
+ * Object layers are parsed separately so tile grids stay small and predictable
  */
 const tinyxml2::XMLElement *
 getDataElement(const tinyxml2::XMLElement &root, const std::string &path) {
@@ -271,13 +281,157 @@ LoadedData loadFiniteData(
     };
 }
 
+/** Parse a Tiled property element into string-backed gameplay metadata */
+std::pair<std::string, std::string> parseProperty(
+    const tinyxml2::XMLElement &propertyElement,
+    const std::string &path
+) {
+    const char *name = propertyElement.Attribute("name");
+
+    if(name == nullptr || std::string{name}.empty()) {
+        throw std::runtime_error(
+            "Map data '" + path + "' object property requires a name"
+        );
+    }
+
+    const char *value = propertyElement.Attribute("value");
+
+    if(value != nullptr) {
+        return {name, value};
+    }
+
+    std::string listValue;
+
+    for(const tinyxml2::XMLElement *itemElement =
+            propertyElement.FirstChildElement("item");
+        itemElement != nullptr;
+        itemElement = itemElement->NextSiblingElement("item")) {
+        const char *itemValue = itemElement->Attribute("value");
+
+        if(itemValue == nullptr) {
+            throw std::runtime_error(
+                "Map data '" + path + "' list property '" + name
+                + "' item requires a value"
+            );
+        }
+
+        if(listValue.empty()) {
+            listValue = "[";
+        } else {
+            listValue += ", ";
+        }
+
+        listValue += itemValue;
+    }
+
+    if(!listValue.empty()) {
+        listValue += "]";
+        return {name, listValue};
+    }
+
+    const char *text = propertyElement.GetText();
+
+    return {name, text == nullptr ? std::string{} : text};
+}
+
+/** Parse all custom properties attached to a Tiled object */
+std::unordered_map<std::string, std::string> parseProperties(
+    const tinyxml2::XMLElement &objectElement,
+    const std::string &path
+) {
+    std::unordered_map<std::string, std::string> properties;
+    const tinyxml2::XMLElement *propertiesElement =
+        objectElement.FirstChildElement("properties");
+
+    if(propertiesElement == nullptr) {
+        return properties;
+    }
+
+    for(const tinyxml2::XMLElement *propertyElement =
+            propertiesElement->FirstChildElement("property");
+        propertyElement != nullptr;
+        propertyElement = propertyElement->NextSiblingElement("property")) {
+        const auto [name, value] = parseProperty(*propertyElement, path);
+
+        if(properties.contains(name)) {
+            throw std::runtime_error(
+                "Map data '" + path + "' object has duplicate property '"
+                + name + "'"
+            );
+        }
+
+        properties.emplace(name, value);
+    }
+
+    return properties;
+}
+
+/** Parse all Tiled object layers as gameplay metadata */
+std::vector<MapObject>
+loadObjects(const tinyxml2::XMLElement &root, const std::string &path) {
+    std::vector<MapObject> objects;
+
+    for(const tinyxml2::XMLElement *objectGroup =
+            root.FirstChildElement("objectgroup");
+        objectGroup != nullptr;
+        objectGroup = objectGroup->NextSiblingElement("objectgroup")) {
+        for(const tinyxml2::XMLElement *objectElement =
+                objectGroup->FirstChildElement("object");
+            objectElement != nullptr;
+            objectElement = objectElement->NextSiblingElement("object")) {
+            float x = 0.0F;
+            float y = 0.0F;
+            float width = 0.0F;
+            float height = 0.0F;
+
+            if(objectElement->QueryFloatAttribute("x", &x)
+                    != tinyxml2::XML_SUCCESS
+                || objectElement->QueryFloatAttribute("y", &y)
+                    != tinyxml2::XML_SUCCESS) {
+                throw std::runtime_error(
+                    "Map data '" + path + "' object requires x and y"
+                );
+            }
+
+            objectElement->QueryFloatAttribute("width", &width);
+            objectElement->QueryFloatAttribute("height", &height);
+
+            const std::string type =
+                getStringAttribute(*objectElement, "type");
+
+            objects.push_back(
+                MapObject{
+                    getStringAttribute(*objectElement, "name"),
+                    type.empty() ? getStringAttribute(*objectElement, "class")
+                                 : type,
+                    SDL_Rect{
+                        static_cast<int>(x),
+                        static_cast<int>(y),
+                        std::max(1, static_cast<int>(width)),
+                        std::max(1, static_cast<int>(height)),
+                    },
+                    parseProperties(*objectElement, path),
+                }
+            );
+        }
+    }
+
+    return objects;
+}
+
+/** Return true when a point sits inside a rectangle */
+bool contains(SDL_Rect bounds, SDL_Point point) {
+    return point.x >= bounds.x && point.y >= bounds.y
+        && point.x < bounds.x + bounds.w && point.y < bounds.y + bounds.h;
+}
+
 } // namespace
 
 MapData::MapData(const std::string &path) : MapData(path, load(path)) {}
 
 MapData::MapData(const std::string &path, Data data)
     : Base("map-data"), path(path), size(data.size),
-      tiles(std::move(data.tiles)) {}
+      tiles(std::move(data.tiles)), objects(std::move(data.objects)) {}
 
 Engine::Resource::ID MapData::key(const std::string &path) {
     return hashKey("MapData:" + path);
@@ -315,6 +469,7 @@ MapData::Data MapData::load(const std::string &path) {
     return Data{
         loadedData.size,
         std::move(loadedData.tiles),
+        loadObjects(*root, path),
     };
 }
 
@@ -343,6 +498,18 @@ std::size_t MapData::getTileCount() const {
     return this->tiles.size();
 }
 
+std::vector<MapObject> MapData::getObjectsAt(SDL_Point pixel) const {
+    std::vector<MapObject> matches;
+
+    for(const MapObject &object : this->objects) {
+        if(contains(object.bounds, pixel)) {
+            matches.push_back(object);
+        }
+    }
+
+    return matches;
+}
+
 std::string MapData::describe() const {
     ::YAML::Node name;
     name["type"] = "MapData";
@@ -352,6 +519,7 @@ std::string MapData::describe() const {
     name["width"] = this->size.w;
     name["height"] = this->size.h;
     name["tiles"] = this->tiles.size();
+    name["objects"] = this->objects.size();
 
     return this->formatDescription(name);
 }

@@ -68,6 +68,7 @@ class Scene : public Engine::Nodes::Base {
         Engine::Game &game = this->getGame();
 
         game.state.clear();
+        game.state.ensure("current-map", std::string{"home-town"});
         game.state.ensure("player-position", SDL_Point{80, 72});
         game.saveState();
         game.queueScene("play");

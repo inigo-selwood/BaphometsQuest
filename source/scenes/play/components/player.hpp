@@ -57,16 +57,7 @@ class Player : public Engine::Nodes::Image {
 
         this->elapsedMovementTime -= interval;
 
-        const SDL_Point target{
-            this->position.x + movement.x,
-            this->position.y + movement.y,
-        };
-
-        if(!this->getAncestor<World>()->canMove(this->position, target)) {
-            return;
-        }
-
-        this->position = target;
+        this->getAncestor<World>()->requestMove(*this, movement);
     }
 
   private:

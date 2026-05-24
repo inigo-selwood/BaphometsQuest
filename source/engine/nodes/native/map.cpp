@@ -6,6 +6,7 @@
 
 #include <tinyxml2.h>
 
+#include <filesystem>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -25,6 +26,7 @@ Map::Map() {
         this->tileset,
         [this](const std::string &value) { this->updateTileset(value); }
     );
+    this->declareProperty("active-map", this->activeMap);
 }
 
 void Map::setup() {
@@ -73,6 +75,10 @@ void Map::render(Engine::Render::Canvas &canvas) {
         game.resources.get<Engine::Resource::Tileset>(this->tilesetResourceID);
 
     for(const Chunk &chunk : this->chunks) {
+        if(!this->isChunkActive(chunk)) {
+            continue;
+        }
+
         const Engine::Resource::MapData &mapData =
             game.resources.get<Engine::Resource::MapData>(
                 chunk.dataResourceID
@@ -125,6 +131,10 @@ Map::findTileAt(SDL_Point localPixel) const {
         );
 
     for(const Chunk &chunk : this->chunks) {
+        if(!this->isChunkActive(chunk)) {
+            continue;
+        }
+
         const std::optional<std::uint16_t> tileID = this->findTileIDAt(
             chunk,
             SDL_Point{
@@ -148,6 +158,37 @@ Map::findTileAt(SDL_Point localPixel) const {
     return std::nullopt;
 }
 
+std::vector<Engine::Resource::MapObject>
+Map::findObjectsAt(SDL_Point localPixel) const {
+    std::vector<Engine::Resource::MapObject> objects;
+
+    for(const Chunk &chunk : this->chunks) {
+        if(!this->isChunkActive(chunk)) {
+            continue;
+        }
+
+        const Engine::Resource::MapData &mapData =
+            this->getGame().resources.get<Engine::Resource::MapData>(
+                chunk.dataResourceID
+            );
+        std::vector<Engine::Resource::MapObject> chunkObjects =
+            mapData.getObjectsAt(
+                SDL_Point{
+                    localPixel.x - chunk.position.x,
+                    localPixel.y - chunk.position.y,
+                }
+            );
+
+        for(Engine::Resource::MapObject &object : chunkObjects) {
+            object.bounds.x += chunk.position.x;
+            object.bounds.y += chunk.position.y;
+            objects.push_back(std::move(object));
+        }
+    }
+
+    return objects;
+}
+
 Map::Chunk Map::parseChunk(const tinyxml2::XMLElement &chunkElement) {
     const std::string elementName = chunkElement.Name();
 
@@ -158,6 +199,7 @@ Map::Chunk Map::parseChunk(const tinyxml2::XMLElement &chunkElement) {
     }
 
     const char *dataAttribute = chunkElement.Attribute("data");
+    const char *nameAttribute = chunkElement.Attribute("name");
     const char *positionAttribute = chunkElement.Attribute("position");
 
     if(dataAttribute == nullptr || std::string{dataAttribute}.empty()) {
@@ -174,13 +216,22 @@ Map::Chunk Map::parseChunk(const tinyxml2::XMLElement &chunkElement) {
     }
 
     const std::string data{dataAttribute};
+    const std::string name =
+        nameAttribute == nullptr || std::string{nameAttribute}.empty()
+        ? std::filesystem::path{data}.stem().string()
+        : std::string{nameAttribute};
     const std::string position{positionAttribute};
 
     return Chunk{
         this->getGame().resources.load<Engine::Resource::MapData>(data),
+        name,
         data,
         Engine::Parse::point(position),
     };
+}
+
+bool Map::isChunkActive(const Chunk &chunk) const {
+    return this->activeMap.empty() || chunk.name == this->activeMap;
 }
 
 std::optional<std::uint16_t> Map::findTileIDAt(

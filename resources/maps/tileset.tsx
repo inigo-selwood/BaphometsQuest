@@ -648,7 +648,7 @@
       <property
         name="walk_mask"
         type="int"
-        value="0"
+        value="15"
       />
     </properties>
   </tile>
@@ -756,7 +756,7 @@
       <property
         name="walk_mask"
         type="int"
-        value="0"
+        value="15"
       />
     </properties>
   </tile>
@@ -1647,7 +1647,7 @@
       <property
         name="walk_mask"
         type="int"
-        value="0"
+        value="4"
       />
     </properties>
   </tile>
@@ -1674,7 +1674,7 @@
       <property
         name="walk_mask"
         type="int"
-        value="0"
+        value="4"
       />
     </properties>
   </tile>
@@ -1701,7 +1701,7 @@
       <property
         name="walk_mask"
         type="int"
-        value="0"
+        value="4"
       />
     </properties>
   </tile>
@@ -1728,7 +1728,7 @@
       <property
         name="walk_mask"
         type="int"
-        value="0"
+        value="4"
       />
     </properties>
   </tile>

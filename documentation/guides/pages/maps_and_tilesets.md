@@ -19,11 +19,11 @@ export targets. Keep the map format simple and explicit:
 - Tile layers use CSV encoding
 - Compressed layer data is unsupported
 - Flipped and rotated tile GIDs are rejected
-- Object layers are reserved for gameplay metadata and are not loaded yet
+- Object layers are loaded as gameplay metadata
 
-That last point is intentional. Teleports, spawn points, interaction zones, and
-similar data should eventually come from Tiled object layers, but they belong to
-a gameplay/object parser rather than the tile-grid loader.
+Object layer entries are not nodes. They are lightweight map metadata that
+runtime components, such as the play scene `World`, can interpret as teleports,
+interaction zones, spawn points, or future actor/object triggers.
 
 Tilesets
 --------
@@ -43,8 +43,9 @@ Map Data
 Map data loads the first Tiled `.tmx` tile layer using CSV encoding. Finite
 maps use the map width and height directly; infinite maps flatten their chunks
 into one bounded grid while preserving the chunk origin in map coordinates.
-Other tile layers are ignored for now, and object layers are not interpreted by
-`MapData`.
+Other tile layers are ignored for now. Object layers are parsed separately from
+the tile grid and stored with name, type, pixel bounds, and string-backed
+custom properties.
 
 Lookups such as `getTileID(SDL_Point cell)` use map coordinates, not screen
 coordinates. Infinite maps can therefore contain negative cell coordinates when
@@ -88,6 +89,28 @@ The map translates a map-local pixel into child chunk-local pixels and uses the
 first matching chunk for lookup. Empty cells, cells outside the loaded map data,
 and tile IDs that are missing from the tileset are treated as absent tiles.
 
+Interaction Objects
+-------------------
+
+Tiled object layers can define gameplay metadata over the map. `MapData` keeps
+the raw object shape and custom properties; `Map` can query objects at a
+map-local pixel; scene components decide what those objects mean.
+
+The play scene `World` is the first interpreter. Player movement now routes
+through `World::requestMove()`, which asks the map whether movement is allowed,
+updates the actor position, then checks any map objects at the destination.
+Teleport objects are recognised when their Tiled type is `teleport` or they
+have a `teleport` property.
+
+Current teleport properties are intentionally small:
+
+- `scene`: scene to queue after the teleport
+- `map`: stored as `current-map` in persistent game state
+- `spawn`: tile-cell coordinate used to update `player-position`
+
+Tiled list properties are accepted for `spawn`, so a two-item integer list such
+as `[3, 7]` becomes a normal point value inside the engine.
+
 Scene XML can create a map chunk with paths to the atlas texture, Tiled tileset,
 and Tiled map under a shared map node:
 
@@ -98,8 +121,9 @@ and Tiled map under a shared map node:
   tileset="resources/maps/tileset.tsx"
 >
   <chunk
-    data="resources/maps/chunks/overworld.tmx"
-    position="[16, 16]"
+    data="resources/maps/chunks/home-town.tmx"
+    name="home-town"
+    position="[0, 0]"
   />
 </map>
 ```

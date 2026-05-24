@@ -8,9 +8,18 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace Engine::Resource {
+
+/** Gameplay object loaded from a Tiled object layer */
+struct MapObject {
+    std::string name;
+    std::string type;
+    SDL_Rect bounds{0, 0, 0, 0};
+    std::unordered_map<std::string, std::string> properties;
+};
 
 /** Tiled tile-layer grid loaded from a map file */
 class MapData : public Engine::Resource::Base {
@@ -38,6 +47,9 @@ class MapData : public Engine::Resource::Base {
     /** Return the number of tile cells in the map */
     std::size_t getTileCount() const;
 
+    /** Return gameplay objects whose bounds contain a map-local pixel */
+    std::vector<MapObject> getObjectsAt(SDL_Point pixel) const;
+
     /** Return YAML-formatted resource details for logging */
     std::string describe() const override;
 
@@ -50,10 +62,14 @@ class MapData : public Engine::Resource::Base {
     /** Row-major tile IDs */
     const std::vector<std::uint16_t> tiles;
 
+    /** Tiled object-layer metadata */
+    const std::vector<MapObject> objects;
+
   private:
     struct Data {
         SDL_Rect size{0, 0, 0, 0};
         std::vector<std::uint16_t> tiles;
+        std::vector<MapObject> objects;
     };
 
     MapData(const std::string &path, Data data);

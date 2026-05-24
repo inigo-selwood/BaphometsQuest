@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<map
+  height="20"
+  infinite="1"
+  nextlayerid="3"
+  nextobjectid="2"
+  orientation="orthogonal"
+  renderorder="right-down"
+  tiledversion="1.12.1"
+  tileheight="8"
+  tilewidth="8"
+  version="1.10"
+  width="30"
+>
+  <tileset
+    firstgid="1"
+    source="../tileset.tsx"
+  />
+  <layer
+    height="20"
+    id="1"
+    name="Tile Layer 1"
+    width="30"
+  >
+    <data encoding="csv">
+      <chunk
+        height="16"
+        width="16"
+        x="0"
+        y="0"
+      >
+        167,92,167,167,167,92,167,0,0,0,0,0,0,0,0,0,
+167,167,167,167,167,167,167,0,0,0,0,0,0,0,0,0,
+18,18,18,18,18,18,106,0,0,0,0,0,0,0,0,0,
+201,139,140,18,18,18,18,0,0,0,0,0,0,0,0,0,
+18,155,156,202,18,18,18,0,0,0,0,0,0,0,0,0,
+18,18,18,18,18,18,18,0,0,0,0,0,0,0,0,0,
+18,18,18,18,18,18,18,0,0,0,0,0,0,0,0,0,
+18,18,18,91,18,18,18,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+      </chunk>
+    </data>
+  </layer>
+  <objectgroup
+    id="2"
+    name="teleports"
+  >
+    <object
+      height="8"
+      id="1"
+      width="8"
+      x="24"
+      y="56"
+    >
+      <properties>
+        <property
+          name="map"
+          value="home-town"
+        />
+        <property
+          name="spawn"
+          type="list"
+        >
+          <item
+            type="int"
+            value="5"
+          />
+          <item
+            type="int"
+            value="8"
+          />
+        </property>
+      </properties>
+    </object>
+  </objectgroup>
+</map>

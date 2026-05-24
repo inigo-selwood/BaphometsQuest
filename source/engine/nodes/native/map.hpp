@@ -34,13 +34,21 @@ class Map : public Engine::Nodes::Object {
     /** Return true when movement between map-local pixels is permitted */
     bool canMove(SDL_Point fromPixel, SDL_Point toPixel) const;
 
+    /** Return gameplay objects at a map-local pixel position */
+    std::vector<Engine::Resource::MapObject>
+    findObjectsAt(SDL_Point localPixel) const;
+
   private:
     /** Positioned map data owned by the map rather than the node tree */
     struct Chunk {
         Engine::Resource::ID dataResourceID = 0;
+        std::string name;
         std::string data;
         SDL_Point position{0, 0};
     };
+
+    /** Return true when a chunk participates in render and lookup */
+    bool isChunkActive(const Chunk &chunk) const;
 
     /** Parse one chunk element into internal map data */
     Chunk parseChunk(const tinyxml2::XMLElement &chunkElement);
@@ -69,6 +77,7 @@ class Map : public Engine::Nodes::Object {
 
     Engine::Resource::ID textureResourceID = 0;
     Engine::Resource::ID tilesetResourceID = 0;
+    std::string activeMap;
     std::string texture;
     std::string tileset;
     std::vector<Chunk> chunks;

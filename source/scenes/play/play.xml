@@ -10,8 +10,14 @@
         tileset="resources/maps/tileset.tsx"
       >
         <chunk
-          data="resources/maps/chunks/overworld.tmx"
-          position="[16, 16]"
+          data="resources/maps/chunks/home-town.tmx"
+          name="home-town"
+          position="[0, 0]"
+        />
+        <chunk
+          data="resources/maps/chunks/home-ground-floor.tmx"
+          name="home-ground-floor"
+          position="[0, 0]"
         />
       </map>
 
