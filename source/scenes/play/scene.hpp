@@ -34,9 +34,7 @@ class Scene : public Engine::Nodes::Base {
         loader.registerNode<Scenes::Play::Components::SelectModeIcon>(
             "select-mode-icon"
         );
-        loader.registerNode<Scenes::Play::Components::StatusBar>(
-            "status-bar"
-        );
+        loader.registerNode<Scenes::Play::Components::StatusBar>("status-bar");
         loader.registerNode<Scenes::Play::Components::Textbox>("textbox");
         loader.registerNode<Scenes::Play::Components::World>("world");
         loader.load("source/scenes/play/play.xml");
@@ -130,21 +128,25 @@ class Scene : public Engine::Nodes::Base {
     }
 
     void moveSelectionCursor(SDL_Point movement) {
-        const auto cursor = this->getChild("world-layer.world.selection-cursor");
+        const auto cursor =
+            this->getChild("world-layer.world.selection-cursor");
         const SDL_Point position = cursor->getProperty<SDL_Point>("position");
 
         cursor->setProperty(
             "position",
-            this->clampSelectionPosition(SDL_Point{
-                position.x + movement.x,
-                position.y + movement.y,
-            })
+            this->clampSelectionPosition(
+                SDL_Point{
+                    position.x + movement.x,
+                    position.y + movement.y,
+                }
+            )
         );
     }
 
     void setSelectionActive(bool active) {
         const auto player = this->getChild("world-layer.world.player");
-        const auto cursor = this->getChild("world-layer.world.selection-cursor");
+        const auto cursor =
+            this->getChild("world-layer.world.selection-cursor");
 
         if(active) {
             cursor->setProperty(
@@ -209,9 +211,8 @@ class Scene : public Engine::Nodes::Base {
         }
 
         if(this->selectionActive) {
-            const auto cursor = this->getChild(
-                "world-layer.world.selection-cursor"
-            );
+            const auto cursor =
+                this->getChild("world-layer.world.selection-cursor");
             cursor->setProperty(
                 "position",
                 this->clampSelectionPosition(
@@ -236,10 +237,16 @@ class Scene : public Engine::Nodes::Base {
 
         if(this->isCloseRangeSelectMode()) {
             return SDL_Point{
-                std::clamp(position.x, playerPosition.x - step,
-                    playerPosition.x + step),
-                std::clamp(position.y, playerPosition.y - step,
-                    playerPosition.y + step),
+                std::clamp(
+                    position.x,
+                    playerPosition.x - step,
+                    playerPosition.x + step
+                ),
+                std::clamp(
+                    position.y,
+                    playerPosition.y - step,
+                    playerPosition.y + step
+                ),
             };
         }
 
@@ -248,10 +255,16 @@ class Scene : public Engine::Nodes::Base {
         const int halfHeight = screen.h / 2;
 
         return SDL_Point{
-            std::clamp(position.x, playerPosition.x - halfWidth,
-                playerPosition.x + halfWidth - step),
-            std::clamp(position.y, playerPosition.y - halfHeight,
-                playerPosition.y + halfHeight - step),
+            std::clamp(
+                position.x,
+                playerPosition.x - halfWidth,
+                playerPosition.x + halfWidth - step
+            ),
+            std::clamp(
+                position.y,
+                playerPosition.y - halfHeight,
+                playerPosition.y + halfHeight - step
+            ),
         };
     }
 

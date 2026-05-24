@@ -217,9 +217,8 @@ void SceneLoader::loadImport(
     );
 }
 
-const tinyxml2::XMLElement &SceneLoader::loadRoot(
-    const std::string &path
-) const {
+const tinyxml2::XMLElement &
+SceneLoader::loadRoot(const std::string &path) const {
     Engine::Game &game = this->getParent()->getGame();
 
     game.recordSceneFile(path);
@@ -303,14 +302,12 @@ tinyxml2::XMLElement *SceneLoader::expandImports(
                 root.FirstChildElement();
             importedChild != nullptr;
             importedChild = importedChild->NextSiblingElement()) {
-            expandedElement->InsertEndChild(
-                this->expandImports(
-                    *importedChild,
-                    importPath,
-                    importStack,
-                    document
-                )
-            );
+            expandedElement->InsertEndChild(this->expandImports(
+                *importedChild,
+                importPath,
+                importStack,
+                document
+            ));
         }
 
         importStack.pop_back();

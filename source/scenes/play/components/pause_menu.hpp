@@ -18,9 +18,8 @@ class PauseMenu : public Engine::Nodes::Base {
         const auto pauseMenu =
             this->getChild<Engine::Nodes::Menu>("pause-overlay.pause-menu");
         const auto saveConfirmation = this->getChild("save-confirmation");
-        const auto saveMenu = this->getChild<Engine::Nodes::Menu>(
-            "save-confirmation.save-menu"
-        );
+        const auto saveMenu =
+            this->getChild<Engine::Nodes::Menu>("save-confirmation.save-menu");
 
         this->getGame().signals.connect<std::string>(
             pauseMenu,
@@ -70,9 +69,11 @@ class PauseMenu : public Engine::Nodes::Base {
 
     /** Open or close the pause overlay */
     void setOpen(bool open) {
-        this->getGame().currentScene->getChild("world-layer")
+        this->getGame()
+            .currentScene->getChild("world-layer")
             ->setProperty("active", !open);
-        this->getGame().currentScene->getChild("screen-layer.textbox")
+        this->getGame()
+            .currentScene->getChild("screen-layer.textbox")
             ->setProperty("active", !open);
         this->getChild("pause-overlay")->setProperty("active", open);
         this->getChild("save-confirmation")->setProperty("active", false);
@@ -91,7 +92,8 @@ class PauseMenu : public Engine::Nodes::Base {
 
   private:
     void setTextboxText(const std::string &text) {
-        this->getGame().currentScene->getChild("screen-layer.textbox")
+        this->getGame()
+            .currentScene->getChild("screen-layer.textbox")
             ->setProperty("text", text);
     }
 
