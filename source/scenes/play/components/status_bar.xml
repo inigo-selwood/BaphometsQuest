@@ -41,7 +41,7 @@
       <image
         name="arrow-icon"
         path="resources/textures/tileset.png"
-        position="[128, 0]"
+        position="[76, 0]"
         region="[104, 48, 8, 8]"
       />
 
@@ -50,8 +50,8 @@
         font="resources/fonts/04B_03.TTF"
         font-size="8"
         name="arrow-count"
-        position="[136, 1]"
-        text="00"
+        position="[86, 1]"
+        text="000"
       />
     </box>
   </status-bar>
