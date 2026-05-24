@@ -2,6 +2,8 @@
 
 [![Build](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml/badge.svg)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml)
 
+![Baphomet's Quest demo](documentation/images/demo.png)
+
 Small SDL game!
 
 Install build tools and native libraries using the
