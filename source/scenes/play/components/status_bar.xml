@@ -1,4 +1,4 @@
-<scene name="play-status-bar">
+<template name="play-status-bar">
   <status-bar name="status-bar">
     <box
       colour="#20283dff"
@@ -39,11 +39,20 @@
       />
 
       <image
-        name="select-mode-icon"
+        name="arrow-icon"
         path="resources/textures/tileset.png"
-        position="[144, 0]"
-        region="[104, 16, 8, 8]"
+        position="[128, 0]"
+        region="[104, 48, 8, 8]"
+      />
+
+      <label
+        colour="#ffffffff"
+        font="resources/fonts/04B_03.TTF"
+        font-size="8"
+        name="arrow-count"
+        position="[136, 1]"
+        text="00"
       />
     </box>
   </status-bar>
-</scene>
+</template>

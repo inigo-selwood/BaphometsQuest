@@ -29,13 +29,38 @@
         />
       </player>
 
-      <image
+      <select-mode-icon
         active="false"
         name="selection-cursor"
         path="resources/textures/tileset.png"
         position="[80, 72]"
         region="[104, 16, 8, 8]"
-      />
+      >
+        <mode
+          name="select"
+          region="[112, 40, 8, 8]"
+        />
+
+        <mode
+          name="sword"
+          region="[96, 40, 8, 8]"
+        />
+
+        <mode
+          name="axe"
+          region="[104, 40, 8, 8]"
+        />
+
+        <mode
+          name="bow"
+          region="[96, 48, 8, 8]"
+        />
+
+        <mode
+          name="magic"
+          region="[112, 48, 8, 8]"
+        />
+      </select-mode-icon>
     </world>
   </canvas-layer>
 
