@@ -31,7 +31,7 @@ void Manager::setRoot(const std::shared_ptr<Base> &root) {
 }
 
 void Manager::enter() {
-    this->walk(this->root, [](Base &node) { node.runSetup(); });
+    this->walkAll(this->root, [](Base &node) { node.runSetup(); });
 
     this->walk(this->root, [](Base &node) {
         if(node.hasHook(Hook::Enter)) {

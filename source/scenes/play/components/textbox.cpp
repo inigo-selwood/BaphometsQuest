@@ -68,8 +68,7 @@ Textbox::Textbox() {
 }
 
 void Textbox::setup() {
-    const SDL_Rect screen = this->getGame().getScreenSize();
-    this->position = SDL_Point{0, screen.h - this->size.h};
+    this->updateAnchor();
     this->rebuildCursor();
 }
 
@@ -198,6 +197,11 @@ void Textbox::rebuildCursor() {
             game.renderer.get(),
             this->cursorPath
         );
+}
+
+void Textbox::updateAnchor() {
+    const SDL_Rect screen = this->getGame().getScreenSize();
+    this->position = SDL_Point{0, screen.h - this->size.h};
 }
 
 SDL_Rect Textbox::getCursorDestination() const {

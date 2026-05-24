@@ -77,6 +77,7 @@
     <import path="components/status_bar.xml" />
 
     <textbox
+      active="false"
       awaiting-input="true"
       colour="#20283dff"
       cursor-path="resources/textures/tileset.png"
@@ -85,7 +86,6 @@
       font-size="8"
       name="textbox"
       size="[0, 0, 160, 32]"
-      text="I should find the temple before night falls."
     />
 
     <import path="components/pause_menu.xml" />

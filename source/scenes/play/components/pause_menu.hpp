@@ -92,9 +92,11 @@ class PauseMenu : public Engine::Nodes::Base {
 
   private:
     void setTextboxText(const std::string &text) {
-        this->getGame()
-            .currentScene->getChild("screen-layer.textbox")
-            ->setProperty("text", text);
+        const auto textbox =
+            this->getGame().currentScene->getChild("screen-layer.textbox");
+
+        textbox->setProperty("text", text);
+        textbox->setProperty("active", true);
     }
 
     void persistPlayerState() {

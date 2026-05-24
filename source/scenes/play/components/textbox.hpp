@@ -35,6 +35,8 @@ class Textbox : public Engine::Nodes::Object {
 
     void rebuildCursor();
 
+    void updateAnchor();
+
     SDL_Rect getCursorDestination() const;
 
     int getTextWidth() const;

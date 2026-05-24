@@ -39,6 +39,20 @@ class Manager {
     void render(SDL_Renderer &renderer);
 
   private:
+    /** Depth-first walk used when inactive nodes still need initialization */
+    template <typename Callback>
+    void walkAll(const std::shared_ptr<Base> &node, Callback &&callback) {
+        if(node == nullptr) {
+            return;
+        }
+
+        callback(*node);
+
+        for(std::size_t index = 0; index < node->children.size(); index++) {
+            this->walkAll(node->children[index], callback);
+        }
+    }
+
     /** Depth-first walk used by hook dispatch methods */
     template <typename Callback>
     void walk(const std::shared_ptr<Base> &node, Callback &&callback) {
