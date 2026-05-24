@@ -32,6 +32,25 @@ bool World::requestMove(Engine::Nodes::Object &actor, SDL_Point movement) {
     return true;
 }
 
+World::Interaction
+World::interactAt(Engine::Nodes::Object &actor, SDL_Point worldPixel) {
+    for(const Engine::Resource::MapObject &object :
+        this->findObjectsAt(worldPixel)) {
+        if(this->isTeleport(object)) {
+            this->handleTeleport(actor, object);
+            return Interaction{Interaction::Type::Teleport, {}};
+        }
+
+        const Interaction textInteraction = this->getTextInteraction(object);
+
+        if(textInteraction.type != Interaction::Type::None) {
+            return textInteraction;
+        }
+    }
+
+    return Interaction{};
+}
+
 bool World::canMove(SDL_Point fromPixel, SDL_Point toPixel) const {
     const std::shared_ptr<Engine::Nodes::Map> map = this->getMap();
     const SDL_Point mapPosition = map->getProperty<SDL_Point>("position");
@@ -79,6 +98,34 @@ bool World::isTeleport(const Engine::Resource::MapObject &object) const {
     return object.type == "teleport" || object.properties.contains("teleport")
         || (object.properties.contains("map")
             && object.properties.contains("spawn"));
+}
+
+World::Interaction World::getTextInteraction(
+    const Engine::Resource::MapObject &object
+) const {
+    const std::string dialogue = this->getProperty(object, "dialogue");
+
+    if(!dialogue.empty()) {
+        return Interaction{Interaction::Type::Dialogue, dialogue};
+    }
+
+    const std::string text = this->getProperty(object, "text");
+
+    if(!text.empty()) {
+        return Interaction{Interaction::Type::Dialogue, text};
+    }
+
+    const std::string inspect = this->getProperty(object, "inspect");
+
+    if(!inspect.empty()) {
+        return Interaction{Interaction::Type::Inspect, inspect};
+    }
+
+    if(!object.name.empty()) {
+        return Interaction{Interaction::Type::Inspect, object.name};
+    }
+
+    return Interaction{};
 }
 
 void World::handleTeleport(

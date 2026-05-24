@@ -162,7 +162,27 @@ void Scene::setSelectionActive(bool active) {
 }
 
 void Scene::confirmSelection() {
-    this->showTextbox("Nothing here.");
+    const auto world =
+        this->getChild<Scenes::Play::Components::World>("world-layer.world");
+    const auto player = this->getChild<Engine::Nodes::Object>(
+        "world-layer.world.player"
+    );
+    const auto cursor = this->getChild("world-layer.world.selection-cursor");
+    const Scenes::Play::Components::World::Interaction interaction =
+        world->interactAt(
+            *player,
+            cursor->getProperty<SDL_Point>("position")
+        );
+
+    if(!interaction.text.empty()) {
+        this->showTextbox(interaction.text);
+    } else if(
+        interaction.type
+        == Scenes::Play::Components::World::Interaction::Type::None
+    ) {
+        this->showTextbox("Nothing here.");
+    }
+
     this->setSelectionActive(false);
 }
 

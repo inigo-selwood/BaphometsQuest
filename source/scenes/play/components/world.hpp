@@ -14,10 +14,26 @@ namespace Scenes::Play::Components {
 /** Coordinate gameplay between play-scene world children */
 class World : public Engine::Nodes::Object {
   public:
+    /** Result of asking the world to handle interaction at a point */
+    struct Interaction {
+        enum class Type {
+            None,
+            Teleport,
+            Dialogue,
+            Inspect,
+        };
+
+        Type type = Type::None;
+        std::string text;
+    };
+
     void setup() override;
 
     /** Move an actor through the world when map traversal allows it */
     bool requestMove(Engine::Nodes::Object &actor, SDL_Point movement);
+
+    /** Handle the best available interaction at a world-local pixel */
+    Interaction interactAt(Engine::Nodes::Object &actor, SDL_Point worldPixel);
 
     /** Return true when movement between world-local pixels is permitted */
     bool canMove(SDL_Point fromPixel, SDL_Point toPixel) const;
@@ -32,6 +48,11 @@ class World : public Engine::Nodes::Object {
 
     /** Return true when a map object represents a teleport trigger */
     bool isTeleport(const Engine::Resource::MapObject &object) const;
+
+    /** Return a text interaction when the object exposes readable text */
+    Interaction getTextInteraction(
+        const Engine::Resource::MapObject &object
+    ) const;
 
     /** Store teleport targets in game state and optionally queue a scene */
     void handleTeleport(
