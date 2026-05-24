@@ -2,7 +2,7 @@
 
 [![Build](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml/badge.svg)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml)
 
-![Baphomet's Quest demo](documentation/images/demo.png)
+![Baphomet's Quest demo](documentation/images/demo.gif)
 
 Small SDL game!
 
