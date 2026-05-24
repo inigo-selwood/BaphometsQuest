@@ -11,11 +11,12 @@ stable.
 XML Shape
 ---------
 
-The root element must be `<scene>` and must include a `name` attribute. That
-name is assigned to the scene root node. Each child element is a node unless
-the parent node consumes its own child XML. The element name selects the
-registered node class, the optional `name` attribute becomes the child node
-name, and every other attribute is applied as a property.
+Top-level scene files should use `<scene>` and include a `name` attribute.
+That name is assigned to the scene root node. Reusable XML fragments should use
+`<template>`. Each child element is a node unless the parent node consumes its
+own child XML. The element name selects the registered node class, the optional
+`name` attribute becomes the child node name, and every other attribute is
+applied as a property.
 
 ```xml
 <scene name="main-menu">
@@ -74,9 +75,9 @@ origin, which keeps simple map scenes usable while camera behaviour evolves.
 Imports
 -------
 
-Use `<import path="..."/>` to include another scene XML file. The imported
-file must also have a named `<scene>` root, and its children are inserted where
-the import appears.
+Use `<import path="..."/>` to include another XML file. Imported files can use
+`<scene>` or `<template>` roots, and their children are inserted where the
+import appears.
 
 ```xml
 <scene name="main-menu">

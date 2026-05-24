@@ -1,4 +1,4 @@
-<scene name="play-pause-menu">
+<template name="play-pause-menu">
   <pause-menu-controller name="pause-menu-controller">
     <box
       active="false"
@@ -90,4 +90,4 @@
       </menu>
     </box>
   </pause-menu-controller>
-</scene>
+</template>

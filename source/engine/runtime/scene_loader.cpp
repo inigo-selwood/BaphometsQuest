@@ -58,36 +58,24 @@ void SceneLoader::loadScene(
     }
 
     importStack.push_back(path);
-    Engine::Game &game = parent.getGame();
-    const Engine::Resource::ID xmlID =
-        game.resources.load<Engine::Resource::XML>(path);
-    const Engine::Resource::XML &xml =
-        game.resources.get<Engine::Resource::XML>(xmlID);
-    const tinyxml2::XMLElement *root = xml.document->RootElement();
+    const tinyxml2::XMLElement &root = this->loadRoot(path);
+    validateRoot(root, path);
 
-    if(root == nullptr) {
-        throw std::runtime_error("Scene XML '" + path + "' is empty");
-    }
+    const std::string rootName = root.Name();
+    const char *nameAttribute = root.Attribute("name");
 
-    if(std::string(root->Name()) != "scene") {
-        throw std::runtime_error(
-            "Scene XML '" + path + "' root element must be <scene>"
-        );
-    }
-
-    const char *nameAttribute = root->Attribute("name");
-
-    if(nameAttribute == nullptr || std::string{nameAttribute}.empty()) {
+    if(assignRootName && rootName == "scene"
+        && (nameAttribute == nullptr || std::string{nameAttribute}.empty())) {
         throw std::runtime_error(
             "Scene XML '" + path + "' root element requires a name attribute"
         );
     }
 
-    if(assignRootName) {
+    if(assignRootName && rootName == "scene") {
         parent.name = nameAttribute;
     }
 
-    this->loadChildren(parent, *root, path, importStack);
+    this->loadChildren(parent, root, path, importStack);
     importStack.pop_back();
 }
 
@@ -196,8 +184,14 @@ void SceneLoader::loadNode(
         }
     }
 
-    if(!node->loadXmlChildren(element)) {
-        this->loadChildren(*node, element, path, importStack);
+    tinyxml2::XMLDocument expandedDocument;
+    tinyxml2::XMLElement *expandedElement =
+        this->expandImports(element, path, importStack, expandedDocument);
+
+    expandedDocument.InsertEndChild(expandedElement);
+
+    if(!node->loadXmlChildren(*expandedElement)) {
+        this->loadChildren(*node, *expandedElement, path, importStack);
     }
 }
 
@@ -221,6 +215,105 @@ void SceneLoader::loadImport(
         importStack,
         false
     );
+}
+
+const tinyxml2::XMLElement &SceneLoader::loadRoot(
+    const std::string &path
+) const {
+    Engine::Game &game = this->getParent()->getGame();
+    const Engine::Resource::ID xmlID =
+        game.resources.load<Engine::Resource::XML>(path);
+    const Engine::Resource::XML &xml =
+        game.resources.get<Engine::Resource::XML>(xmlID);
+    const tinyxml2::XMLElement *root = xml.document->RootElement();
+
+    if(root == nullptr) {
+        throw std::runtime_error("Scene XML '" + path + "' is empty");
+    }
+
+    return *root;
+}
+
+void SceneLoader::validateRoot(
+    const tinyxml2::XMLElement &root,
+    const std::string &path
+) {
+    const std::string rootName = root.Name();
+
+    if(rootName == "scene" || rootName == "template") {
+        return;
+    }
+
+    throw std::runtime_error(
+        "Scene XML '" + path + "' root element must be <scene> or <template>"
+    );
+}
+
+tinyxml2::XMLElement *SceneLoader::expandImports(
+    const tinyxml2::XMLElement &element,
+    const std::string &path,
+    std::vector<std::string> &importStack,
+    tinyxml2::XMLDocument &document
+) const {
+    tinyxml2::XMLElement *expandedElement =
+        element.ShallowClone(&document)->ToElement();
+
+    if(expandedElement == nullptr) {
+        throw std::runtime_error("Failed to expand XML element imports");
+    }
+
+    for(const tinyxml2::XMLElement *child = element.FirstChildElement();
+        child != nullptr;
+        child = child->NextSiblingElement()) {
+        const std::string childName = child->Name();
+
+        if(childName != "import") {
+            expandedElement->InsertEndChild(
+                this->expandImports(*child, path, importStack, document)
+            );
+            continue;
+        }
+
+        const char *pathAttribute = child->Attribute("path");
+
+        if(pathAttribute == nullptr || std::string{pathAttribute}.empty()) {
+            throw std::runtime_error(
+                "Scene XML import in '" + path + "' requires a path attribute"
+            );
+        }
+
+        const std::string importPath = resolvePath(path, pathAttribute);
+
+        for(const std::string &stackPath : importStack) {
+            if(stackPath == importPath) {
+                throw std::runtime_error(
+                    "Scene XML import cycle detected for '" + importPath + "'"
+                );
+            }
+        }
+
+        importStack.push_back(importPath);
+        const tinyxml2::XMLElement &root = this->loadRoot(importPath);
+        validateRoot(root, importPath);
+
+        for(const tinyxml2::XMLElement *importedChild =
+                root.FirstChildElement();
+            importedChild != nullptr;
+            importedChild = importedChild->NextSiblingElement()) {
+            expandedElement->InsertEndChild(
+                this->expandImports(
+                    *importedChild,
+                    importPath,
+                    importStack,
+                    document
+                )
+            );
+        }
+
+        importStack.pop_back();
+    }
+
+    return expandedElement;
 }
 
 std::string SceneLoader::resolvePath(

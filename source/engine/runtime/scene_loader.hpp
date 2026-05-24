@@ -12,6 +12,7 @@
 
 namespace tinyxml2 {
 class XMLElement;
+class XMLDocument;
 }
 
 namespace Engine {
@@ -122,6 +123,18 @@ class SceneLoader {
         const tinyxml2::XMLElement &element,
         const std::string &path,
         std::vector<std::string> &importStack
+    ) const;
+
+    const tinyxml2::XMLElement &loadRoot(const std::string &path) const;
+
+    static void
+    validateRoot(const tinyxml2::XMLElement &root, const std::string &path);
+
+    tinyxml2::XMLElement *expandImports(
+        const tinyxml2::XMLElement &element,
+        const std::string &path,
+        std::vector<std::string> &importStack,
+        tinyxml2::XMLDocument &document
     ) const;
 
     static std::string
