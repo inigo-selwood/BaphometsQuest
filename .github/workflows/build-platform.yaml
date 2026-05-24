@@ -1,0 +1,251 @@
+name: Build Platform
+
+on:
+  workflow_call:
+    inputs:
+      artifact:
+        type: string
+        required: true
+      msystem:
+        type: string
+        required: false
+        default: ''
+      name:
+        type: string
+        required: true
+      package_prefix:
+        type: string
+        required: false
+        default: ''
+      runner:
+        type: string
+        required: true
+
+jobs:
+  build:
+    name: ${{ inputs.name }}
+    runs-on: ${{ inputs.runner }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # GitHub still starts scheduled workflows even when nothing changed. This
+      # cache key gives us a cheap early exit per platform after checkout
+      - name: Check scheduled build cache
+        id: build-cache
+        if: github.event_name == 'schedule'
+        uses: actions/cache/restore@v4
+        with:
+          path: .github/build-cache/${{ inputs.artifact }}
+
+          # Only files that can affect compilation, packaging, or bundled
+          # runtime data should be included here. Docs and unrelated project
+          # notes should not wake the expensive build path
+          key: >-
+            platform-build-${{ inputs.artifact }}-${{ hashFiles(
+              '.github/workflows/build.yaml',
+              '.github/workflows/build-platform.yaml',
+              'CMakeLists.txt',
+              'Taskfile.yaml',
+              'configuration/cmake/**',
+              'configuration/distribution/**',
+              'configuration/task/build.yaml',
+              'resources/**',
+              'source/**'
+            ) }}
+
+      # go-task keeps CI aligned with local commands. Scheduled cache hits skip
+      # this and all following build setup to avoid burning platform minutes
+      - name: Set up Task
+        if: >-
+          github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true'
+        uses: arduino/setup-task@v2
+
+      # Linux uses distro packages so the build resembles a normal developer or
+      # CI machine rather than a bespoke vendored dependency layout
+      - name: Install Linux dependencies
+        if: >-
+          runner.os == 'Linux' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            build-essential \
+            cmake \
+            imagemagick \
+            libcli11-dev \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            libspdlog-dev \
+            libtinyxml2-dev \
+            libx11-dev \
+            libyaml-cpp-dev \
+            ninja-build \
+            pkg-config
+
+      # macOS packages exercise the same toolchain family as local development,
+      # including sips-generated app icons and .app bundle layout
+      - name: Install macOS dependencies
+        if: >-
+          runner.os == 'macOS' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
+        run: |
+          brew update
+          brew install \
+            cli11 \
+            cmake \
+            imagemagick \
+            ninja \
+            sdl2 \
+            sdl2_image \
+            sdl2_mixer \
+            sdl2_ttf \
+            spdlog \
+            tinyxml2 \
+            yaml-cpp
+
+      # Windows uses MSYS2 so CMake can find MinGW packages consistently
+      # x64 uses UCRT64; x86 uses MINGW32 for a 32-bit build
+      - name: Set up MSYS2
+        if: >-
+          runner.os == 'Windows' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ inputs.msystem }}
+          path-type: inherit
+          update: true
+          install: >-
+            ${{ inputs.package_prefix }}-cli11
+            ${{ inputs.package_prefix }}-cmake
+            ${{ inputs.package_prefix }}-gcc
+            ${{ inputs.package_prefix }}-imagemagick
+            ${{ inputs.package_prefix }}-ninja
+            ${{ inputs.package_prefix }}-SDL2
+            ${{ inputs.package_prefix }}-SDL2_image
+            ${{ inputs.package_prefix }}-SDL2_mixer
+            ${{ inputs.package_prefix }}-SDL2_ttf
+            ${{ inputs.package_prefix }}-spdlog
+            ${{ inputs.package_prefix }}-tinyxml2
+            ${{ inputs.package_prefix }}-yaml-cpp
+
+      # Non-Windows runners can call the same task from their default shell
+      - name: Build
+        if: >-
+          runner.os != 'Windows' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
+        run: task build
+
+      # Windows keeps the build inside the MSYS2 shell so packages, cmake, ninja,
+      # and ImageMagick all resolve from the same environment
+      - name: Build Windows
+        if: >-
+          runner.os == 'Windows' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
+        shell: msys2 {0}
+        run: task build
+
+      # Linux artifacts use the AppDir assembled by CMake
+      # GitHub zips this directory for download from the workflow run
+      - name: Prepare Linux artifact
+        if: >-
+          runner.os == 'Linux' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
+        run: |
+          mkdir -p "build/artifacts/${{ inputs.artifact }}"
+          cp -R \
+            build/release/BaphometsQuest.AppDir \
+            "build/artifacts/${{ inputs.artifact }}/"
+
+      # macOS artifacts use the .app bundle assembled by CMake
+      # Separate Intel and Apple Silicon runners produce native bundles
+      - name: Prepare macOS artifact
+        if: >-
+          runner.os == 'macOS' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
+        run: |
+          mkdir -p "build/artifacts/${{ inputs.artifact }}"
+          cp -R \
+            build/release/BaphometsQuest.app \
+            "build/artifacts/${{ inputs.artifact }}/"
+
+      # Windows artifacts include the executable, runtime data, scene XML, and
+      # MinGW runtime DLLs discovered from the linked executable
+      - name: Prepare Windows artifact
+        if: >-
+          runner.os == 'Windows' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
+        shell: msys2 {0}
+        run: |
+          mkdir -p "build/artifacts/${{ inputs.artifact }}"
+          cp \
+            build/release/baphomets_quest.exe \
+            "build/artifacts/${{ inputs.artifact }}/"
+          cp -R \
+            build/release/resources \
+            "build/artifacts/${{ inputs.artifact }}/"
+          cp -R \
+            build/release/source \
+            "build/artifacts/${{ inputs.artifact }}/"
+          ldd build/release/baphomets_quest.exe \
+            | awk '/mingw|ucrt64|mingw32/ { print $3 }' \
+            | while read -r dll
+              do
+                cp -n "$dll" "build/artifacts/${{ inputs.artifact }}/"
+              done
+
+      # Uploads are attached to the workflow run
+      # They are build artifacts, not signed installers or GitHub releases
+      - name: Upload build artifact
+        if: >-
+          github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact }}
+          path: build/artifacts/${{ inputs.artifact }}
+          if-no-files-found: error
+
+      # The marker file is intentionally tiny. The cache key carries the real
+      # state; the file only gives actions/cache something concrete to store
+      - name: Mark scheduled build complete
+        if: >-
+          github.event_name == 'schedule' &&
+          steps.build-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ".github/build-cache/${{ inputs.artifact }}"
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > ".github/build-cache/${{ inputs.artifact }}/built-at.txt"
+
+      # Only successful scheduled builds reach this step, so a failing build
+      # never records a false "already checked" cache entry
+      - name: Save scheduled build cache
+        if: >-
+          github.event_name == 'schedule' &&
+          steps.build-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .github/build-cache/${{ inputs.artifact }}
+          key: >-
+            platform-build-${{ inputs.artifact }}-${{ hashFiles(
+              '.github/workflows/build.yaml',
+              '.github/workflows/build-platform.yaml',
+              'CMakeLists.txt',
+              'Taskfile.yaml',
+              'configuration/cmake/**',
+              'configuration/distribution/**',
+              'configuration/task/build.yaml',
+              'resources/**',
+              'source/**'
+            ) }}
