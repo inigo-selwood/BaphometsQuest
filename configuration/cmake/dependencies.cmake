@@ -19,7 +19,7 @@ function(configure_dependencies targetName)
     # Imported targets carry include paths and linker details
     # Keeps package-specific flags out of project target code
     target_link_libraries(${targetName}
-        PRIVATE
+        PUBLIC
             CLI11::CLI11
             spdlog::spdlog
             SDL2::SDL2

@@ -12,6 +12,7 @@ Start with the guide pages when learning the shape of the engine:
 - @ref runtime_lifecycle
 - @ref signals
 - @ref maps_and_tilesets
+- @ref testing
 
 The API reference is generated from Doxygen comments in `source/`. Use the
 guide pages for intent and the class reference for exact methods, types, and

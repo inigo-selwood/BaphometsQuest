@@ -5,7 +5,7 @@ tasks:
     dir: ../..
     cmds:
       - >-
-        find source
+        find source test
         \( -name '*.cpp' -o -name '*.hpp' \)
         -type f
         | xargs clang-format

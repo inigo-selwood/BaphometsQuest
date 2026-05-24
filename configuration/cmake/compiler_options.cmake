@@ -12,6 +12,10 @@ option(BAPHOMETS_QUEST_NATIVE_RELEASE_ARCH
     "Optimise Release builds for the current machine architecture"
     ON
 )
+option(BAPHOMETS_QUEST_ENABLE_COVERAGE
+    "Enable Clang source coverage flags for test builds"
+    OFF
+)
 
 # configure_compiler_options owns compiler policy
 # Keeps feature, optimisation, and compiler-family conditionals in one place
@@ -71,5 +75,22 @@ function(configure_compiler_options targetName)
                     $<$<CONFIG:Release>:/fp:fast>
             )
         endif()
+    endif()
+
+    if(BAPHOMETS_QUEST_ENABLE_COVERAGE)
+        if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+            message(FATAL_ERROR "Coverage is currently configured for Clang")
+        endif()
+
+        target_compile_options(${targetName}
+            PRIVATE
+                -fprofile-instr-generate
+                -fcoverage-mapping
+        )
+        target_link_options(${targetName}
+            PRIVATE
+                -fprofile-instr-generate
+                -fcoverage-mapping
+        )
     endif()
 endfunction()

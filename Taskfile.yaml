@@ -11,6 +11,16 @@ tasks:
     cmds:
       - task --taskfile configuration/task/formatting.yaml format
 
+  test:
+    desc: Build and run unit tests
+    cmds:
+      - task --taskfile configuration/task/build.yaml test
+
+  coverage:
+    desc: Build tests and generate a coverage report
+    cmds:
+      - task --taskfile configuration/task/build.yaml coverage
+
   run:
     desc: Build and run the game, forwarding arguments after --
     cmds:

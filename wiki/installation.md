@@ -7,6 +7,7 @@ Task commands in this repository to build, run, format, and generate docs.
 
 ```bash
 brew install \
+  catch2 \
   cli11 \
   cmake \
   doxygen \
@@ -31,6 +32,7 @@ sudo apt-get update
 sudo apt-get install -y \
   build-essential \
   cmake \
+  catch2 \
   doxygen \
   libcli11-dev \
   libsdl2-dev \
@@ -53,6 +55,7 @@ sudo dnf install -y \
   SDL2_image-devel \
   SDL2_mixer-devel \
   SDL2_ttf-devel \
+  catch2-devel \
   cli11-devel \
   cmake \
   doxygen \
@@ -70,6 +73,7 @@ Arch:
 ```bash
 sudo pacman -Syu --needed \
   base-devel \
+  catch2 \
   cli11 \
   cmake \
   doxygen \
@@ -99,6 +103,7 @@ winget install --id Doxygen.Doxygen --exact
 winget install --id Microsoft.Vcpkg --exact
 
 vcpkg install `
+  catch2 `
   cli11 `
   spdlog `
   sdl2 `

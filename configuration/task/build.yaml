@@ -23,6 +23,46 @@ tasks:
         --config Release
         --parallel
 
+  test:
+    dir: ../..
+    cmds:
+      - >-
+        cmake -S . -B build/debug
+        -G Ninja
+        -DBAPHOMETS_QUEST_BUILD_TESTS=ON
+      - cmake --build build/debug --target unit_tests --parallel
+      - ctest --test-dir build/debug --output-on-failure
+
+  coverage:
+    dir: ../..
+    cmds:
+      - >-
+        cmake -S . -B build/coverage
+        -G Ninja
+        -DCMAKE_BUILD_TYPE=Debug
+        -DBAPHOMETS_QUEST_BUILD_TESTS=ON
+        -DBAPHOMETS_QUEST_ENABLE_COVERAGE=ON
+      - cmake --build build/coverage --target unit_tests --parallel
+      - >-
+        LLVM_PROFILE_FILE=$PWD/build/coverage/unit_tests.profraw
+        ctest --test-dir build/coverage --output-on-failure
+      - >-
+        xcrun llvm-profdata merge -sparse
+        build/coverage/unit_tests.profraw
+        -o build/coverage/unit_tests.profdata
+      - >-
+        xcrun llvm-cov report
+        build/coverage/unit_tests
+        -instr-profile=build/coverage/unit_tests.profdata
+        -ignore-filename-regex='test/|/opt/homebrew|/usr/'
+      - >-
+        xcrun llvm-cov show
+        build/coverage/unit_tests
+        -instr-profile=build/coverage/unit_tests.profdata
+        -format=html
+        -output-dir=build/coverage/html
+        -ignore-filename-regex='test/|/opt/homebrew|/usr/'
+
   clean:
     dir: ../..
     cmds:
