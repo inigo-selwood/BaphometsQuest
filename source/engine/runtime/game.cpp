@@ -22,6 +22,12 @@ constexpr char SETTINGS_PATH[] = "resources/configuration/settings.yaml";
 constexpr char STATE_DIRECTORY[] = ".saves";
 constexpr char STATE_FILENAME[] = "state.yaml";
 
+#ifndef NDEBUG
+constexpr bool HOT_RELOAD_ENABLED = true;
+#else
+constexpr bool HOT_RELOAD_ENABLED = false;
+#endif
+
 /** Return the development save path outside shipped resources */
 std::filesystem::path
 getStatePath(const std::filesystem::path &executableDirectory) {
@@ -147,14 +153,18 @@ void Game::run() {
             spdlog::debug("Entering scene '{}'", sceneName);
             this->nodeManager.enter();
             this->activeScene = sceneName;
-            this->sceneFileWatcher.watch(this->sceneFiles);
+            if constexpr(HOT_RELOAD_ENABLED) {
+                this->sceneFileWatcher.watch(this->sceneFiles);
+            }
             sceneEntered = true;
         } else if(!sceneEntered) {
             this->sceneFiles.clear();
             this->nodeManager.setRoot(this->currentScene);
             spdlog::debug("Entering current scene");
             this->nodeManager.enter();
-            this->sceneFileWatcher.watch(this->sceneFiles);
+            if constexpr(HOT_RELOAD_ENABLED) {
+                this->sceneFileWatcher.watch(this->sceneFiles);
+            }
             sceneEntered = true;
         }
 
@@ -193,14 +203,16 @@ void Game::run() {
         this->resources.purgeExpired();
 
         // Changed XML reloads by queuing the current scene for next frame
-        if(!this->queuedScene.has_value() && this->activeScene.has_value()
-            && this->sceneFileWatcher.hasChanged()) {
-            spdlog::debug(
-                "Reloading scene '{}' after XML change",
-                *this->activeScene
-            );
-            this->resources.unloadAll<Engine::Resource::XML>();
-            this->queuedScene = this->activeScene;
+        if constexpr(HOT_RELOAD_ENABLED) {
+            if(!this->queuedScene.has_value() && this->activeScene.has_value()
+                && this->sceneFileWatcher.hasChanged()) {
+                spdlog::debug(
+                    "Reloading scene '{}' after XML change",
+                    *this->activeScene
+                );
+                this->resources.unloadAll<Engine::Resource::XML>();
+                this->queuedScene = this->activeScene;
+            }
         }
 
         // Delay only after render and cache maintenance so frame work is
