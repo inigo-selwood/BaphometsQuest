@@ -1,3 +1,5 @@
+.DS_Store
+
 /build/
 /.task/
 /configuration/formatting/node_modules/
