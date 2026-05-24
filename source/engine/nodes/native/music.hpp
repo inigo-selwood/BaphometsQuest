@@ -101,11 +101,12 @@ class Music : public Engine::Nodes::Base {
         }
     }
 
-    Engine::Resource::ID musicResourceID = 0;
-    std::string path;
+    bool active = false;
     bool autoplay = false;
     bool loop = false;
-    bool active = false;
+    std::string path;
+
+    Engine::Resource::ID musicResourceID = 0;
 };
 
 } // namespace Engine::Nodes

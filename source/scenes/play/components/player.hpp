@@ -92,10 +92,12 @@ class Player : public Engine::Nodes::Image {
             / static_cast<float>(this->speed);
     }
 
-    float elapsedMovementTime = 1.0F;
     bool movementActive = true;
+
     int speed = 102;
     int step = 8;
+
+    float elapsedMovementTime = 1.0F;
 };
 
 } // namespace Scenes::Play::Components

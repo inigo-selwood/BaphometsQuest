@@ -50,6 +50,22 @@ class Base : public std::enable_shared_from_this<Base> {
     Base();
     virtual ~Base() = default;
 
+    virtual void setup();
+    virtual void enter();
+    virtual void exit();
+    virtual void input(const SDL_Event &event);
+    virtual void process(float deltaSeconds);
+    virtual void render(Engine::Render::Canvas &canvas);
+
+    /** Apply this node's transform to the inherited render context */
+    virtual void applyRenderContext(Engine::Render::Context &context) const;
+
+    /** Return true when this node consumed its own XML child elements */
+    virtual bool loadXmlChildren(const tinyxml2::XMLElement &element);
+
+    /** Run setup once for this node */
+    void runSetup();
+
     const std::uint32_t id;
 
     /** Return the game this node is attached to */
@@ -134,11 +150,11 @@ class Base : public std::enable_shared_from_this<Base> {
         throw std::runtime_error("Node tree type was not found");
     }
 
-    /** Return true when this node has declared a property */
-    bool hasProperty(const std::string &name) const;
-
     /** Return true when this node has declared a hook */
     bool hasHook(Hook hook) const;
+
+    /** Return true when this node has declared a property */
+    bool hasProperty(const std::string &name) const;
 
     /** Return true when this node and its subtree can receive dispatch */
     bool isActive() const {
@@ -204,22 +220,6 @@ class Base : public std::enable_shared_from_this<Base> {
     /** Update a typed property from text using its declared property type */
     void
     setPropertyFromText(const std::string &name, const std::string &value);
-
-    /** Run setup once for this node */
-    void runSetup();
-
-    virtual void setup();
-    virtual void enter();
-    virtual void exit();
-    virtual void input(const SDL_Event &event);
-    virtual void process(float deltaSeconds);
-    virtual void render(Engine::Render::Canvas &canvas);
-
-    /** Apply this node's transform to the inherited render context */
-    virtual void applyRenderContext(Engine::Render::Context &context) const;
-
-    /** Return true when this node consumed its own XML child elements */
-    virtual bool loadXmlChildren(const tinyxml2::XMLElement &element);
 
   protected:
     /** Declare a property backed by direct member assignment */
@@ -331,14 +331,16 @@ class Base : public std::enable_shared_from_this<Base> {
 
     static std::uint32_t generateID();
 
-    std::string name;
     std::vector<std::shared_ptr<Base>> children;
-    std::weak_ptr<Base> parent;
     std::weak_ptr<Game> game;
+    std::string name;
+    std::weak_ptr<Base> parent;
+
     bool active = true;
     bool setupComplete = false;
-    std::unordered_map<std::string, Property> properties;
+
     std::set<Hook> hooks;
+    std::unordered_map<std::string, Property> properties;
 };
 
 } // namespace Nodes

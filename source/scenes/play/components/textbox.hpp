@@ -31,15 +31,15 @@ class Textbox : public Engine::Nodes::Object {
         Engine::Resource::ID textResourceID = 0;
     };
 
+    SDL_Rect getCursorDestination() const;
+
+    int getTextWidth() const;
+
     void rebuild();
 
     void rebuildCursor();
 
     void updateAnchor();
-
-    SDL_Rect getCursorDestination() const;
-
-    int getTextWidth() const;
 
     std::vector<std::string>
     wrapText(const Engine::Resource::Font &font, int width) const;
@@ -53,19 +53,21 @@ class Textbox : public Engine::Nodes::Object {
         int width
     );
 
-    std::string text;
     bool awaitingInput = false;
     SDL_Color colour{32, 40, 61, 255};
-    SDL_Rect size{0, 0, 144, 40};
     std::string font = "resources/fonts/04B_03.TTF";
     int fontSize = 8;
+    SDL_Rect size{0, 0, 144, 40};
+    std::string text;
+
     std::string cursorPath = "resources/textures/tileset.png";
     SDL_Rect cursorRegion{8, 8, 8, 8};
-    Engine::Resource::ID fontResourceID = 0;
     Engine::Resource::ID cursorResourceID = 0;
-    std::vector<Line> lines;
     float caretElapsed = 0.0F;
     int caretShift = 0;
+
+    Engine::Resource::ID fontResourceID = 0;
+    std::vector<Line> lines;
 };
 
 } // namespace Scenes::Play::Components

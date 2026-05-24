@@ -39,28 +39,29 @@ class Sprite : public Engine::Nodes::Object {
     void render(Engine::Render::Canvas &canvas) override;
 
   private:
-    /** Update the cached texture ID when the sprite path changes */
-    void update(const std::string &path);
-
-    const Animation &getAnimation() const;
-
-    /** Reset animation timing when animation definitions change */
-    void updateAnimations(const std::vector<Animation> &animations);
-
-    /** Reset animation timing when changing active animation */
-    void updateAnimation(const std::string &animation);
-
     static Animation
     parseAnimation(const tinyxml2::XMLElement &animationElement);
 
     static Frame parseFrame(const tinyxml2::XMLElement &frameElement);
 
-    Engine::Resource::ID textureResourceID = 0;
-    std::string path;
-    std::vector<Animation> animations;
+    const Animation &getAnimation() const;
+
+    /** Update the cached texture ID when the sprite path changes */
+    void update(const std::string &path);
+
+    /** Reset animation timing when changing active animation */
+    void updateAnimation(const std::string &animation);
+
+    /** Reset animation timing when animation definitions change */
+    void updateAnimations(const std::vector<Animation> &animations);
+
     std::string animation;
-    std::size_t frameIndex = 0;
+    std::vector<Animation> animations;
     float frameElapsed = 0.0F;
+    std::size_t frameIndex = 0;
+
+    std::string path;
+    Engine::Resource::ID textureResourceID = 0;
 };
 
 } // namespace Engine::Nodes

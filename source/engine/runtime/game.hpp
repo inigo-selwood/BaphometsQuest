@@ -91,17 +91,17 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Shared state store */
     Engine::State::Store state;
 
-    /** Active node tree manager */
-    Engine::Nodes::Manager nodeManager;
-
-    /** Current active scene root */
-    std::shared_ptr<Engine::Nodes::Base> currentScene;
-
     /** Active SDL renderer */
     std::unique_ptr<SDL_Renderer, RendererDeleter> renderer;
 
     /** Active SDL window */
     std::unique_ptr<SDL_Window, WindowDeleter> window;
+
+    /** Active node tree manager */
+    Engine::Nodes::Manager nodeManager;
+
+    /** Current active scene root */
+    std::shared_ptr<Engine::Nodes::Base> currentScene;
 
   private:
     friend class SceneLoader;
@@ -109,23 +109,11 @@ class Game : public std::enable_shared_from_this<Game> {
     /** Record an XML file used while loading the active scene */
     void recordSceneFile(const std::string &path);
 
-    /** Whether the game loop is currently running */
-    bool running = false;
+    /** Scene name currently attached to the node manager */
+    std::optional<std::string> activeScene;
 
-    /** Adaptive frame limiter */
-    Timer timer;
-
-    /** Renderer clear colour */
-    SDL_Color renderClearColour{0, 0, 0, 255};
-
-    /** Persistent state save path */
-    std::optional<std::filesystem::path> statePath;
-
-    /** Current scene XML files watched for development reloads */
-    FileWatcher sceneFileWatcher;
-
-    /** XML files used by the active scene and its imports */
-    std::vector<std::string> sceneFiles;
+    /** Scene name waiting to be applied at the next frame boundary */
+    std::optional<std::string> queuedScene;
 
     /** Registered scene factories keyed by the names used with queueScene() */
     std::unordered_map<
@@ -133,11 +121,23 @@ class Game : public std::enable_shared_from_this<Game> {
         std::function<std::shared_ptr<Engine::Nodes::Base>()>>
         sceneFactories;
 
-    /** Scene name waiting to be applied at the next frame boundary */
-    std::optional<std::string> queuedScene;
+    /** Whether the game loop is currently running */
+    bool running = false;
 
-    /** Scene name currently attached to the node manager */
-    std::optional<std::string> activeScene;
+    /** Renderer clear colour */
+    SDL_Color renderClearColour{0, 0, 0, 255};
+
+    /** Adaptive frame limiter */
+    Timer timer;
+
+    /** Current scene XML files watched for development reloads */
+    FileWatcher sceneFileWatcher;
+
+    /** XML files used by the active scene and its imports */
+    std::vector<std::string> sceneFiles;
+
+    /** Persistent state save path */
+    std::optional<std::filesystem::path> statePath;
 };
 
 } // namespace Engine

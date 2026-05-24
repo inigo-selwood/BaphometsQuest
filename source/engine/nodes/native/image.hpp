@@ -82,9 +82,9 @@ class Image : public Engine::Nodes::Object {
             );
     }
 
-    Engine::Resource::ID textureResourceID = 0;
     std::string path;
     SDL_Rect region{0, 0, 0, 0};
+    Engine::Resource::ID textureResourceID = 0;
 };
 
 } // namespace Engine::Nodes

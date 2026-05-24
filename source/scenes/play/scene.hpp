@@ -28,18 +28,22 @@ class Scene : public Engine::Nodes::Base {
         Magic,
     };
 
+    void confirmSelection();
+    void cycleSelectMode();
+
     void showTextbox(const std::string &text);
     void hideTextbox();
-    bool isSelectionKey(const SDL_Event &event) const;
+
+    SDL_Point clampSelectionPosition(SDL_Point position) const;
+    std::string getSelectModeName() const;
     SDL_Point getSelectionMovement(const SDL_Event &event) const;
+    bool isCloseRangeSelectMode() const;
+    bool isSelectionKey(const SDL_Event &event) const;
+
     void moveSelectionCursor(SDL_Point movement);
     void setSelectionActive(bool active);
-    void confirmSelection();
     void updateSelectionMode();
-    std::string getSelectModeName() const;
-    void cycleSelectMode();
-    bool isCloseRangeSelectMode() const;
-    SDL_Point clampSelectionPosition(SDL_Point position) const;
+
     std::shared_ptr<Scenes::Play::Components::PauseMenu> getPauseMenu() const;
 
     SelectMode selectMode = SelectMode::Select;

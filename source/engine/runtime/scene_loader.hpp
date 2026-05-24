@@ -89,29 +89,24 @@ class SceneLoader {
         });
     }
 
+    static std::unordered_map<std::string, NodeCreator> &
+    getGlobalNodeCreators();
+
     static const NodeCreator *getNodeCreator(
         const std::unordered_map<std::string, NodeCreator> &localNodeCreators,
         const std::string &elementName
     );
 
-    static std::unordered_map<std::string, NodeCreator> &
-    getGlobalNodeCreators();
+    std::shared_ptr<Engine::Nodes::Base> getParent() const;
 
-    void loadScene(
-        Engine::Nodes::Base &parent,
+    tinyxml2::XMLElement *expandImports(
+        const tinyxml2::XMLElement &element,
         const std::string &path,
         std::vector<std::string> &importStack,
-        bool assignRootName
+        tinyxml2::XMLDocument &document
     ) const;
 
     void loadChildren(
-        Engine::Nodes::Base &parent,
-        const tinyxml2::XMLElement &element,
-        const std::string &path,
-        std::vector<std::string> &importStack
-    ) const;
-
-    void loadNode(
         Engine::Nodes::Base &parent,
         const tinyxml2::XMLElement &element,
         const std::string &path,
@@ -125,24 +120,30 @@ class SceneLoader {
         std::vector<std::string> &importStack
     ) const;
 
-    const tinyxml2::XMLElement &loadRoot(const std::string &path) const;
-
-    static void
-    validateRoot(const tinyxml2::XMLElement &root, const std::string &path);
-
-    tinyxml2::XMLElement *expandImports(
+    void loadNode(
+        Engine::Nodes::Base &parent,
         const tinyxml2::XMLElement &element,
         const std::string &path,
+        std::vector<std::string> &importStack
+    ) const;
+
+    const tinyxml2::XMLElement &loadRoot(const std::string &path) const;
+
+    void loadScene(
+        Engine::Nodes::Base &parent,
+        const std::string &path,
         std::vector<std::string> &importStack,
-        tinyxml2::XMLDocument &document
+        bool assignRootName
     ) const;
 
     static std::string
     resolvePath(const std::string &path, const std::string &importPath);
 
-    std::shared_ptr<Engine::Nodes::Base> getParent() const;
+    static void
+    validateRoot(const tinyxml2::XMLElement &root, const std::string &path);
 
     std::weak_ptr<Engine::Nodes::Base> parent;
+
     std::unordered_map<std::string, NodeCreator> nodeCreators;
 };
 

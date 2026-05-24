@@ -39,25 +39,29 @@ class Menu : public Engine::Nodes::Object {
     void render(Engine::Render::Canvas &canvas) override;
 
   private:
+    static Option parseOption(const tinyxml2::XMLElement &optionElement);
+
     void rebuild();
 
     void selectCurrent();
 
-    static Option parseOption(const tinyxml2::XMLElement &optionElement);
-
+    SDL_Color colour{255, 255, 255, 255};
     std::string font;
     int fontSize = 0;
-    SDL_Color colour{255, 255, 255, 255};
+
     int lineHeight = 0;
+
     int cursorOffset = 0;
     std::string cursorPath;
     SDL_Rect cursorRegion{0, 0, 0, 0};
-    Engine::Resource::ID fontResourceID = 0;
     Engine::Resource::ID cursorResourceID = 0;
-    std::vector<Option> options;
-    std::size_t selectedOption = 0;
     float cursorElapsed = 0.0F;
     int cursorShift = 0;
+
+    Engine::Resource::ID fontResourceID = 0;
+
+    std::vector<Option> options;
+    std::size_t selectedOption = 0;
 };
 
 } // namespace Engine::Nodes

@@ -39,6 +39,15 @@ class World : public Engine::Nodes::Object {
     bool canMove(SDL_Point fromPixel, SDL_Point toPixel) const;
 
   private:
+    /** Return the required map child */
+    std::shared_ptr<Engine::Nodes::Map> getMap() const;
+
+    /** Return an object property or an empty string when absent */
+    static std::string getProperty(
+        const Engine::Resource::MapObject &object,
+        const std::string &name
+    );
+
     /** Return gameplay objects at a world-local pixel position */
     std::vector<Engine::Resource::MapObject>
     findObjectsAt(SDL_Point worldPixel) const;
@@ -58,15 +67,6 @@ class World : public Engine::Nodes::Object {
     void handleTeleport(
         Engine::Nodes::Object &actor,
         const Engine::Resource::MapObject &object
-    );
-
-    /** Return the required map child */
-    std::shared_ptr<Engine::Nodes::Map> getMap() const;
-
-    /** Return an object property or an empty string when absent */
-    static std::string getProperty(
-        const Engine::Resource::MapObject &object,
-        const std::string &name
     );
 };
 

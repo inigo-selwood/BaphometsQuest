@@ -145,13 +145,14 @@ class Label : public Engine::Nodes::Object {
             );
     }
 
-    Engine::Resource::ID fontResourceID = 0;
-    Engine::Resource::ID textResourceID = 0;
+    SDL_Color colour{255, 255, 255, 255};
     std::string font;
     int fontSize = 0;
-    std::string text;
-    SDL_Color colour{255, 255, 255, 255};
     Justification justification = Justification::Left;
+    std::string text;
+
+    Engine::Resource::ID fontResourceID = 0;
+    Engine::Resource::ID textResourceID = 0;
 };
 
 } // namespace Engine::Nodes
