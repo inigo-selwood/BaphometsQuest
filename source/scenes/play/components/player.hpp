@@ -14,6 +14,7 @@ class Player : public Engine::Nodes::Image {
         this->declareHook(Engine::Nodes::Hook::Enter);
         this->declareHook(Engine::Nodes::Hook::Exit);
         this->declareHook(Engine::Nodes::Hook::Process);
+        this->declareProperty("movement-active", this->movementActive);
         this->declareProperty("speed", this->speed);
         this->declareProperty("step", this->step);
     }
@@ -28,6 +29,10 @@ class Player : public Engine::Nodes::Image {
     }
 
     void process(float deltaSeconds) override {
+        if(!this->movementActive) {
+            return;
+        }
+
         const Uint8 *keys = SDL_GetKeyboardState(nullptr);
         const SDL_Point movement = this->getMovement(keys);
         const float interval = this->getMovementInterval();
@@ -97,6 +102,7 @@ class Player : public Engine::Nodes::Image {
     }
 
     float elapsedMovementTime = 1.0F;
+    bool movementActive = true;
     int speed = 102;
     int step = 8;
 };
