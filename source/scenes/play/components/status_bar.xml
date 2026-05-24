@@ -1,0 +1,49 @@
+<scene name="play-status-bar">
+  <status-bar name="status-bar">
+    <box
+      colour="#20283dff"
+      name="background"
+      position="[0, 0]"
+      size="[0, 0, 160, 8]"
+    >
+      <image
+        name="heart-icon"
+        path="resources/textures/tileset.png"
+        position="[8, 0]"
+        region="[112, 16, 8, 8]"
+      />
+
+      <label
+        colour="#ffffffff"
+        font="resources/fonts/04B_03.TTF"
+        font-size="8"
+        name="health-value"
+        position="[18, 1]"
+        text="000"
+      />
+
+      <image
+        name="dollar-icon"
+        path="resources/textures/tileset.png"
+        position="[40, 0]"
+        region="[120, 16, 8, 8]"
+      />
+
+      <label
+        colour="#ffffffff"
+        font="resources/fonts/04B_03.TTF"
+        font-size="8"
+        name="money-value"
+        position="[48, 1]"
+        text="0000"
+      />
+
+      <image
+        name="select-mode-icon"
+        path="resources/textures/tileset.png"
+        position="[144, 0]"
+        region="[104, 16, 8, 8]"
+      />
+    </box>
+  </status-bar>
+</scene>

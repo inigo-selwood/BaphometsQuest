@@ -28,6 +28,14 @@
           position="[4, 4]"
         />
       </player>
+
+      <image
+        active="false"
+        name="selection-cursor"
+        path="resources/textures/tileset.png"
+        position="[80, 72]"
+        region="[104, 16, 8, 8]"
+      />
     </world>
   </canvas-layer>
 
@@ -35,44 +43,7 @@
     mode="screen"
     name="screen-layer"
   >
-    <box
-      colour="#20283dff"
-      name="hud"
-      position="[0, 0]"
-      size="[0, 0, 160, 8]"
-    >
-      <image
-        name="heart-icon"
-        path="resources/textures/tileset.png"
-        position="[8, 0]"
-        region="[112, 16, 8, 8]"
-      />
-
-      <label
-        colour="#ffffffff"
-        font="resources/fonts/04B_03.TTF"
-        font-size="8"
-        name="health-value"
-        position="[18, 1]"
-        text="000"
-      />
-
-      <image
-        name="dollar-icon"
-        path="resources/textures/tileset.png"
-        position="[40, 0]"
-        region="[120, 16, 8, 8]"
-      />
-
-      <label
-        colour="#ffffffff"
-        font="resources/fonts/04B_03.TTF"
-        font-size="8"
-        name="money-value"
-        position="[48, 1]"
-        text="0000"
-      />
-    </box>
+    <import path="components/status_bar.xml" />
 
     <textbox
       awaiting-input="true"
@@ -86,94 +57,6 @@
       text="I should find the temple before night falls."
     />
 
-    <box
-      active="false"
-      colour="#20283dff"
-      name="pause-overlay"
-      position="[0, 0]"
-      size="[0, 0, 160, 120]"
-    >
-      <label
-        colour="#ffffffff"
-        font="resources/fonts/Early GameBoy.ttf"
-        font-size="8"
-        justification="centre"
-        name="pause-title"
-        position="[80, 28]"
-        text="paused"
-      />
-
-      <menu
-        colour="#ffffffff"
-        cursor-offset="12"
-        cursor-path="resources/textures/tileset.png"
-        cursor-region="[104, 16, 8, 8]"
-        font="resources/fonts/Early GameBoy.ttf"
-        font-size="8"
-        line-height="12"
-        name="pause-menu"
-        position="[48, 52]"
-      >
-        <option
-          tag="inventory"
-          text="Inventory"
-        />
-
-        <option
-          tag="stats"
-          text="Stats"
-        />
-
-        <option
-          tag="save"
-          text="Save"
-        />
-
-        <option
-          tag="main-menu"
-          text="Main Menu"
-        />
-      </menu>
-    </box>
-
-    <box
-      active="false"
-      colour="#20283dff"
-      name="save-confirmation"
-      position="[0, 0]"
-      size="[0, 0, 160, 120]"
-    >
-      <label
-        colour="#ffffffff"
-        font="resources/fonts/Early GameBoy.ttf"
-        font-size="8"
-        justification="centre"
-        name="save-title"
-        position="[80, 48]"
-        text="save game?"
-      />
-
-      <menu
-        colour="#ffffffff"
-        cursor-offset="12"
-        cursor-path="resources/textures/tileset.png"
-        cursor-region="[104, 16, 8, 8]"
-        font="resources/fonts/Early GameBoy.ttf"
-        font-size="8"
-        line-height="12"
-        name="save-menu"
-        position="[56, 76]"
-      >
-        <option
-          tag="yes"
-          text="Yes"
-        />
-
-        <option
-          tag="back"
-          text="Back"
-        />
-      </menu>
-    </box>
+    <import path="components/pause_menu.xml" />
   </canvas-layer>
 </scene>
