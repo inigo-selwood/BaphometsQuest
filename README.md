@@ -1,6 +1,7 @@
 # Baphomet's Quest
 
 [![Build](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml/badge.svg)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/inigo-selwood/Baphomet-s-Quest/main/documentation/badges/coverage.json)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml)
 
 ![Baphomet's Quest demo](documentation/images/demo.gif)
 

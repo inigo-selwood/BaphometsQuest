@@ -11,10 +11,66 @@ on:
     - cron: '0 6 * * 1'
 
 permissions:
-  contents: read
+  contents: write
   actions: write
 
 jobs:
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Coverage uses the Linux Clang toolchain so the badge can be refreshed
+      # cheaply once per workflow run without waiting on every platform matrix
+      - name: Set up Task
+        uses: arduino/setup-task@v2
+
+      # Keep this dependency set aligned with the Linux platform build
+      # llvm supplies llvm-cov and llvm-profdata for source coverage reports
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            build-essential \
+            catch2 \
+            clang \
+            cmake \
+            imagemagick \
+            llvm \
+            libcli11-dev \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            libspdlog-dev \
+            libtinyxml2-dev \
+            libx11-dev \
+            libyaml-cpp-dev \
+            ninja-build \
+            pkg-config
+
+      - name: Build coverage
+        run: task coverage
+
+      # The README badge reads this committed Shields endpoint from main
+      # Only main updates the badge; other refs still run coverage without push
+      - name: Update coverage badge
+        if: github.ref == 'refs/heads/main'
+        run: |
+          if git diff --quiet documentation/badges/coverage.json
+          then
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add documentation/badges/coverage.json
+          git commit -m "Update coverage badge"
+          git push
+
   build:
     name: ${{ matrix.name }}
     uses: ./.github/workflows/build-platform.yaml

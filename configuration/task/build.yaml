@@ -35,8 +35,15 @@ tasks:
 
   coverage:
     dir: ../..
+    vars:
+      LLVM_COV:
+        sh: command -v llvm-cov || xcrun --find llvm-cov
+      LLVM_PROFDATA:
+        sh: command -v llvm-profdata || xcrun --find llvm-profdata
     cmds:
       - >-
+        CC=clang
+        CXX=clang++
         cmake -S . -B build/coverage
         -G Ninja
         -DCMAKE_BUILD_TYPE=Debug
@@ -47,21 +54,33 @@ tasks:
         LLVM_PROFILE_FILE=$PWD/build/coverage/unit_tests.profraw
         ctest --test-dir build/coverage --output-on-failure
       - >-
-        xcrun llvm-profdata merge -sparse
+        {{.LLVM_PROFDATA}} merge -sparse
         build/coverage/unit_tests.profraw
         -o build/coverage/unit_tests.profdata
       - >-
-        xcrun llvm-cov report
+        {{.LLVM_COV}} report
         build/coverage/unit_tests
         -instr-profile=build/coverage/unit_tests.profdata
         -ignore-filename-regex='test/|/opt/homebrew|/usr/'
+        | tee build/coverage/report.txt
       - >-
-        xcrun llvm-cov show
+        {{.LLVM_COV}} show
         build/coverage/unit_tests
         -instr-profile=build/coverage/unit_tests.profdata
         -format=html
         -output-dir=build/coverage/html
         -ignore-filename-regex='test/|/opt/homebrew|/usr/'
+      - >-
+        awk '/^TOTAL/ {
+          coverage=$10;
+          numeric=coverage;
+          sub("%", "", numeric);
+          colour="red";
+          if(numeric >= 70) colour="green";
+          else if(numeric >= 50) colour="yellow";
+          else if(numeric >= 35) colour="orange";
+          printf "{\"schemaVersion\":1,\"label\":\"coverage\",\"message\":\"%s\",\"color\":\"%s\"}\n", coverage, colour
+        }' build/coverage/report.txt > documentation/badges/coverage.json
 
   clean:
     dir: ../..

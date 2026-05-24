@@ -16,8 +16,8 @@ task coverage
 ```
 
 The text report prints to the terminal. The HTML report is written to
-`build/coverage/html`. Coverage currently uses Clang's source coverage tools
-through `xcrun`, matching the local macOS toolchain.
+`build/coverage/html`. The coverage badge endpoint is written to
+`documentation/badges/coverage.json`.
 
 The first test layer focuses on behaviour that can run without opening an SDL
 window:

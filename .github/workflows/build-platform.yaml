@@ -52,7 +52,8 @@ jobs:
               'configuration/distribution/**',
               'configuration/task/build.yaml',
               'resources/**',
-              'source/**'
+              'source/**',
+              'test/**'
             ) }}
 
       # go-task keeps CI aligned with local commands. Scheduled cache hits skip
@@ -74,8 +75,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes \
             build-essential \
+            catch2 \
             cmake \
+            clang \
             imagemagick \
+            llvm \
             libcli11-dev \
             libsdl2-dev \
             libsdl2-image-dev \
@@ -98,6 +102,7 @@ jobs:
         run: |
           brew update
           brew install \
+            catch2 \
             cli11 \
             cmake \
             imagemagick \
@@ -128,6 +133,7 @@ jobs:
             ${{ inputs.package_prefix }}-gcc
             ${{ inputs.package_prefix }}-imagemagick
             ${{ inputs.package_prefix }}-ninja
+            ${{ inputs.package_prefix }}-catch2
             ${{ inputs.package_prefix }}-SDL2
             ${{ inputs.package_prefix }}-SDL2_image
             ${{ inputs.package_prefix }}-SDL2_mixer
@@ -153,6 +159,25 @@ jobs:
           steps.build-cache.outputs.cache-hit != 'true')
         shell: msys2 {0}
         run: task build
+
+      # Unit tests run before packaging so artifacts are only uploaded after the
+      # platform build proves both compilation and engine-level checks pass
+      - name: Test
+        if: >-
+          runner.os != 'Windows' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
+        run: task test
+
+      # Windows tests stay inside MSYS2 for the same package resolution reasons
+      # as the Windows release build
+      - name: Test Windows
+        if: >-
+          runner.os == 'Windows' &&
+          (github.event_name != 'schedule' ||
+          steps.build-cache.outputs.cache-hit != 'true')
+        shell: msys2 {0}
+        run: task test
 
       # Linux artifacts use the AppDir assembled by CMake
       # GitHub zips this directory for download from the workflow run
@@ -247,5 +272,6 @@ jobs:
               'configuration/distribution/**',
               'configuration/task/build.yaml',
               'resources/**',
-              'source/**'
+              'source/**',
+              'test/**'
             ) }}
