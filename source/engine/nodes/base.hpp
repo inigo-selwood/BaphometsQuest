@@ -50,11 +50,22 @@ class Base : public std::enable_shared_from_this<Base> {
     Base();
     virtual ~Base() = default;
 
+    /** Initialize node-owned children, resources, and signals */
     virtual void setup();
+
+    /** Run when the node enters the active tree */
     virtual void enter();
+
+    /** Run when the node exits the active tree */
     virtual void exit();
+
+    /** Handle an SDL input event */
     virtual void input(const SDL_Event &event);
+
+    /** Update node state using elapsed frame time */
     virtual void process(float deltaSeconds);
+
+    /** Draw the node through the render canvas */
     virtual void render(Engine::Render::Canvas &canvas);
 
     /** Apply this node's transform to the inherited render context */

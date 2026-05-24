@@ -16,12 +16,14 @@ namespace Scenes::Play::Components {
 /** Image node that maps named select modes to atlas regions from XML */
 class SelectModeIcon : public Engine::Nodes::Image {
   public:
+    /** Load named mode regions from XML child elements */
     bool loadXmlChildren(const tinyxml2::XMLElement &element) override;
 
     /** Set the active icon mode */
     void setMode(const std::string &name);
 
   private:
+    /** Parse a mode child element into an icon lookup entry */
     static std::pair<std::string, SDL_Rect>
     parseMode(const tinyxml2::XMLElement &modeElement);
 

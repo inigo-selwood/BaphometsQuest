@@ -26,12 +26,14 @@ class Music : public Engine::Nodes::Base {
         this->declareProperty("loop", this->loop);
     }
 
+    /** Start playback when autoplay is enabled */
     void enter() override {
         if(this->autoplay) {
             this->start();
         }
     }
 
+    /** Stop playback when leaving the active tree */
     void exit() override {
         this->stop();
     }

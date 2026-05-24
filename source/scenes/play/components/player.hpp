@@ -19,15 +19,18 @@ class Player : public Engine::Nodes::Image {
         this->declareProperty("step", this->step);
     }
 
+    /** Restore persisted player position when entering play */
     void enter() override {
         this->position =
             this->getGame().state.ensure("player-position", SDL_Point{80, 72});
     }
 
+    /** Persist player position when leaving play */
     void exit() override {
         this->getGame().state.set("player-position", this->position);
     }
 
+    /** Apply held-key movement on a fixed grid cooldown */
     void process(float deltaSeconds) override {
         if(!this->movementActive) {
             return;

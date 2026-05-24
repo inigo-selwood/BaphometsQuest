@@ -16,6 +16,7 @@ class Box : public Engine::Nodes::Object {
         this->declareProperty("size", this->size);
     }
 
+    /** Draw the configured filled rectangle */
     void render(Engine::Render::Canvas &canvas) override {
         canvas.setBlendMode(SDL_BLENDMODE_BLEND);
         canvas.setDrawColour(this->colour);

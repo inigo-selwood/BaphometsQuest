@@ -19,34 +19,46 @@ class Textbox : public Engine::Nodes::Object {
   public:
     Textbox();
 
+    /** Anchor the textbox and build its initial cached resources */
     void setup() override;
 
+    /** Advance the waiting cursor animation */
     void process(float deltaSeconds) override;
 
+    /** Draw the textbox background, wrapped text, and waiting cursor */
     void render(Engine::Render::Canvas &canvas) override;
 
   private:
+    /** Cached wrapped line of rendered dialogue text */
     struct Line {
         std::string text;
         Engine::Resource::ID textResourceID = 0;
     };
 
+    /** Return the cursor rectangle relative to the textbox */
     SDL_Rect getCursorDestination() const;
 
+    /** Return the text width available beside the cursor */
     int getTextWidth() const;
 
+    /** Rebuild wrapped text resources after display input changes */
     void rebuild();
 
+    /** Rebuild the cached cursor image resource */
     void rebuildCursor();
 
+    /** Anchor the textbox to the bottom of the current screen */
     void updateAnchor();
 
+    /** Split current textbox text into rendered line strings */
     std::vector<std::string>
     wrapText(const Engine::Resource::Font &font, int width) const;
 
+    /** Measure text width for wrapping decisions */
     static int
     measureText(const Engine::Resource::Font &font, const std::string &text);
 
+    /** Split one paragraph into lines that fit the target width */
     static std::vector<std::string> wrapParagraph(
         const Engine::Resource::Font &font,
         const std::string &paragraph,

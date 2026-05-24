@@ -14,6 +14,7 @@ class Object : public Engine::Nodes::Base {
         this->declareProperty("position", this->position);
     }
 
+    /** Add local position to the inherited render context */
     void applyRenderContext(Engine::Render::Context &context) const override {
         context.addOrigin(this->position);
     }

@@ -27,6 +27,7 @@ class World : public Engine::Nodes::Object {
         std::string text;
     };
 
+    /** Select the active map from persisted state */
     void setup() override;
 
     /** Move an actor through the world when map traversal allows it */

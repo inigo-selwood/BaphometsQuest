@@ -27,22 +27,29 @@ class Menu : public Engine::Nodes::Object {
 
     Menu();
 
+    /** Load menu options from XML child elements */
     bool loadXmlChildren(const tinyxml2::XMLElement &element) override;
 
     /** Remove a selectable option by tag */
     void removeOption(const std::string &tag);
 
+    /** Handle keyboard navigation and selection */
     void input(const SDL_Event &event) override;
 
+    /** Advance cursor animation state */
     void process(float deltaSeconds) override;
 
+    /** Draw menu labels and cursor */
     void render(Engine::Render::Canvas &canvas) override;
 
   private:
+    /** Parse one XML option child */
     static Option parseOption(const tinyxml2::XMLElement &optionElement);
 
+    /** Rebuild cached text and cursor resources */
     void rebuild();
 
+    /** Emit the selected option signal */
     void selectCurrent();
 
     SDL_Color colour{255, 255, 255, 255};

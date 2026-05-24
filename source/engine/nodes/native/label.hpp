@@ -56,6 +56,7 @@ class Label : public Engine::Nodes::Object {
         this->declareProperty("justification", this->justification);
     }
 
+    /** Draw the rendered text texture using the configured justification */
     void render(Engine::Render::Canvas &canvas) override {
         Engine::Game &game = this->getGame();
 

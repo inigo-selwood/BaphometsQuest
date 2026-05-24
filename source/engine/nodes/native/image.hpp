@@ -25,6 +25,7 @@ class Image : public Engine::Nodes::Object {
         this->declareProperty("region", this->region);
     }
 
+    /** Draw the selected texture region at local origin */
     void render(Engine::Render::Canvas &canvas) override {
         Engine::Game &game = this->getGame();
 

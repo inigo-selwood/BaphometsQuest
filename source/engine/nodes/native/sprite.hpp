@@ -32,18 +32,24 @@ class Sprite : public Engine::Nodes::Object {
 
     Sprite();
 
+    /** Load animation definitions from XML child elements */
     bool loadXmlChildren(const tinyxml2::XMLElement &element) override;
 
+    /** Advance the active animation by elapsed frame time */
     void process(float deltaSeconds) override;
 
+    /** Draw the current animation frame */
     void render(Engine::Render::Canvas &canvas) override;
 
   private:
+    /** Parse one XML animation child */
     static Animation
     parseAnimation(const tinyxml2::XMLElement &animationElement);
 
+    /** Parse one XML frame child */
     static Frame parseFrame(const tinyxml2::XMLElement &frameElement);
 
+    /** Return the active animation definition */
     const Animation &getAnimation() const;
 
     /** Update the cached texture ID when the sprite path changes */

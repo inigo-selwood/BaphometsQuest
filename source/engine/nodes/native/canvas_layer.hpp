@@ -19,12 +19,14 @@ class CanvasLayer : public Engine::Nodes::Base {
         );
     }
 
+    /** Reset inherited origin and apply this layer's canvas mode */
     void applyRenderContext(Engine::Render::Context &context) const override {
         context.resetOrigin();
         context.mode = this->canvasMode;
     }
 
   private:
+    /** Parse the XML canvas mode into render context state */
     void setMode(const std::string &mode) {
         if(mode == "screen") {
             this->mode = mode;

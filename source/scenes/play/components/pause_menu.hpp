@@ -13,6 +13,7 @@ namespace Scenes::Play::Components {
 /** Play-scene pause and save menu controller */
 class PauseMenu : public Engine::Nodes::Base {
   public:
+    /** Connect pause and save menu signals */
     void setup() override {
         const auto pauseOverlay = this->getChild("pause-overlay");
         const auto pauseMenu =
@@ -91,6 +92,7 @@ class PauseMenu : public Engine::Nodes::Base {
     }
 
   private:
+    /** Show feedback text through the scene textbox */
     void setTextboxText(const std::string &text) {
         const auto textbox =
             this->getGame().currentScene->getChild("screen-layer.textbox");
@@ -99,6 +101,7 @@ class PauseMenu : public Engine::Nodes::Base {
         textbox->setProperty("active", true);
     }
 
+    /** Store the current player position before saving */
     void persistPlayerState() {
         const SDL_Point playerPosition =
             this->getGame()
