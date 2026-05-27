@@ -1,0 +1,24 @@
+<map width="2" height="2">
+  <layer>
+    <data encoding="csv">1, 2, 3, 4</data>
+  </layer>
+  <objectgroup>
+    <object
+      name="door"
+      class="teleport"
+      x="8"
+      y="16"
+      width="8"
+      height="8"
+    >
+      <properties>
+        <property name="chunk" value="home" />
+        <property name="spawn" value="front-door" />
+        <property name="options">
+          <item value="talk" />
+          <item value="look" />
+        </property>
+      </properties>
+    </object>
+  </objectgroup>
+</map>

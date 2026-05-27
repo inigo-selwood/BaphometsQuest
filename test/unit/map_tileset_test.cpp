@@ -12,18 +12,7 @@
 
 TEST_CASE("tileset loads tile origins and walk masks from Tiled XML") {
     const std::filesystem::path path =
-        Tests::getTestDirectory() / "tileset.tsx";
-    Tests::writeFile(
-        path,
-        "<tileset tilewidth=\"8\" tileheight=\"8\" tilecount=\"4\" "
-        "columns=\"2\">\n"
-        "  <tile id=\"1\">\n"
-        "    <properties>\n"
-        "      <property name=\"walk-mask\" value=\"9\" />\n"
-        "    </properties>\n"
-        "  </tile>\n"
-        "</tileset>\n"
-    );
+        Tests::getResourcePath("tilesets/basic.tsx");
 
     const Engine::Resource::Tileset tileset{path.string()};
 
@@ -60,30 +49,52 @@ TEST_CASE("tileset rejects malformed Tiled XML") {
     );
 }
 
+TEST_CASE("tileset rejects invalid metadata and properties") {
+    const std::filesystem::path missingAttributePath =
+        Tests::getTestDirectory() / "missing-tileset-attribute.tsx";
+    const std::filesystem::path invalidSizePath =
+        Tests::getTestDirectory() / "invalid-tileset-size.tsx";
+    const std::filesystem::path badWalkMaskPath =
+        Tests::getTestDirectory() / "bad-tileset-walk-mask.tsx";
+
+    Tests::writeFile(
+        missingAttributePath,
+        "<tileset tilewidth=\"8\" tileheight=\"8\" tilecount=\"1\" />\n"
+    );
+    Tests::writeFile(
+        invalidSizePath,
+        "<tileset tilewidth=\"0\" tileheight=\"8\" tilecount=\"1\" "
+        "columns=\"1\" />\n"
+    );
+    Tests::writeFile(
+        badWalkMaskPath,
+        "<tileset tilewidth=\"8\" tileheight=\"8\" tilecount=\"1\" "
+        "columns=\"1\">\n"
+        "  <tile id=\"0\">\n"
+        "    <properties>\n"
+        "      <property name=\"walk-mask\" value=\"north\" />\n"
+        "    </properties>\n"
+        "  </tile>\n"
+        "</tileset>\n"
+    );
+
+    CHECK_THROWS_AS(
+        Engine::Resource::Tileset{missingAttributePath.string()},
+        std::runtime_error
+    );
+    CHECK_THROWS_AS(
+        Engine::Resource::Tileset{invalidSizePath.string()},
+        std::runtime_error
+    );
+    CHECK_THROWS_AS(
+        Engine::Resource::Tileset{badWalkMaskPath.string()},
+        std::runtime_error
+    );
+}
+
 TEST_CASE("map data loads finite CSV tile layers and object metadata") {
     const std::filesystem::path path =
-        Tests::getTestDirectory() / "finite-map.tmx";
-    Tests::writeFile(
-        path,
-        "<map width=\"2\" height=\"2\">\n"
-        "  <layer>\n"
-        "    <data encoding=\"csv\">1, 2, 3, 4</data>\n"
-        "  </layer>\n"
-        "  <objectgroup>\n"
-        "    <object name=\"door\" class=\"teleport\" x=\"8\" y=\"16\" "
-        "width=\"8\" height=\"8\">\n"
-        "      <properties>\n"
-        "        <property name=\"chunk\" value=\"home\" />\n"
-        "        <property name=\"spawn\" value=\"front-door\" />\n"
-        "        <property name=\"options\">\n"
-        "          <item value=\"talk\" />\n"
-        "          <item value=\"look\" />\n"
-        "        </property>\n"
-        "      </properties>\n"
-        "    </object>\n"
-        "  </objectgroup>\n"
-        "</map>\n"
-    );
+        Tests::getResourcePath("maps/finite.tmx");
 
     const Engine::Resource::MapData mapData{path.string()};
 
@@ -106,18 +117,7 @@ TEST_CASE("map data loads finite CSV tile layers and object metadata") {
 
 TEST_CASE("map data flattens infinite-map chunks") {
     const std::filesystem::path path =
-        Tests::getTestDirectory() / "chunked-map.tmx";
-    Tests::writeFile(
-        path,
-        "<map infinite=\"1\">\n"
-        "  <layer>\n"
-        "    <data encoding=\"csv\">\n"
-        "      <chunk x=\"-1\" y=\"0\" width=\"1\" height=\"1\">7</chunk>\n"
-        "      <chunk x=\"0\" y=\"0\" width=\"1\" height=\"1\">8</chunk>\n"
-        "    </data>\n"
-        "  </layer>\n"
-        "</map>\n"
-    );
+        Tests::getResourcePath("maps/chunked.tmx");
 
     const Engine::Resource::MapData mapData{path.string()};
 
@@ -159,6 +159,111 @@ TEST_CASE("map data rejects unsupported layer data") {
     );
     CHECK_THROWS_AS(
         Engine::Resource::MapData{shortPath.string()},
+        std::runtime_error
+    );
+}
+
+TEST_CASE("map data rejects malformed map structure") {
+    const std::filesystem::path badRootPath =
+        Tests::getTestDirectory() / "bad-map-root.tmx";
+    const std::filesystem::path noLayerPath =
+        Tests::getTestDirectory() / "no-layer-map.tmx";
+    const std::filesystem::path noDataPath =
+        Tests::getTestDirectory() / "no-data-map.tmx";
+    const std::filesystem::path compressedPath =
+        Tests::getTestDirectory() / "compressed-map.tmx";
+    const std::filesystem::path invalidSizePath =
+        Tests::getTestDirectory() / "invalid-size-map.tmx";
+
+    Tests::writeFile(badRootPath, "<tileset />\n");
+    Tests::writeFile(noLayerPath, "<map width=\"1\" height=\"1\" />\n");
+    Tests::writeFile(noDataPath, "<map><layer /></map>\n");
+    Tests::writeFile(
+        compressedPath,
+        "<map width=\"1\" height=\"1\"><layer><data encoding=\"csv\" "
+        "compression=\"zlib\">1</data></layer></map>\n"
+    );
+    Tests::writeFile(
+        invalidSizePath,
+        "<map width=\"0\" height=\"1\"><layer><data "
+        "encoding=\"csv\">1</data></layer></map>\n"
+    );
+
+    CHECK_THROWS_AS(
+        Engine::Resource::MapData{badRootPath.string()},
+        std::runtime_error
+    );
+    CHECK_THROWS_AS(
+        Engine::Resource::MapData{noLayerPath.string()},
+        std::runtime_error
+    );
+    CHECK_THROWS_AS(
+        Engine::Resource::MapData{noDataPath.string()},
+        std::runtime_error
+    );
+    CHECK_THROWS_AS(
+        Engine::Resource::MapData{compressedPath.string()},
+        std::runtime_error
+    );
+    CHECK_THROWS_AS(
+        Engine::Resource::MapData{invalidSizePath.string()},
+        std::runtime_error
+    );
+}
+
+TEST_CASE("map data rejects malformed object metadata") {
+    const std::filesystem::path missingCoordinatePath =
+        Tests::getTestDirectory() / "missing-object-coordinate-map.tmx";
+    const std::filesystem::path duplicatePropertyPath =
+        Tests::getTestDirectory() / "duplicate-object-property-map.tmx";
+    const std::filesystem::path namelessPropertyPath =
+        Tests::getTestDirectory() / "nameless-object-property-map.tmx";
+    const std::filesystem::path listItemPath =
+        Tests::getTestDirectory() / "bad-list-object-property-map.tmx";
+
+    Tests::writeFile(
+        missingCoordinatePath,
+        "<map width=\"1\" height=\"1\"><layer><data "
+        "encoding=\"csv\">1</data></layer><objectgroup><object x=\"0\" "
+        "/></objectgroup></map>\n"
+    );
+    Tests::writeFile(
+        duplicatePropertyPath,
+        "<map width=\"1\" height=\"1\"><layer><data "
+        "encoding=\"csv\">1</data></layer><objectgroup><object x=\"0\" "
+        "y=\"0\"><properties><property name=\"tag\" value=\"a\" />"
+        "<property name=\"tag\" value=\"b\" /></properties></object>"
+        "</objectgroup></map>\n"
+    );
+    Tests::writeFile(
+        namelessPropertyPath,
+        "<map width=\"1\" height=\"1\"><layer><data "
+        "encoding=\"csv\">1</data></layer><objectgroup><object x=\"0\" "
+        "y=\"0\"><properties><property value=\"a\" /></properties></object>"
+        "</objectgroup></map>\n"
+    );
+    Tests::writeFile(
+        listItemPath,
+        "<map width=\"1\" height=\"1\"><layer><data "
+        "encoding=\"csv\">1</data></layer><objectgroup><object x=\"0\" "
+        "y=\"0\"><properties><property name=\"options\"><item />"
+        "</property></properties></object></objectgroup></map>\n"
+    );
+
+    CHECK_THROWS_AS(
+        Engine::Resource::MapData{missingCoordinatePath.string()},
+        std::runtime_error
+    );
+    CHECK_THROWS_AS(
+        Engine::Resource::MapData{duplicatePropertyPath.string()},
+        std::runtime_error
+    );
+    CHECK_THROWS_AS(
+        Engine::Resource::MapData{namelessPropertyPath.string()},
+        std::runtime_error
+    );
+    CHECK_THROWS_AS(
+        Engine::Resource::MapData{listItemPath.string()},
         std::runtime_error
     );
 }

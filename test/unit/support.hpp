@@ -55,6 +55,29 @@ inline std::filesystem::path getTestDirectory() {
     return directory;
 }
 
+inline std::filesystem::path getResourcePath(const std::filesystem::path &path) {
+    std::filesystem::path directory = std::filesystem::current_path();
+
+    while(true) {
+        const std::filesystem::path candidate =
+            directory / "test" / "resources" / path;
+
+        if(std::filesystem::exists(candidate)) {
+            return candidate;
+        }
+
+        if(!directory.has_parent_path() || directory == directory.parent_path()) {
+            break;
+        }
+
+        directory = directory.parent_path();
+    }
+
+    throw std::runtime_error(
+        "Failed to find test resource '" + path.string() + "'"
+    );
+}
+
 inline void
 writeFile(const std::filesystem::path &path, std::string_view contents) {
     std::ofstream file{path};

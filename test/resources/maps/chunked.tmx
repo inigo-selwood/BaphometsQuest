@@ -1,0 +1,8 @@
+<map infinite="1">
+  <layer>
+    <data encoding="csv">
+      <chunk x="-1" y="0" width="1" height="1">7</chunk>
+      <chunk x="0" y="0" width="1" height="1">8</chunk>
+    </data>
+  </layer>
+</map>
