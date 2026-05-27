@@ -4,8 +4,12 @@ option(BAPHOMETS_QUEST_BUILD_TESTS
     OFF
 )
 
+if(BAPHOMETS_QUEST_BUILD_TESTS)
+    include(CTest)
+endif()
+
 # configure_unit_tests wires Catch2 tests into CTest
-# Test files stay under test/unit and link the reusable engine target
+# Test cases are discovered individually so CTest reports useful granularity
 function(configure_unit_tests engineTargetName)
     if(NOT BAPHOMETS_QUEST_BUILD_TESTS)
         return()
@@ -15,8 +19,8 @@ function(configure_unit_tests engineTargetName)
         message(FATAL_ERROR "Target '${engineTargetName}' does not exist")
     endif()
 
-    enable_testing()
     find_package(Catch2 3 REQUIRED)
+    include(Catch)
 
     file(GLOB_RECURSE unitTestFiles CONFIGURE_DEPENDS
         ${CMAKE_SOURCE_DIR}/test/unit/*.cpp
@@ -33,5 +37,5 @@ function(configure_unit_tests engineTargetName)
             ${engineTargetName}
     )
 
-    add_test(NAME unit_tests COMMAND unit_tests)
+    catch_discover_tests(unit_tests)
 endfunction()

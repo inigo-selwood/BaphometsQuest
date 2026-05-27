@@ -51,11 +51,15 @@ tasks:
         -DBAPHOMETS_QUEST_ENABLE_COVERAGE=ON
       - cmake --build build/coverage --target unit_tests --parallel
       - >-
-        LLVM_PROFILE_FILE=$PWD/build/coverage/unit_tests.profraw
+        cmake -E rm -f
+        build/coverage/unit_tests-*.profraw
+        build/coverage/unit_tests.profdata
+      - >-
+        LLVM_PROFILE_FILE=$PWD/build/coverage/unit_tests-%p.profraw
         ctest --test-dir build/coverage --output-on-failure
       - >-
         {{.LLVM_PROFDATA}} merge -sparse
-        build/coverage/unit_tests.profraw
+        build/coverage/unit_tests-*.profraw
         -o build/coverage/unit_tests.profdata
       - >-
         {{.LLVM_COV}} report
