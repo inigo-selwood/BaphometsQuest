@@ -1,7 +1,9 @@
 # Baphomet's Quest
 
-[![Build](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml/badge.svg)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml)
-[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/inigo-selwood/Baphomet-s-Quest/main/documentation/badges/coverage.json)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build.yaml)
+[![Linux](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build-linux.yaml/badge.svg)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build-linux.yaml)
+[![macOS](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build-macos.yaml/badge.svg)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build-macos.yaml)
+[![Windows](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build-windows.yaml/badge.svg)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/build-windows.yaml)
+[![Coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Finigo-selwood%2FBaphomet-s-Quest%2Fmain%2Fdocumentation%2Fbadges%2Fcoverage.json)](https://github.com/inigo-selwood/Baphomet-s-Quest/actions/workflows/coverage.yaml)
 
 ![Baphomet's Quest demo](documentation/images/demo.gif)
 
@@ -9,6 +11,11 @@ Small SDL game!
 
 Install build tools and native libraries using the
 [installation guide](wiki/installation.md)
+
+## Downloads
+
+Successful workflow builds publish downloadable artifacts from the Linux, macOS,
+and Windows workflow pages linked above
 
 ## Usage
 
