@@ -44,8 +44,7 @@ jobs:
           # notes should not wake the expensive build path
           key: >-
             platform-build-${{ inputs.artifact }}-${{ hashFiles(
-              '.github/workflows/build.yaml',
-              '.github/workflows/build-platform.yaml',
+              '.github/workflows/**',
               'CMakeLists.txt',
               'Taskfile.yaml',
               'configuration/cmake/**',
@@ -133,7 +132,7 @@ jobs:
             ${{ inputs.package_prefix }}-gcc
             ${{ inputs.package_prefix }}-imagemagick
             ${{ inputs.package_prefix }}-ninja
-            ${{ inputs.package_prefix }}-catch2
+            ${{ inputs.package_prefix }}-catch
             ${{ inputs.package_prefix }}-SDL2
             ${{ inputs.package_prefix }}-SDL2_image
             ${{ inputs.package_prefix }}-SDL2_mixer
@@ -232,7 +231,7 @@ jobs:
               done
 
       # Uploads are attached to the workflow run
-      # They are build artifacts, not signed installers or GitHub releases
+      # They are downloadable from the run page after successful builds
       - name: Upload build artifact
         if: >-
           github.event_name != 'schedule' ||
@@ -242,6 +241,7 @@ jobs:
           name: ${{ inputs.artifact }}
           path: build/artifacts/${{ inputs.artifact }}
           if-no-files-found: error
+          retention-days: 14
 
       # The marker file is intentionally tiny. The cache key carries the real
       # state; the file only gives actions/cache something concrete to store
@@ -264,8 +264,7 @@ jobs:
           path: .github/build-cache/${{ inputs.artifact }}
           key: >-
             platform-build-${{ inputs.artifact }}-${{ hashFiles(
-              '.github/workflows/build.yaml',
-              '.github/workflows/build-platform.yaml',
+              '.github/workflows/**',
               'CMakeLists.txt',
               'Taskfile.yaml',
               'configuration/cmake/**',

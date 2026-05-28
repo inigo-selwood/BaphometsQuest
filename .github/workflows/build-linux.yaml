@@ -1,0 +1,20 @@
+name: Build Linux
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  build:
+    name: Linux
+    uses: ./.github/workflows/build-platform.yaml
+    with:
+      artifact: baphomets-quest-linux-x64
+      name: Linux
+      runner: ubuntu-latest
